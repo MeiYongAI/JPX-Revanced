@@ -3872,7 +3872,7 @@ const $persona = {
     _top.node.div.classList.remove('hvut-top-warn');
     _top.node.persona.firstElementChild.classList.remove('hvut-warn');
     _top.node.stamina.firstElementChild.classList.remove('hvut-warn', 'hvut-bonus');
-    _player.warn = $qsa('#stamina_restore > div > div', doc).map((d) => d.textContent.trim()); // Repair weapon, Repair armor, Check equipment, Check attributes
+    _player.warn = $qsa('#stamina_restore > div > div', doc).map((d) => d.textContent.trim()).filter(Boolean); // Repair weapon, Repair armor, Check equipment, Check attributes
     if (_player.warn.length) {
       if (_query.s === 'Battle') {
         _top.node.message = _top.node.message || $element('div', null, ['.hvut-top-message']);
