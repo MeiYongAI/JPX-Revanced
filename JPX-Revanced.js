@@ -1402,15 +1402,15 @@ let cfg = {
             z-index: 100;
             box-sizing: border-box;
             width: max-content;
-            max-width: min(540px, calc(100vw - 32px));
+            max-width: min(620px, calc(100vw - 32px));
             max-height: min(260px, 70vh);
             overflow: auto;
             background: var(--jpx-panel) !important;
             border: 1px solid var(--jpx-border);
             border-radius: 0;
-            padding: 4px;
+            padding: 3px;
             flex-wrap: wrap;
-            gap: 4px;
+            gap: 3px;
             align-items: flex-start;
         }
 
@@ -1421,26 +1421,37 @@ let cfg = {
             cursor: pointer;
         }
 
-        #settings-container .multiSelect-option {
+        #settings-container button.multiSelect-option {
             display: inline-flex;
             align-items: center;
-            gap: 4px;
+            justify-content: center;
             border: 1px solid var(--jpx-border);
             border-radius: 0;
             background: var(--jpx-bg);
-            padding: 2px 5px;
-            min-height: 22px;
+            color: var(--jpx-text);
+            padding: 1px 6px;
+            min-height: 20px;
             box-sizing: border-box;
             white-space: nowrap;
+            cursor: pointer;
+            font: 12px/17px var(--jpx-font-ui);
+            font-weight: 700;
         }
 
-        #settings-container .multiSelect-option.is-checked {
+        #settings-container button.multiSelect-option:hover:not(:disabled) {
             border-color: var(--jpx-border-strong);
             background: var(--jpx-accent-soft);
         }
 
-        #settings-container .multiSelect-option input {
-            margin: 0;
+        #settings-container button.multiSelect-option.is-checked {
+            border-color: var(--jpx-border-strong);
+            background: var(--jpx-accent);
+            color: var(--jpx-text-on-dark);
+        }
+
+        #settings-container button.multiSelect-option.is-checked:hover:not(:disabled) {
+            background: var(--jpx-accent);
+            color: var(--jpx-text-on-dark);
         }
 
         #settings-container .field-picker-select {
@@ -1566,19 +1577,21 @@ let cfg = {
             background: transparent;
             z-index: 12;
             display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 10px;
+            justify-content: flex-end;
+            align-items: stretch;
+            padding: 0;
             box-sizing: border-box;
         }
 
         #settings-container .rule-editor-window {
-            width: fit-content;
-            min-width: min(360px, 100%);
-            max-width: 100%;
-            max-height: min(680px, 100%);
+            width: min(760px, 96%);
+            min-width: 0;
+            max-width: 760px;
+            height: 100%;
+            max-height: none;
             background: var(--jpx-panel);
-            border: 1px solid var(--jpx-border-strong);
+            border: 0;
+            border-left: 1px solid var(--jpx-border-strong);
             display: flex;
             flex-direction: column;
             box-sizing: border-box;
@@ -1609,10 +1622,6 @@ let cfg = {
             min-height: 0;
             overflow: auto;
             padding: 6px;
-            display: grid;
-            justify-items: start;
-            align-content: start;
-            gap: 6px;
         }
 
         #settings-container .rule-editor-body .settings-group {
@@ -1621,8 +1630,8 @@ let cfg = {
             align-items: flex-start;
             gap: 4px 8px;
             padding: 5px;
-            margin-bottom: 0;
-            width: fit-content;
+            margin-bottom: 6px;
+            width: 100%;
             max-width: 100%;
             box-sizing: border-box;
         }
@@ -7546,33 +7555,32 @@ const fieldRenderers = {
 
             function renderCheckboxes(targetContainer, onUpdate) {
                 field.multiSelectOptions.forEach(opt => {
-                    let id = getUniqueId(`${field.key}_${opt.value}`);
-                    let span = document.createElement('span');
-                    span.className = 'multiSelect-option';
+                    let optionBtn = document.createElement('button');
+                    optionBtn.type = 'button';
+                    optionBtn.className = 'multiSelect-option';
+                    optionBtn.textContent = t(opt.label);
+                    optionBtn.title = t(opt.label);
 
-                    let checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.id = id;
-                    checkbox.checked = dataObj[field.key].includes(opt.value);
-                    if (checkbox.checked) span.classList.add('is-checked');
-                    checkbox.onchange = e => {
-                        if (e.target.checked) {
+                    const refreshOption = () => {
+                        let checked = dataObj[field.key].includes(opt.value);
+                        optionBtn.classList.toggle('is-checked', checked);
+                        optionBtn.setAttribute('aria-pressed', checked ? 'true' : 'false');
+                    };
+
+                    optionBtn.onclick = () => {
+                        let checked = dataObj[field.key].includes(opt.value);
+                        if (!checked) {
                             if (!dataObj[field.key].includes(opt.value)) dataObj[field.key].push(opt.value);
                         } else {
                             if (field.hasRange) dataObj[field.key] = [...dataObj[field.key].slice(0, 2), ...dataObj[field.key].slice(2).filter(v => v !== opt.value)];
                             else dataObj[field.key] = dataObj[field.key].filter(v => v !== opt.value);
                         }
-                        span.classList.toggle('is-checked', e.target.checked);
+                        refreshOption();
                         if (onUpdate) onUpdate();
                     };
 
-                    let label = document.createElement('label');
-                    label.htmlFor = id;
-                    label.textContent = t(opt.label);
-                    label.title = t(opt.label);
-
-                    span.append(checkbox, label)
-                    targetContainer.appendChild(span);
+                    refreshOption();
+                    targetContainer.appendChild(optionBtn);
                 });
             }
         }
