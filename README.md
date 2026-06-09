@@ -1,4 +1,4 @@
-# jpx-plus
+# JPX-Revanced
 
 JPX-PLUS userscript for Hentaiverse. Installation file: `jpx-plus.js`.
 
