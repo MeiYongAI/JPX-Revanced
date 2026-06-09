@@ -7,8 +7,9 @@
 // @homepageURL    https://forums.e-hentai.org/index.php?showtopic=211883
 // @supportURL     https://forums.e-hentai.org/index.php?showtopic=211883
 // @version        4.2.1
+// @icon         https://hentaiverse.org/y/favicon.png
 // @date           2026-06-08
-// @author         sssss2
+// @author         sssss2 & MeiYongAI
 // @match          *://*.hentaiverse.org/*
 // @match          *://e-hentai.org/*
 // @connect        hentaiverse.org

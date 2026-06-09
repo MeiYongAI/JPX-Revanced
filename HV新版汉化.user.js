@@ -2,10 +2,10 @@
 // @name         HV 新版汉化
 // @namespace    http://tampermonkey.net/
 // @version      2.2
+// @icon         https://hentaiverse.org/y/favicon.png
 // @description  完全重构后新版的HV汉化脚本
-// @author       mbbdzz
+// @author       mbbdzz & MeiYongAI
 // @grant        none
-// @icon           https://hentaiverse.org/y/favicon.png
 // @match        https://hentaiverse.org/*
 // @match        *://*.hentaiverse.org/*
 // @match     https://forums.e-hentai.org/index.php?showtopic=*
