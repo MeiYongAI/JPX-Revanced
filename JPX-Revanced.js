@@ -1210,32 +1210,49 @@ let cfg = {
             border-color: var(--jpx-accent);
         }
 
-        #settings-container .jpx-select-panel {
+        #settings-container .jpx-select-window {
             display: none;
-            position: absolute;
-            top: calc(100% + 2px);
-            left: 0;
+            position: fixed;
+            top: 72px;
+            left: 24px;
+            right: 24px;
             z-index: 160;
-            min-width: 100%;
-            max-width: min(520px, calc(100vw - 80px));
-            max-height: 280px;
-            overflow: auto;
+            width: min(760px, calc(100vw - 48px));
+            margin: 0 auto;
             border: 1px solid var(--jpx-border);
             border-radius: 0;
             background: var(--jpx-panel);
             box-sizing: border-box;
+            padding: 6px;
+        }
+
+        #settings-container .jpx-select-window-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            border-bottom: 1px solid var(--jpx-border);
+            padding: 0 0 5px;
+            margin-bottom: 6px;
+            color: var(--jpx-text);
+            font-weight: 700;
+        }
+
+        #settings-container .jpx-select-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
         }
 
         #settings-container .jpx-select-option {
-            display: block;
-            width: 100%;
-            border: 0;
+            display: inline-block;
+            border: 1px solid var(--jpx-border);
             border-radius: 0;
             background: var(--jpx-panel);
             color: var(--jpx-text);
-            padding: 3px 8px;
+            padding: 3px 7px;
             font: 12px/18px var(--jpx-font-ui);
-            text-align: left;
+            text-align: center;
             white-space: nowrap;
             cursor: pointer;
         }
@@ -6832,7 +6849,7 @@ function bindConfigNumberInput(input, getValue, setValue) {
 }
 
 function closeJpxSelectPanels(except = null) {
-    document.querySelectorAll('#settings-container .jpx-select-panel').forEach(panel => {
+    document.querySelectorAll('#settings-container .jpx-select-window').forEach(panel => {
         if (panel !== except) panel.style.display = 'none';
     });
 }
@@ -6854,7 +6871,7 @@ function enhanceSelectElement(select) {
     trigger.className = 'jpx-select-trigger';
 
     let panel = document.createElement('div');
-    panel.className = 'jpx-select-panel';
+    panel.className = 'jpx-select-window';
 
     const refreshTrigger = () => {
         let selected = select.selectedOptions?.[0];
@@ -6862,8 +6879,32 @@ function enhanceSelectElement(select) {
         trigger.disabled = select.disabled;
     };
 
+    const getTitle = () => {
+        let label = null;
+        if (select.id) {
+            label = document.querySelector(`#settings-container label[for="${select.id}"]`);
+        }
+        return label?.textContent?.trim() || trigger.textContent || 'Select';
+    };
+
     const renderOptions = () => {
         panel.textContent = '';
+
+        let header = document.createElement('div');
+        header.className = 'jpx-select-window-header';
+
+        let title = document.createElement('span');
+        title.textContent = getTitle();
+        header.appendChild(title);
+
+        jpxUtils.createButton(header, {
+            text: 'x',
+            onClick: () => closeJpxSelectPanels()
+        });
+
+        let optionsBox = document.createElement('div');
+        optionsBox.className = 'jpx-select-options';
+
         Array.from(select.options).forEach(option => {
             let item = document.createElement('button');
             item.type = 'button';
@@ -6880,8 +6921,10 @@ function enhanceSelectElement(select) {
                 refreshTrigger();
             });
 
-            panel.appendChild(item);
+            optionsBox.appendChild(item);
         });
+
+        panel.append(header, optionsBox);
     };
 
     trigger.addEventListener('click', (e) => {
