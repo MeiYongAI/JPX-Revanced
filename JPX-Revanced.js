@@ -1336,6 +1336,47 @@ let cfg = {
             margin-bottom: 5px;
         }
 
+        #settings-container .conditions-list {
+            display: grid;
+            gap: 4px;
+            margin: 4px 0 5px;
+        }
+
+        #settings-container .condition-row {
+            border: 1px solid var(--jpx-border);
+            border-radius: 0;
+            background: var(--jpx-bg);
+            padding: 4px;
+            margin: 0;
+            gap: 4px 6px;
+        }
+
+        #settings-container .condition-index {
+            border: 1px solid var(--jpx-border);
+            border-radius: 0;
+            background: var(--jpx-panel);
+            color: var(--jpx-muted);
+            padding: 2px 5px;
+            font-weight: 700;
+            line-height: 18px;
+        }
+
+        #settings-container .condition-value,
+        #settings-container .condition-extra {
+            display: inline-flex;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 4px 6px;
+        }
+
+        #settings-container .condition-value.is-wide {
+            width: 100%;
+        }
+
+        #settings-container .condition-extra-field {
+            display: inline-block;
+        }
+
         #settings-container .multiSelect-popup-panel {
             background: var(--jpx-panel) !important;
             border: 1px solid var(--jpx-border);
@@ -1470,15 +1511,17 @@ let cfg = {
             background: transparent;
             z-index: 12;
             display: flex;
-            justify-content: flex-end;
-            align-items: stretch;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 10px;
+            box-sizing: border-box;
         }
 
-        #settings-container .rule-editor-drawer {
-            width: min(760px, 96%);
-            height: 100%;
+        #settings-container .rule-editor-window {
+            width: min(820px, 100%);
+            max-height: min(680px, 100%);
             background: var(--jpx-panel);
-            border-left: 1px solid var(--jpx-border);
+            border: 1px solid var(--jpx-border-strong);
             display: flex;
             flex-direction: column;
         }
@@ -1507,16 +1550,23 @@ let cfg = {
             flex: 1;
             min-height: 0;
             overflow: auto;
-            padding: 8px;
+            padding: 6px;
         }
 
-        #settings-container .rule-editor-footer {
-            border-top: 1px solid var(--jpx-border);
-            padding: 7px 8px;
-            display: flex;
-            justify-content: flex-end;
-            gap: 5px;
-            background: var(--jpx-bg);
+        #settings-container .rule-editor-body .settings-group {
+            grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
+            gap: 4px 8px;
+            padding: 5px;
+            margin-bottom: 6px;
+        }
+
+        #settings-container .rule-editor-body .settings-group-title {
+            margin-bottom: 2px;
+            padding: 3px 5px;
+        }
+
+        #settings-container .rule-editor-body .field-block {
+            padding: 1px 2px;
         }
 
         #settings-container .switch-row {
@@ -6937,6 +6987,7 @@ function enhanceSelectElement(select) {
     const refreshTrigger = () => {
         let selected = select.selectedOptions?.[0];
         trigger.textContent = selected ? selected.textContent : '';
+        trigger.title = select.title || getTitle();
         trigger.disabled = select.disabled;
         updateSelectHostWidth(select, host);
     };
@@ -7497,8 +7548,8 @@ const fieldRenderers = {
                 let overlay = document.createElement('div');
                 overlay.className = 'rule-editor-overlay';
 
-                let drawer = document.createElement('div');
-                drawer.className = 'rule-editor-drawer';
+                let editorWindow = document.createElement('div');
+                editorWindow.className = 'rule-editor-window';
 
                 let header = document.createElement('div');
                 header.className = 'rule-editor-header';
@@ -7524,6 +7575,7 @@ const fieldRenderers = {
                     }
                 });
                 closeBtn.classList.add('jpx-btn-primary');
+                closeBtn.title = '完成编辑';
                 header.prepend(headerText);
 
                 let body = document.createElement('div');
@@ -7532,18 +7584,9 @@ const fieldRenderers = {
                 body.addEventListener('input', renderRuleList);
                 body.addEventListener('change', renderRuleList);
 
-                let footer = document.createElement('div');
-                footer.className = 'rule-editor-footer';
-                jpxUtils.createButton(footer, {
-                    text: '完成',
-                    onClick: () => {
-                        finishEdit();
-                    }
-                });
-
-                drawer.append(header, body, footer);
-                drawer.addEventListener('pointerdown', e => e.stopPropagation());
-                overlay.appendChild(drawer);
+                editorWindow.append(header, body);
+                editorWindow.addEventListener('pointerdown', e => e.stopPropagation());
+                overlay.appendChild(editorWindow);
                 overlay.addEventListener('pointerdown', (e) => {
                     if (e.target === overlay) {
                         finishEdit();
@@ -7571,11 +7614,11 @@ const fieldRenderers = {
 
                     let row = document.createElement('div');
                     row.className = 'rule-item';
-                    row.title = '双击编辑';
                     if (item.disabled === true) row.classList.add('is-disabled');
 
                     let main = document.createElement('div');
                     main.className = 'rule-item-main';
+                    main.title = '双击编辑规则';
 
                     let title = document.createElement('div');
                     title.className = 'rule-item-title';
@@ -7592,20 +7635,22 @@ const fieldRenderers = {
                     let actions = document.createElement('div');
                     actions.className = 'rule-actions';
 
-                    jpxUtils.createButton(actions, {
+                    let editBtn = jpxUtils.createButton(actions, {
                         text: '编辑',
                         onClick: () => openRuleEditor(index)
                     });
+                    editBtn.title = '编辑规则';
 
-                    jpxUtils.createButton(actions, {
+                    let copyBtn = jpxUtils.createButton(actions, {
                         text: decodeURIComponent('%E2%A7%89'),
                         onClick: () => {
                             dataObj[field.key].splice(index + 1, 0, JSON.parse(JSON.stringify(item)));
                             renderRuleList();
                         }
                     });
+                    copyBtn.title = '复制规则';
 
-                    jpxUtils.createButton(actions, {
+                    let upBtn = jpxUtils.createButton(actions, {
                         text: decodeURIComponent('%E2%86%91'),
                         disabled: isTop,
                         onClick: () => {
@@ -7613,8 +7658,9 @@ const fieldRenderers = {
                             renderRuleList();
                         }
                     });
+                    upBtn.title = isTop ? '已经是第一条' : '上移规则';
 
-                    jpxUtils.createButton(actions, {
+                    let downBtn = jpxUtils.createButton(actions, {
                         text: decodeURIComponent('%E2%86%93'),
                         disabled: isBottom,
                         onClick: () => {
@@ -7622,9 +7668,10 @@ const fieldRenderers = {
                             renderRuleList();
                         }
                     });
+                    downBtn.title = isBottom ? '已经是最后一条' : '下移规则';
 
                     if (field.canDisable) {
-                        jpxUtils.createButton(actions, {
+                        let disableBtn = jpxUtils.createButton(actions, {
                             text: item.disabled === true ? '启用' : '禁用',
                             onClick: () => {
                                 if (item.disabled === true) {
@@ -7635,9 +7682,10 @@ const fieldRenderers = {
                                 renderRuleList();
                             }
                         });
+                        disableBtn.title = item.disabled === true ? '启用规则' : '禁用规则';
                     }
 
-                    jpxUtils.createButton(actions, {
+                    let deleteBtn = jpxUtils.createButton(actions, {
                         text: t('delete'),
                         className: 'jpx-btn-danger',
                         onClick: () => {
@@ -7645,6 +7693,7 @@ const fieldRenderers = {
                             renderRuleList();
                         }
                     });
+                    deleteBtn.title = '删除规则';
 
                     row.appendChild(actions);
                     row.addEventListener('dblclick', (e) => {
@@ -7969,6 +8018,7 @@ const fieldRenderers = {
         if (!Array.isArray(dataObj[field.key])) dataObj[field.key] = [];
 
         let listDiv = document.createElement('div');
+        listDiv.className = 'conditions-list';
         container.appendChild(listDiv);
 
         const notifyConditionsChanged = () => {
@@ -7979,11 +8029,17 @@ const fieldRenderers = {
             let selectId = getUniqueId('condition');
 
             let row = document.createElement('div');
-            row.className = 'dynamic-array-row';
-            row.style.cssText = 'display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-bottom: 8px;';
+            row.className = 'dynamic-array-row condition-row';
+
+            let indexLabel = document.createElement('span');
+            indexLabel.className = 'condition-index';
+            indexLabel.textContent = `#${index + 1}`;
+            indexLabel.title = '条件序号';
+            row.appendChild(indexLabel);
 
             let select = document.createElement('select');
             select.id = selectId;
+            select.title = '选择条件类型';
             field.options.forEach(opt => {
                 let option = document.createElement('option');
                 option.value = opt.key;
@@ -7995,11 +8051,11 @@ const fieldRenderers = {
             enhanceSelectElement(select);
 
             let inputDiv = document.createElement('div');
-            inputDiv.style.cssText = 'display: inline-flex; align-items: baseline; flex-wrap: wrap; gap: 8px;';
+            inputDiv.className = 'condition-value';
             row.appendChild(inputDiv);
             
             let extraDiv = document.createElement('div');
-            extraDiv.style.cssText = 'display: inline-flex; align-items: baseline; flex-wrap: wrap; gap: 8px;';
+            extraDiv.className = 'condition-extra';
             row.appendChild(extraDiv);
 
             function renderInput() {
@@ -8022,9 +8078,9 @@ const fieldRenderers = {
 				}
 
                 if (selectedOption.type === 'array' && selectedOption.hasRange && selectedOption.extraFields) {
-                    inputDiv.style.width = '100%';
+                    inputDiv.classList.add('is-wide');
                 } else {
-                    inputDiv.style.width = 'auto';
+                    inputDiv.classList.remove('is-wide');
                 }
 
                 renderField(inputDiv, {
@@ -8034,15 +8090,12 @@ const fieldRenderers = {
                 }, item);
                 
                 if (selectedOption.extraFields) {
-                    extraDiv.style.marginLeft = '0';
                     selectedOption.extraFields.forEach(f => {
                         let wrap = document.createElement('div');
-                        wrap.style.display = 'inline-block';
+                        wrap.className = 'condition-extra-field';
                         renderField(wrap, f, item);
                         extraDiv.appendChild(wrap);
                     });
-                } else {
-                    extraDiv.style.marginLeft = '0';
                 }
             }
             
@@ -8074,7 +8127,7 @@ const fieldRenderers = {
                     notifyConditionsChanged();
                 }
             });
-            deleteButton.style.marginLeft = '0';
+            deleteButton.title = '删除条件';
 
             renderInput();
             return row;
