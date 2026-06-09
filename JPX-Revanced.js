@@ -1106,6 +1106,58 @@ let cfg = {
             min-height: 22px;
             padding: 2px 5px;
             box-sizing: border-box;
+            max-width: 100%;
+            font: 12px/18px var(--jpx-font-ui);
+            vertical-align: middle;
+        }
+
+        #settings-container input[type="text"],
+        #settings-container select:not([multiple]) {
+            width: min(100%, 360px);
+            height: 24px;
+        }
+
+        #settings-container input[type="number"] {
+            width: 72px;
+            height: 24px;
+            text-align: right;
+        }
+
+        #settings-container .jpx-input-wide {
+            width: min(100%, 560px) !important;
+        }
+
+        #settings-container .jpx-range-field {
+            display: inline-flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-right: 8px;
+        }
+
+        #settings-container .jpx-range-input {
+            width: 68px !important;
+        }
+
+        #settings-container .jpx-range-separator {
+            color: var(--jpx-muted);
+            font-weight: 600;
+        }
+
+        #settings-container textarea {
+            width: min(100%, 680px);
+            min-height: 88px;
+            resize: vertical;
+        }
+
+        #settings-container input::placeholder,
+        #settings-container textarea::placeholder {
+            color: var(--jpx-muted);
+        }
+
+        #settings-container input[readonly] {
+            background: var(--jpx-bg) !important;
+            cursor: pointer;
         }
 
         #settings-container select,
@@ -1132,7 +1184,7 @@ let cfg = {
         }
 
         #settings-container select[multiple] option:checked {
-            background: var(--jpx-accent-soft) linear-gradient(0deg, var(--jpx-accent-soft), var(--jpx-accent-soft)) !important;
+            background: var(--jpx-accent-soft) !important;
             color: var(--jpx-text-primary) !important;
         }
 
@@ -5956,13 +6008,21 @@ function openBattleRecords() {
 
         #filtersDiv input[type="number"] {
             width: 72px;
+            height: 24px;
             border: 1px solid var(--stats-border);
             border-radius: 0;
             background: var(--stats-panel);
             color: var(--stats-text);
-            text-align: center;
+            text-align: right;
             padding: 2px 5px;
             font-weight: 600;
+            box-sizing: border-box;
+            font: 12px/18px var(--stats-font);
+        }
+
+        #filtersDiv input[type="number"]:focus {
+            outline: 1px solid var(--stats-accent);
+            border-color: var(--stats-accent);
         }
 
         #battleStatsWrap {
@@ -6634,6 +6694,61 @@ function getBooleanLabelMeta(field) {
     };
 }
 
+function appendConfigLabel(container, field, inputId) {
+    if (field.skipLabel) return null;
+
+    let label = document.createElement('label');
+    label.htmlFor = inputId;
+    label.textContent = t(field.label);
+    container.appendChild(label);
+    return label;
+}
+
+function createConfigInput(type, field, inputId, className = '') {
+    let input = document.createElement('input');
+    input.id = inputId;
+    input.type = type;
+    if (className) input.className = className;
+    input.autocomplete = 'off';
+
+    if (type === 'text') input.spellcheck = false;
+    if (type === 'number') input.step = field.step ?? 'any';
+    if (field.placeholder) input.placeholder = field.placeholder;
+    if (field.title) input.title = field.title;
+    else if (!field.skipLabel && field.label) input.title = t(field.label);
+
+    ['min', 'max'].forEach(attr => {
+        if (field[attr] !== undefined) input[attr] = field[attr];
+    });
+
+    return input;
+}
+
+function bindConfigNumberInput(input, getValue, setValue) {
+    const restoreValue = () => {
+        input.value = getValue() ?? 0;
+    };
+
+    const commitValue = (restoreInvalid = false) => {
+        let rawValue = input.value.trim();
+        if (!rawValue) {
+            if (restoreInvalid) restoreValue();
+            return;
+        }
+
+        let value = Number(rawValue);
+        if (!Number.isFinite(value)) {
+            if (restoreInvalid) restoreValue();
+            return;
+        }
+
+        setValue(value);
+    };
+
+    input.addEventListener('input', () => commitValue(false));
+    input.addEventListener('blur', () => commitValue(true));
+}
+
 const fieldRenderers = {
     heading(container, field) {
         let div = document.createElement('div');
@@ -6684,25 +6799,25 @@ const fieldRenderers = {
     text(container, field, dataObj) {
         let key = field.key;
         let inputId = getUniqueId(key);
-        container.innerHTML = `
-            ${field.skipLabel ? '' : `<label for="${inputId}">${t(field.label)}</label>`}
-            <input id="${inputId}" type="text">
-        `;
+        container.textContent = '';
+        appendConfigLabel(container, field, inputId);
 
-        let input = container.querySelector('input');
-        if (field.placeholder) input.placeholder = field.placeholder;
+        let input = createConfigInput('text', field, inputId);
         input.value = dataObj[key] ?? '';
+        container.appendChild(input);
         input.oninput = event => dataObj[key] = event.target.value;
     },
 
     number(container, field, dataObj) {
         let key = field.key;
         let inputId = getUniqueId(key);
-        container.innerHTML = `
-            ${field.skipLabel ? '' : `<label for="${inputId}">${t(field.label)}</label>`}
-            <input id="${inputId}" type="number" value="${dataObj[key] ?? 0}">
-        `;
-        container.querySelector('input').oninput = event => dataObj[key] = +event.target.value;
+        container.textContent = '';
+        appendConfigLabel(container, field, inputId);
+
+        let input = createConfigInput('number', field, inputId);
+        input.value = dataObj[key] ?? 0;
+        container.appendChild(input);
+        bindConfigNumberInput(input, () => dataObj[key], value => dataObj[key] = value);
     },
 
     rangeNumber(container, field, dataObj) {
@@ -6710,16 +6825,27 @@ const fieldRenderers = {
         if (!Array.isArray(dataObj[key])) dataObj[key] = [0, 0];
         let idMin = getUniqueId(`${key}_min`);
         let idMax = getUniqueId(`${key}_max`);
-        
-        container.innerHTML = `
-            ${field.skipLabel ? '' : `<label style="margin-right: 6px;">${t(field.label)}</label>`}
-            <input id="${idMin}" type="number" style="width:60px;" value="${dataObj[key][0]}">
-            <span style="margin:0 4px;">to</span>
-            <input id="${idMax}" type="number" style="width:60px;" value="${dataObj[key][1]}">
-        `;
+        container.textContent = '';
 
-        container.querySelector(`#${idMin}`).oninput = event => dataObj[key][0] = +event.target.value;
-        container.querySelector(`#${idMax}`).oninput = event => dataObj[key][1] = +event.target.value;
+        let wrap = document.createElement('span');
+        wrap.className = 'jpx-range-field';
+        appendConfigLabel(wrap, field, idMin);
+
+        let minInput = createConfigInput('number', field, idMin, 'jpx-range-input');
+        minInput.value = dataObj[key][0];
+
+        let separator = document.createElement('span');
+        separator.className = 'jpx-range-separator';
+        separator.textContent = 'to';
+
+        let maxInput = createConfigInput('number', field, idMax, 'jpx-range-input');
+        maxInput.value = dataObj[key][1];
+
+        wrap.append(minInput, separator, maxInput);
+        container.appendChild(wrap);
+
+        bindConfigNumberInput(minInput, () => dataObj[key][0], value => dataObj[key][0] = value);
+        bindConfigNumberInput(maxInput, () => dataObj[key][1], value => dataObj[key][1] = value);
     },
     
     dropdown(container, field, dataObj) {
@@ -6975,7 +7101,6 @@ const fieldRenderers = {
             if (field.hasRange) {
                 if (dataObj[field.key].length < 2) dataObj[field.key].unshift(0, 0);
                 let rangeBox = document.createElement('div');
-                rangeBox.style.cssText = 'display: inline-flex; align-items: baseline;  margin-right: 8px;';
                 fieldRenderers.rangeNumber(rangeBox, { ...field, label: field.hasRange, skipLabel: false }, dataObj);
                 listDiv.appendChild(rangeBox);
             }
@@ -6985,8 +7110,7 @@ const fieldRenderers = {
                 summary.type = 'text';
                 summary.readOnly = true;
                 summary.placeholder = t('cB.clickToSelect');
-                summary.className = 'multiSelect-summary';
-                summary.style.cssText = 'width: 500px;';
+                summary.className = 'multiSelect-summary jpx-input-wide';
                 summary.onclick = (e) => {
                     e.stopPropagation();
                     document.querySelectorAll('.multiSelect-popup-panel').forEach(p => {
@@ -7056,11 +7180,6 @@ const fieldRenderers = {
 
             let toolbar = document.createElement('div');
             toolbar.className = 'rule-toolbar';
-
-            let searchInput = document.createElement('input');
-            searchInput.type = 'text';
-            searchInput.placeholder = '搜索规则名称/类型';
-            toolbar.appendChild(searchInput);
 
             let typeSelect = document.createElement('select');
             Object.keys(field.itemSchema.oneOf).forEach(typeKey => {
@@ -7169,8 +7288,7 @@ const fieldRenderers = {
             const renderRuleList = () => {
                 ruleList.innerHTML = '';
 
-                let keyword = (searchInput.value || '').trim().toLowerCase();
-                let visibleCount = 0;
+                let ruleCount = dataObj[field.key].length;
 
                 dataObj[field.key].forEach((item, index) => {
                     let isTop = index === 0;
@@ -7178,11 +7296,6 @@ const fieldRenderers = {
                     let conditionCount = Array.isArray(item.conditions) ? item.conditions.length : 0;
                     let titleText = getRuleDisplayName(item) || `${t(field.label)} #${index + 1}`;
                     let metaText = `${getRuleTypeLabel(item.type)} · ${conditionCount} 条条件${item.disabled === true ? ' · 已禁用' : ''}`;
-
-                    let searchableText = `${titleText} ${metaText} ${item.name || ''} ${item.type || ''}`.toLowerCase();
-                    if (keyword && !searchableText.includes(keyword)) return;
-
-                    visibleCount += 1;
 
                     let row = document.createElement('div');
                     row.className = 'rule-item';
@@ -7269,19 +7382,16 @@ const fieldRenderers = {
                     ruleList.appendChild(row);
                 });
 
-                if (visibleCount === 0) {
+                if (ruleCount === 0) {
                     let empty = document.createElement('div');
                     empty.className = 'rule-empty';
-                    empty.textContent = keyword ? '没有匹配的规则' : '暂无规则，先从上方新增一条';
+                    empty.textContent = '暂无规则，先从上方新增一条';
                     ruleList.appendChild(empty);
                 }
 
-                toolbarMeta.textContent = keyword
-                    ? `共 ${dataObj[field.key].length} 条，匹配 ${visibleCount} 条`
-                    : `共 ${dataObj[field.key].length} 条`;
+                toolbarMeta.textContent = `共 ${ruleCount} 条`;
             };
 
-            searchInput.addEventListener('input', renderRuleList);
             renderRuleList();
         }
 
@@ -7425,11 +7535,7 @@ const fieldRenderers = {
             let div = document.createElement('div');
             div.textContent = `${t(editF.label)}: `;
 
-            let input = document.createElement('input');
-            input.id = getUniqueId('editField');
-            input.type = 'text';
-            input.style.width = '100%';
-            if (editF.placeholder) input.placeholder = editF.placeholder;
+            let input = createConfigInput('text', editF, getUniqueId('editField'), 'jpx-input-wide');
             input.addEventListener('input', () => {
                 let indexes = getSelectedIndexes(rightSelect);
                 indexes.forEach(i => {
