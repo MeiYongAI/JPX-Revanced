@@ -1136,7 +1136,7 @@ let cfg = {
         }
 
         #settings-container .jpx-range-input {
-            width: 68px !important;
+            width: 68px;
         }
 
         #settings-container .jpx-range-separator {
@@ -1173,7 +1173,7 @@ let cfg = {
         #settings-container .jpx-select-host {
             position: relative;
             display: inline-block;
-            width: min(100%, 360px);
+            width: auto;
             max-width: 100%;
             vertical-align: middle;
         }
@@ -1213,12 +1213,7 @@ let cfg = {
         #settings-container .jpx-select-window {
             display: none;
             position: fixed;
-            top: 72px;
-            left: 24px;
-            right: 24px;
             z-index: 160;
-            width: min(760px, calc(100vw - 48px));
-            margin: 0 auto;
             border: 1px solid var(--jpx-border);
             border-radius: 0;
             background: var(--jpx-panel);
@@ -1262,12 +1257,6 @@ let cfg = {
             background: var(--jpx-accent-soft);
             color: var(--jpx-text-primary);
         }
-
-        #settings-container .rule-toolbar .jpx-select-host,
-        #settings-container .dynamic-array-row .jpx-select-host {
-            min-width: 200px;
-        }
-
         #settings-container select[multiple] {
             background: var(--jpx-bg) !important;
             border-color: var(--jpx-border);
@@ -6803,6 +6792,36 @@ function appendConfigLabel(container, field, inputId) {
     return label;
 }
 
+function getTextWidthUnits(text = '') {
+    return Array.from(String(text)).reduce((sum, char) => sum + (/[^\x00-\xff]/.test(char) ? 2 : 1), 0);
+}
+
+function clampNumber(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+}
+
+function setContentBasedWidth(element, text, options = {}) {
+    if (!element || element.classList?.contains('jpx-input-wide')) return;
+
+    let min = options.min ?? 8;
+    let max = options.max ?? 44;
+    let extra = options.extra ?? 4;
+    let units = clampNumber(getTextWidthUnits(text || '') + extra, min, max);
+    element.style.width = `${units}ch`;
+}
+
+function updateConfigInputWidth(input) {
+    if (!input || input.dataset.jpxAutoWidth !== '1') return;
+
+    let fallbackText = input.placeholder || input.title || '';
+    let text = input.value || fallbackText;
+    if (input.type === 'number') {
+        setContentBasedWidth(input, text || '0', { min: 7, max: 14, extra: 3 });
+    } else {
+        setContentBasedWidth(input, text, { min: 10, max: 46, extra: 4 });
+    }
+}
+
 function createConfigInput(type, field, inputId, className = '') {
     let input = document.createElement('input');
     input.id = inputId;
@@ -6812,6 +6831,10 @@ function createConfigInput(type, field, inputId, className = '') {
 
     if (type === 'text') input.spellcheck = false;
     if (type === 'number') input.step = field.step ?? 'any';
+    if ((type === 'text' || type === 'number') && !className.includes('jpx-input-wide')) {
+        input.dataset.jpxAutoWidth = '1';
+        input.addEventListener('input', () => updateConfigInputWidth(input));
+    }
     if (field.placeholder) input.placeholder = field.placeholder;
     if (field.title) input.title = field.title;
     else if (!field.skipLabel && field.label) input.title = t(field.label);
@@ -6826,6 +6849,7 @@ function createConfigInput(type, field, inputId, className = '') {
 function bindConfigNumberInput(input, getValue, setValue) {
     const restoreValue = () => {
         input.value = getValue() ?? 0;
+        updateConfigInputWidth(input);
     };
 
     const commitValue = (restoreInvalid = false) => {
@@ -6854,6 +6878,45 @@ function closeJpxSelectPanels(except = null) {
     });
 }
 
+function updateSelectHostWidth(select, host) {
+    let selected = select.selectedOptions?.[0];
+    let text = selected?.textContent || '';
+    setContentBasedWidth(host, text, { min: 8, max: 48, extra: 7 });
+}
+
+function setSelectWindowWidth(select, panel, trigger) {
+    let optionTexts = Array.from(select.options).map(option => option.textContent || '');
+    let maxOptionUnits = optionTexts.reduce((max, text) => Math.max(max, getTextWidthUnits(text)), 0);
+    let titleUnits = getTextWidthUnits(trigger.textContent || '');
+    let minUnits = Math.max(18, titleUnits + 10);
+    let maxUnits = optionTexts.length > 8 ? 96 : 64;
+    let widthUnits = clampNumber(Math.max(maxOptionUnits + 10, minUnits), minUnits, maxUnits);
+    panel.style.width = `min(${widthUnits}ch, calc(100vw - 32px))`;
+}
+
+function positionSelectWindow(panel, trigger) {
+    let rect = trigger.getBoundingClientRect();
+    let settingsRect = document.getElementById('settings-container')?.getBoundingClientRect();
+    let viewportWidth = document.documentElement.clientWidth;
+    let viewportHeight = document.documentElement.clientHeight;
+    let margin = 8;
+    let leftMin = Math.max(margin, (settingsRect?.left ?? 0) + margin);
+    let leftMax = Math.min(viewportWidth - margin, (settingsRect?.right ?? viewportWidth) - margin) - panel.offsetWidth;
+    if (leftMax < leftMin) leftMax = viewportWidth - panel.offsetWidth - margin;
+
+    let left = clampNumber(rect.left, leftMin, Math.max(leftMin, leftMax));
+    let top = rect.bottom + 4;
+    if (top + panel.offsetHeight > viewportHeight - margin) {
+        top = rect.top - panel.offsetHeight - 4;
+    }
+
+    let topMax = Math.max(margin, viewportHeight - panel.offsetHeight - margin);
+    top = clampNumber(top, margin, topMax);
+
+    panel.style.left = `${left}px`;
+    panel.style.top = `${top}px`;
+}
+
 function enhanceSelectElement(select) {
     if (!select || select.multiple || select.dataset.jpxSelectEnhanced === '1') return;
     if (!select.parentNode) return;
@@ -6877,6 +6940,7 @@ function enhanceSelectElement(select) {
         let selected = select.selectedOptions?.[0];
         trigger.textContent = selected ? selected.textContent : '';
         trigger.disabled = select.disabled;
+        updateSelectHostWidth(select, host);
     };
 
     const getTitle = () => {
@@ -6935,7 +6999,11 @@ function enhanceSelectElement(select) {
         closeJpxSelectPanels(panel);
         if (shouldOpen) {
             renderOptions();
+            setSelectWindowWidth(select, panel, trigger);
+            panel.style.visibility = 'hidden';
             panel.style.display = 'block';
+            positionSelectWindow(panel, trigger);
+            panel.style.visibility = '';
         } else {
             panel.style.display = 'none';
         }
@@ -7005,6 +7073,7 @@ const fieldRenderers = {
 
         let input = createConfigInput('text', field, inputId);
         input.value = dataObj[key] ?? '';
+        updateConfigInputWidth(input);
         container.appendChild(input);
         input.oninput = event => dataObj[key] = event.target.value;
     },
@@ -7017,6 +7086,7 @@ const fieldRenderers = {
 
         let input = createConfigInput('number', field, inputId);
         input.value = dataObj[key] ?? 0;
+        updateConfigInputWidth(input);
         container.appendChild(input);
         bindConfigNumberInput(input, () => dataObj[key], value => dataObj[key] = value);
     },
@@ -7034,6 +7104,7 @@ const fieldRenderers = {
 
         let minInput = createConfigInput('number', field, idMin, 'jpx-range-input');
         minInput.value = dataObj[key][0];
+        updateConfigInputWidth(minInput);
 
         let separator = document.createElement('span');
         separator.className = 'jpx-range-separator';
@@ -7041,6 +7112,7 @@ const fieldRenderers = {
 
         let maxInput = createConfigInput('number', field, idMax, 'jpx-range-input');
         maxInput.value = dataObj[key][1];
+        updateConfigInputWidth(maxInput);
 
         wrap.append(minInput, separator, maxInput);
         container.appendChild(wrap);
