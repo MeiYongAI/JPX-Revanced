@@ -1417,8 +1417,8 @@ let cfg = {
 
         #settings-container .multiSelect-summary {
             width: auto;
-            min-width: 10ch;
-            max-width: min(46ch, 100%);
+            min-width: 4ch;
+            max-width: min(34ch, 100%);
             cursor: pointer;
         }
 
@@ -6986,6 +6986,8 @@ function updateConfigInputWidth(input) {
     let text = input.value || fallbackText;
     if (input.type === 'number') {
         setContentBasedWidth(input, text || '0', { min: 7, max: 14, extra: 3 });
+    } else if (input.classList?.contains('multiSelect-summary')) {
+        setContentBasedWidth(input, text, { min: 4, max: 34, extra: 2 });
     } else {
         setContentBasedWidth(input, text, { min: 10, max: 46, extra: 4 });
     }
@@ -7074,7 +7076,7 @@ function positionMultiSelectPanel(panel, summary) {
 function updateSelectHostWidth(select, host) {
     let selected = select.selectedOptions?.[0];
     let text = selected?.textContent || '';
-    setContentBasedWidth(host, text, { min: 8, max: 48, extra: 7 });
+    setContentBasedWidth(host, text, { min: 5, max: 40, extra: 4 });
 }
 
 function setSelectWindowWidth(select, panel, trigger) {
