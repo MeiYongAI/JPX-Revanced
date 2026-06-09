@@ -2230,12 +2230,15 @@ const conditionsTarget = [
 const cfgBattleSchema = {
     type: 'object',
     properties: [
-        mkF('basic', 'heading', { class: 'heading' }),
+        mkF('autoFlowSettings', 'heading', { class: 'heading' }),
         mkF('advanceToNextRound', 'boolean'),
         mkF('ajaxRound', 'boolean'),
         mkF('autoFinishBattle', 'boolean'),
+        mkF('noticeSettings', 'heading', { class: 'heading' }),
         mkF('notifyOnRiddle', 'boolean'),
         mkF('riddleAlarmLimit', 'number'),
+        mkF('dailyStaminaQuotaPlus', 'number'),
+        mkF('battleDisplaySettings', 'heading', { class: 'heading' }),
         mkF('showCooldowns', 'boolean'),
         mkF('quickbarExtend', 'array', { itemSchema: { type: 'text' } }),
         mkF('showDurations', 'boolean'),
@@ -2243,8 +2246,8 @@ const cfgBattleSchema = {
         mkF('showMonsterIndex', 'boolean'),
         mkF('showMonsterInfo', 'boolean'),
         mkF('showMonsterHP', 'boolean'),
+        mkF('recordWidgetSettings', 'heading', { class: 'heading' }),
         mkF('recordBattleLog', 'boolean'),
-        mkF('dailyStaminaQuotaPlus', 'number'),
         mkF('ctrlWidgetStyleText', 'text', { placeholder: 'right: 18px;' }),
         mkF('ctrlWidgetMouseEnter', 'boolean'),
         mkF('ctrlWidgetRows', 'fieldPicker', {
@@ -2338,7 +2341,6 @@ const cfgStatsSchema = {
     type: 'object',
     properties: [
         mkF('basic', 'heading', { class: 'heading', prefix: 'cS.' }),
-        mkF('darkMode', 'boolean', { prefix: 'cS.' }),
         mkF('combatRows', 'fieldPicker', {
             prefix: 'cS.',
             size: 16,
@@ -2473,6 +2475,10 @@ const I18N = (() => {
             "exportKeybindConfig": "导出按键设定",
             "importKeybindConfig": "导入按键设定",
 			"basic": "基本",
+            "autoFlowSettings": "自动流程",
+            "noticeSettings": "提示与限制",
+            "battleDisplaySettings": "战斗显示",
+            "recordWidgetSettings": "记录与控件",
 			"advanceToNextRound": "自动进入下一轮战斗",
             "autoFinishBattle": "自动结束战斗",
             "notifyOnRiddle": "小马谜题通知",
@@ -6601,22 +6607,22 @@ function renderSchema(container, schema, data) {
 }
 
 const BOOLEAN_LABEL_META = {
-    advanceToNextRound: { short: '下一轮', title: '自动进入下一轮战斗' },
-    ajaxRound: { short: 'AJAX', title: '启用以AJAX进入下一回合。其他脚本不支援时关闭它' },
-    autoFinishBattle: { short: '结束', title: '自动结束战斗' },
-    notifyOnRiddle: { short: '谜题', title: '小马谜题通知' },
-    showCooldowns: { short: '冷却', title: '在快捷栏位显示冷却回合数' },
-    showDurations: { short: '状态', title: '显示状态剩余回合数' },
-    showRealTimeProficiency: { short: '熟练', title: '即时显示目前获得的熟练度' },
-    showMonsterIndex: { short: '索引', title: '显示怪物索引值' },
-    showMonsterInfo: { short: '资料', title: '显示怪物资讯，包含类别、攻击类型与战斗力；需要安装怪物资料库脚本' },
-    showMonsterHP: { short: 'HP', title: '显示怪物血量，包含目前血量与最大血量' },
-    recordBattleLog: { short: '日志', title: '纪录战斗日志' },
-    ctrlWidgetMouseEnter: { short: '悬停', title: '在控制元件监听游标进入事件' },
-    darkMode: { short: '深色', title: '切换设置界面、悬浮控件和统计界面的深色模式' },
-    pSpiritStatus: { short: '灵动', title: '玩家必须处于灵动状态' },
-    bottomUp: { short: '倒序', title: '由下而上（从怪物J处理到怪物A）' },
-    toggled: { short: '开启', title: '切换类动作的目标状态' },
+    advanceToNextRound: { short: '自动下一轮', title: '当前轮次结束后，自动点击进入下一轮战斗' },
+    ajaxRound: { short: 'AJAX下一回合', title: '使用AJAX进入下一回合；如果其他脚本不兼容，可以关闭' },
+    autoFinishBattle: { short: '自动结束战斗', title: '战斗结束后自动点击结束按钮' },
+    notifyOnRiddle: { short: '小马谜题通知', title: '出现小马谜题时发出通知提醒' },
+    showCooldowns: { short: '显示冷却', title: '在快捷栏位上显示动作、法术或物品的冷却回合数' },
+    showDurations: { short: '显示状态回合', title: '在玩家和怪物状态图标上显示剩余回合数' },
+    showRealTimeProficiency: { short: '显示熟练度', title: '战斗中即时显示本场目前获得的熟练度' },
+    showMonsterIndex: { short: '显示怪物索引', title: '在怪物区域显示索引值，方便规则定位目标' },
+    showMonsterInfo: { short: '显示怪物资料', title: '显示怪物类别、攻击类型与战斗力；需要安装怪物资料库脚本' },
+    showMonsterHP: { short: '显示怪物HP', title: '显示怪物当前血量与最大血量' },
+    recordBattleLog: { short: '记录战斗日志', title: '保存战斗日志，用于统计和复盘' },
+    ctrlWidgetMouseEnter: { short: '悬停监听控件', title: '在控制元件上监听鼠标进入事件；部分环境下可提高控制按钮响应' },
+    darkMode: { short: '深色界面', title: '切换设置界面、悬浮控件和统计界面的深色模式' },
+    pSpiritStatus: { short: '要求灵动状态', title: '玩家必须处于灵动状态时才满足此条件' },
+    bottomUp: { short: '由下而上', title: '从怪物J到怪物A的顺序处理目标' },
+    toggled: { short: '目标为开启', title: '切换类动作需要处于开启状态' },
 };
 
 function getBooleanLabelMeta(field) {
@@ -7824,11 +7830,6 @@ function setJpxDarkMode(enabled) {
         if (themeText) themeText.textContent = cfgStats.darkMode ? '深色' : '浅色';
     }
 
-    let cfgStatsUI = document.getElementById('cfgStats-ui');
-    if (cfgStatsUI) {
-        cfgStatsUI.innerHTML = '';
-        renderSchema(cfgStatsUI, cfgStatsSchema, cfgStats);
-    }
 }
 
 function mergeCfg(storedCfg, defaultCfg, mergedCfg, mergedType) {
