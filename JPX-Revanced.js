@@ -1212,7 +1212,7 @@ let cfg = {
 
         #settings-container .jpx-select-window {
             display: none;
-            position: fixed;
+            position: absolute;
             z-index: 160;
             border: 1px solid var(--jpx-border);
             border-radius: 0;
@@ -1237,6 +1237,7 @@ let cfg = {
             display: flex;
             flex-wrap: wrap;
             gap: 4px;
+            align-items: flex-start;
         }
 
         #settings-container .jpx-select-option {
@@ -2389,11 +2390,6 @@ const cfgBattleSchema = {
         mkF('recordBattleLog', 'boolean'),
         mkF('ctrlWidgetStyleText', 'text', { placeholder: 'right: 18px;' }),
         mkF('ctrlWidgetMouseEnter', 'boolean'),
-        mkF('ctrlWidgetRows', 'fieldPicker', {
-            prefix: 'cW.',
-            size: 8,
-            allFields: CTRLWIDGET_FIELDS,
-        }),
 
         mkF('battleModeSettings', 'heading', { class: 'heading' }),
         {
@@ -2546,7 +2542,6 @@ const I18N = (() => {
 		"delete": "删除",
 		"conditions": "条件",
 		"cW": {
-			"ctrlWidgetRows": "控制元件列",
 			"isActiveBattle": "启动",
 			"auto": "自动",
 			"manual": "手动",
@@ -6889,13 +6884,15 @@ function setSelectWindowWidth(select, panel, trigger) {
     let maxOptionUnits = optionTexts.reduce((max, text) => Math.max(max, getTextWidthUnits(text)), 0);
     let titleUnits = getTextWidthUnits(trigger.textContent || '');
     let minUnits = Math.max(18, titleUnits + 10);
-    let maxUnits = optionTexts.length > 8 ? 96 : 64;
-    let widthUnits = clampNumber(Math.max(maxOptionUnits + 10, minUnits), minUnits, maxUnits);
+    let countUnits = optionTexts.length > 18 ? 78 : (optionTexts.length > 10 ? 62 : (optionTexts.length > 5 ? 44 : 0));
+    let maxUnits = optionTexts.length > 18 ? 110 : 76;
+    let widthUnits = clampNumber(Math.max(maxOptionUnits + 10, minUnits, countUnits), minUnits, maxUnits);
     panel.style.width = `min(${widthUnits}ch, calc(100vw - 32px))`;
 }
 
 function positionSelectWindow(panel, trigger) {
-    let rect = trigger.getBoundingClientRect();
+    let host = trigger.closest('.jpx-select-host');
+    let rect = host.getBoundingClientRect();
     let settingsRect = document.getElementById('settings-container')?.getBoundingClientRect();
     let viewportWidth = document.documentElement.clientWidth;
     let viewportHeight = document.documentElement.clientHeight;
@@ -6905,16 +6902,17 @@ function positionSelectWindow(panel, trigger) {
     if (leftMax < leftMin) leftMax = viewportWidth - panel.offsetWidth - margin;
 
     let left = clampNumber(rect.left, leftMin, Math.max(leftMin, leftMax));
-    let top = rect.bottom + 4;
-    if (top + panel.offsetHeight > viewportHeight - margin) {
-        top = rect.top - panel.offsetHeight - 4;
+    panel.style.left = `${left - rect.left}px`;
+
+    let belowSpace = viewportHeight - rect.bottom - margin;
+    let aboveSpace = rect.top - margin;
+    if (belowSpace >= panel.offsetHeight || belowSpace >= aboveSpace) {
+        panel.style.top = 'calc(100% + 4px)';
+        panel.style.bottom = 'auto';
+    } else {
+        panel.style.top = 'auto';
+        panel.style.bottom = 'calc(100% + 4px)';
     }
-
-    let topMax = Math.max(margin, viewportHeight - panel.offsetHeight - margin);
-    top = clampNumber(top, margin, topMax);
-
-    panel.style.left = `${left}px`;
-    panel.style.top = `${top}px`;
 }
 
 function enhanceSelectElement(select) {
