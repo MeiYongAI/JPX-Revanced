@@ -1340,6 +1340,7 @@ let cfg = {
             display: grid;
             gap: 4px;
             margin: 4px 0 5px;
+            justify-items: start;
         }
 
         #settings-container .condition-row {
@@ -1349,6 +1350,10 @@ let cfg = {
             padding: 4px;
             margin: 0;
             gap: 4px 6px;
+            width: fit-content;
+            max-width: 100%;
+            box-sizing: border-box;
+            align-items: flex-start;
         }
 
         #settings-container .condition-index {
@@ -1367,25 +1372,75 @@ let cfg = {
             align-items: baseline;
             flex-wrap: wrap;
             gap: 4px 6px;
+            border: 1px solid var(--jpx-border);
+            border-radius: 0;
+            background: var(--jpx-panel);
+            padding: 3px 5px;
+            min-height: 22px;
+            box-sizing: border-box;
+        }
+
+        #settings-container .condition-extra:empty {
+            display: none;
         }
 
         #settings-container .condition-value.is-wide {
-            width: 100%;
+            max-width: 100%;
         }
 
         #settings-container .condition-extra-field {
             display: inline-block;
         }
 
+        #settings-container .condition-row > button {
+            align-self: flex-start;
+        }
+
         #settings-container .multiSelect-popup-panel {
+            display: none;
+            position: absolute;
+            z-index: 100;
+            box-sizing: border-box;
+            width: max-content;
+            max-width: min(540px, calc(100vw - 32px));
+            max-height: min(260px, 70vh);
+            overflow: auto;
             background: var(--jpx-panel) !important;
             border: 1px solid var(--jpx-border);
             border-radius: 0;
+            padding: 4px;
+            flex-wrap: wrap;
+            gap: 4px;
+            align-items: flex-start;
         }
 
         #settings-container .multiSelect-summary {
-            width: 100%;
-            max-width: 680px;
+            width: auto;
+            min-width: 10ch;
+            max-width: min(46ch, 100%);
+            cursor: pointer;
+        }
+
+        #settings-container .multiSelect-option {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            border: 1px solid var(--jpx-border);
+            border-radius: 0;
+            background: var(--jpx-bg);
+            padding: 2px 5px;
+            min-height: 22px;
+            box-sizing: border-box;
+            white-space: nowrap;
+        }
+
+        #settings-container .multiSelect-option.is-checked {
+            border-color: var(--jpx-border-strong);
+            background: var(--jpx-accent-soft);
+        }
+
+        #settings-container .multiSelect-option input {
+            margin: 0;
         }
 
         #settings-container .field-picker-select {
@@ -1518,12 +1573,15 @@ let cfg = {
         }
 
         #settings-container .rule-editor-window {
-            width: min(820px, 100%);
+            width: fit-content;
+            min-width: min(360px, 100%);
+            max-width: 100%;
             max-height: min(680px, 100%);
             background: var(--jpx-panel);
             border: 1px solid var(--jpx-border-strong);
             display: flex;
             flex-direction: column;
+            box-sizing: border-box;
         }
 
         #settings-container .rule-editor-header {
@@ -1551,22 +1609,38 @@ let cfg = {
             min-height: 0;
             overflow: auto;
             padding: 6px;
+            display: grid;
+            justify-items: start;
+            align-content: start;
+            gap: 6px;
         }
 
         #settings-container .rule-editor-body .settings-group {
-            grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-start;
             gap: 4px 8px;
             padding: 5px;
-            margin-bottom: 6px;
+            margin-bottom: 0;
+            width: fit-content;
+            max-width: 100%;
+            box-sizing: border-box;
         }
 
         #settings-container .rule-editor-body .settings-group-title {
+            flex: 1 0 100%;
             margin-bottom: 2px;
             padding: 3px 5px;
+            box-sizing: border-box;
         }
 
         #settings-container .rule-editor-body .field-block {
+            flex: 0 1 auto;
             padding: 1px 2px;
+        }
+
+        #settings-container .rule-editor-body .field-block-wide {
+            flex: 1 0 100%;
         }
 
         #settings-container .switch-row {
@@ -7432,22 +7506,25 @@ const fieldRenderers = {
                 summary.type = 'text';
                 summary.readOnly = true;
                 summary.placeholder = t('cB.clickToSelect');
-                summary.className = 'multiSelect-summary jpx-input-wide';
+                summary.className = 'multiSelect-summary';
+                summary.dataset.jpxAutoWidth = '1';
+                summary.title = t('cB.clickToSelect');
                 summary.onclick = (e) => {
                     e.stopPropagation();
                     document.querySelectorAll('.multiSelect-popup-panel').forEach(p => {
                         let isHidden = panel.style.display === 'none';
-                        if (p === panel) panel.style.display = isHidden ? 'block' : 'none';
+                        if (p === panel) {
+                            panel.style.left = `${summary.offsetLeft}px`;
+                            panel.style.top = `${summary.offsetTop + summary.offsetHeight + 3}px`;
+                            panel.style.display = isHidden ? 'flex' : 'none';
+                        }
                         else p.style.display = 'none';
                     });
                 };
 
                 let panel = document.createElement('div');
                 panel.className = 'multiSelect-popup-panel';
-                panel.style.cssText = `
-                    display: none; position: absolute; z-index: 100; background: var(--jpx-bg-panel); border: 1px solid var(--jpx-border-subtle); border-radius: 0;
-                    padding: 5px 10px; min-width: 200px; max-width: 1000px; max-height: 300px; overflow-y: auto;
-                `;
+                panel.style.display = 'none';
                 panel.onclick = (e) => e.stopPropagation();
 
                 listDiv.style.position = 'relative';
@@ -7457,6 +7534,8 @@ const fieldRenderers = {
                     let values = field.hasRange ? dataObj[field.key].slice(2) : dataObj[field.key];
                     let labels = values.map(v => t(field.multiSelectOptions.find(opt => opt.value === v)?.label || v));
                     summary.value = labels.join(', ');
+                    summary.title = summary.value || t('cB.clickToSelect');
+                    updateConfigInputWidth(summary);
                 };
 
                 renderCheckboxes(panel, updateSummary);
@@ -7469,12 +7548,13 @@ const fieldRenderers = {
                 field.multiSelectOptions.forEach(opt => {
                     let id = getUniqueId(`${field.key}_${opt.value}`);
                     let span = document.createElement('span');
-                    span.style.cssText = 'display: inline-flex; align-items: center; margin-right: 8px;';
+                    span.className = 'multiSelect-option';
 
                     let checkbox = document.createElement('input');
                     checkbox.type = 'checkbox';
                     checkbox.id = id;
                     checkbox.checked = dataObj[field.key].includes(opt.value);
+                    if (checkbox.checked) span.classList.add('is-checked');
                     checkbox.onchange = e => {
                         if (e.target.checked) {
                             if (!dataObj[field.key].includes(opt.value)) dataObj[field.key].push(opt.value);
@@ -7482,12 +7562,14 @@ const fieldRenderers = {
                             if (field.hasRange) dataObj[field.key] = [...dataObj[field.key].slice(0, 2), ...dataObj[field.key].slice(2).filter(v => v !== opt.value)];
                             else dataObj[field.key] = dataObj[field.key].filter(v => v !== opt.value);
                         }
+                        span.classList.toggle('is-checked', e.target.checked);
                         if (onUpdate) onUpdate();
                     };
 
                     let label = document.createElement('label');
                     label.htmlFor = id;
                     label.textContent = t(opt.label);
+                    label.title = t(opt.label);
 
                     span.append(checkbox, label)
                     targetContainer.appendChild(span);
