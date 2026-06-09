@@ -1,23 +1,13 @@
 # JPX-Revanced
 
-JPX-PLUS userscript for Hentaiverse. Installation file: `JPX-Revanced.js`.
+JPX userscript for Hentaiverse. Installation file: `JPX-Revanced-260608.js`.
 
-Install directly in Tampermonkey/Violentmonkey using the raw file URL from this repo.
+如果你想让 Tampermonkey/Violentmonkey 自动更新脚本，把安装地址设置为：
 
-## HV Dark Mode ([Stylus](https://github.com/openstyles/stylus))
-
-本仓库同时包含一个为 Hentaiverse 提供的深色主题样式文件：`hv-dark-mode.user.css`。
-
-使用方法（推荐 [Stylus](https://github.com/openstyles/stylus) 浏览器扩展）：
-
-1. 安装 Stylus（Chrome/Edge/Firefox 均支持）。
-2. 打开 Stylus → 新建样式，或直接导入仓库中的 `hv-dark-mode.user.css` 文件。
-3. 在样式的适用范围中设置为 `domain("hentaiverse.org")`（文件已包含该规则），并保存启用。
-
-说明：该样式会在页面最开始加载时生效，避免页面闪烁；因此建议使用 Stylus 而不是把 CSS 内嵌到 userscript。
-
-如果你想让 Tampermonkey 自动更新 `JPX-Revanced.js`，把脚本安装地址设置为：
-
+```text
+https://raw.githubusercontent.com/MeiYongAI/JPX-Revanced/main/JPX-Revanced-260608.js
 ```
-https://raw.githubusercontent.com/MeiYongAI/JPX-PLUS/main/JPX-Revanced.js
-```
+
+## HV Dark Mode
+
+仓库同时包含 `hv-dark-mode.user.css`。推荐用 Stylus 导入，并把适用范围设为 `domain("hentaiverse.org")`。

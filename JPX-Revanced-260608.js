@@ -1,10 +1,10 @@
 // ==UserScript==
-// @name         JPX-Revanced-NoAuto
+// @name         JPX-Revanced
 // @namespace    ijpx
 // @version      26.06.08
 // @author       MeiYongAI
 // @icon         https://hentaiverse.org/y/favicon.png
-// @description  jpx without auto arena or auto HVUT encounter trigger
+// @description  jpx
 // @run-at       document-end
 // @match        *://*.hentaiverse.org/*
 // @exclude      *hentaiverse.org/equip/*
