@@ -2271,6 +2271,11 @@ const getConsumable = (record, field) => {
     if (!item) return { drop: 0, use: 0, balance: 0 };
     return { drop: item.drop || 0, use: item.use || 0, balance: item.balance || 0 };
 };
+const getEquipmentCount = (record, quality) => {
+    let value = record.revenueRecords?.equipment?.[quality];
+    if (Array.isArray(value)) return value.length;
+    return typeof value === 'number' ? value : 0;
+};
 const STATS_FIELDS = [
     { id: 'date', get: d => d.date || '' },
     { id: 'round', get: d => d.roundInfo?.current || '' },
@@ -2303,9 +2308,9 @@ const STATS_FIELDS = [
     { id: 'uCloakOfTheFallen', get: d => d.combatRecords?.use?.['Cloak of the Fallen'] || 0 },
     { id: 'uImperil', get: d => d.combatRecords?.use?.Imperil || 0 },
 
-    { id: 'eqP', get: d => d.revenueRecords?.equipment?.Peerless?.length || 0 },
-    { id: 'eqL', get: d => d.revenueRecords?.equipment?.Legendary?.length || 0 },
-    { id: 'eqM', get: d => d.revenueRecords?.equipment?.Magnificent?.length || 0 },
+    { id: 'eqP', get: d => getEquipmentCount(d, 'Peerless') },
+    { id: 'eqL', get: d => getEquipmentCount(d, 'Legendary') },
+    { id: 'eqM', get: d => getEquipmentCount(d, 'Magnificent') },
     { id: 'cha', get: d => d.revenueRecords?.token?.['Chaos Token'] || 0 },
     { id: 'blo', get: d => d.revenueRecords?.token?.['Token of Blood'] || 0 },
 
@@ -6525,6 +6530,7 @@ function generateAggregate(data_array, type, timestamp_name = null) { //type: Av
             turns: type === 'Average' ? (Math.round(total_turns / length * 100) / 100) : total_turns,
             tps: 0,
             riddle: 0,
+            aggregateType: type,
             combatRecords: jpxUtils.createCombatRecords(),
             revenueRecords: jpxUtils.createRevenueRecords(),
         };
@@ -6598,6 +6604,11 @@ function generateAggregate(data_array, type, timestamp_name = null) { //type: Av
                             if (key != 'total' && key != 'profit') {
                                 new_data.revenueRecords[categoryKey][key].balance = Math.round(value.balance / length * 10) / 10;
                             }
+                        }
+                        break;
+                    case ('equipment'):
+                        for (const [key, value] of Object.entries(categoryValue)) {
+                            new_data.revenueRecords[categoryKey][key] = Math.round((Array.isArray(value) ? value.length : value) / length * 10) / 10;
                         }
                         break;
                     case ('material'):
@@ -6820,7 +6831,7 @@ function renderDynamicTable(battleRecords, displayedColumns, parent) {
             if (field.styleText) td.style.cssText = field.styleText;
             if (field.doI18n) value = t(`sP.${value}`);
             
-            if ((field.id === 'eqP' || field.id === 'eqL' || field.id === 'eqM') && value > 0) {
+            if (!record.aggregateType && (field.id === 'eqP' || field.id === 'eqL' || field.id === 'eqM') && value > 0) {
                 let eqType = field.id === 'eqP' ? 'Peerless' : (field.id === 'eqL' ? 'Legendary' : 'Magnificent');
                 let eqList = record.revenueRecords?.equipment?.[eqType] || [];
                 if (eqList.length > 0) {
