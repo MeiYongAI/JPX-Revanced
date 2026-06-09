@@ -1405,8 +1405,7 @@ let cfg = {
             box-sizing: border-box;
             width: max-content;
             max-width: min(620px, calc(100vw - 32px));
-            max-height: min(260px, 70vh);
-            overflow: auto;
+            overflow: visible;
             background: var(--jpx-panel) !important;
             border: 1px solid var(--jpx-border);
             border-radius: 0;
@@ -1646,7 +1645,8 @@ let cfg = {
         #settings-container .rule-editor-body {
             flex: 1;
             min-height: 0;
-            overflow: auto;
+            overflow-x: hidden;
+            overflow-y: auto;
             padding: 6px;
         }
 
@@ -7053,6 +7053,24 @@ function closeMultiSelectPanels() {
     });
 }
 
+function positionMultiSelectPanel(panel, summary) {
+    let listRect = panel.offsetParent?.getBoundingClientRect() || summary.parentElement.getBoundingClientRect();
+    let summaryRect = summary.getBoundingClientRect();
+    let bounds = summary.closest('.rule-editor-window') || summary.closest('#settings-container') || document.documentElement;
+    let boundsRect = bounds.getBoundingClientRect();
+    let margin = 8;
+    let minLeft = boundsRect.left + margin;
+    let maxRight = boundsRect.right - margin;
+    let availableWidth = Math.max(220, maxRight - minLeft);
+
+    panel.style.maxWidth = `${availableWidth}px`;
+
+    let panelWidth = Math.min(panel.offsetWidth, availableWidth);
+    let left = clampNumber(summaryRect.left, minLeft, Math.max(minLeft, maxRight - panelWidth));
+    panel.style.left = `${left - listRect.left}px`;
+    panel.style.top = `${summaryRect.bottom - listRect.top + 3}px`;
+}
+
 function updateSelectHostWidth(select, host) {
     let selected = select.selectedOptions?.[0];
     let text = selected?.textContent || '';
@@ -7562,15 +7580,13 @@ const fieldRenderers = {
                 summary.title = t('cB.clickToSelect');
                 summary.onclick = (e) => {
                     e.stopPropagation();
-                    document.querySelectorAll('.multiSelect-popup-panel').forEach(p => {
-                        let isHidden = panel.style.display === 'none';
-                        if (p === panel) {
-                            panel.style.left = `${summary.offsetLeft}px`;
-                            panel.style.top = `${summary.offsetTop + summary.offsetHeight + 3}px`;
-                            panel.style.display = isHidden ? 'flex' : 'none';
-                        }
-                        else p.style.display = 'none';
-                    });
+                    let shouldOpen = panel.style.display === 'none';
+                    closeMultiSelectPanels();
+                    if (!shouldOpen) return;
+                    panel.style.visibility = 'hidden';
+                    panel.style.display = 'flex';
+                    positionMultiSelectPanel(panel, summary);
+                    panel.style.visibility = '';
                 };
 
                 let panel = document.createElement('div');
