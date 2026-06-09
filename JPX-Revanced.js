@@ -1170,6 +1170,87 @@ let cfg = {
             padding-right: 5px;
         }
 
+        #settings-container .jpx-select-host {
+            position: relative;
+            display: inline-block;
+            width: min(100%, 360px);
+            max-width: 100%;
+            vertical-align: middle;
+        }
+
+        #settings-container .jpx-select-source {
+            display: none !important;
+        }
+
+        #settings-container .jpx-select-trigger {
+            position: relative;
+            width: 100%;
+            height: 24px;
+            border: 1px solid var(--jpx-border);
+            border-radius: 0;
+            background: var(--jpx-panel);
+            color: var(--jpx-text);
+            box-sizing: border-box;
+            padding: 2px 22px 2px 5px;
+            font: 12px/18px var(--jpx-font-ui);
+            text-align: left;
+            cursor: pointer;
+        }
+
+        #settings-container .jpx-select-trigger::after {
+            content: "▾";
+            position: absolute;
+            right: 7px;
+            top: 2px;
+            color: var(--jpx-text);
+        }
+
+        #settings-container .jpx-select-trigger:focus {
+            outline: 1px solid var(--jpx-accent);
+            border-color: var(--jpx-accent);
+        }
+
+        #settings-container .jpx-select-panel {
+            display: none;
+            position: absolute;
+            top: calc(100% + 2px);
+            left: 0;
+            z-index: 160;
+            min-width: 100%;
+            max-width: min(520px, calc(100vw - 80px));
+            max-height: 280px;
+            overflow: auto;
+            border: 1px solid var(--jpx-border);
+            border-radius: 0;
+            background: var(--jpx-panel);
+            box-sizing: border-box;
+        }
+
+        #settings-container .jpx-select-option {
+            display: block;
+            width: 100%;
+            border: 0;
+            border-radius: 0;
+            background: var(--jpx-panel);
+            color: var(--jpx-text);
+            padding: 3px 8px;
+            font: 12px/18px var(--jpx-font-ui);
+            text-align: left;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        #settings-container .jpx-select-option:hover,
+        #settings-container .jpx-select-option.is-selected {
+            background: var(--jpx-accent-soft);
+            color: var(--jpx-text-primary);
+        }
+
+        #settings-container .rule-toolbar .jpx-select-host,
+        #settings-container .dynamic-array-row .jpx-select-host {
+            min-width: 200px;
+        }
+
         #settings-container select[multiple] {
             background: var(--jpx-bg) !important;
             border-color: var(--jpx-border);
@@ -1248,49 +1329,15 @@ let cfg = {
             margin-bottom: 5px;
         }
 
-        #settings-container .jpx-popup-host {
-            position: relative;
-            display: inline-block;
-            max-width: 100%;
-        }
-
-        #settings-container .jpx-popup-panel {
-            display: none;
-            position: absolute;
-            top: calc(100% + 2px);
-            left: 0;
-            z-index: 120;
+        #settings-container .multiSelect-popup-panel {
             background: var(--jpx-panel) !important;
             border: 1px solid var(--jpx-border);
             border-radius: 0;
         }
 
-        #settings-container .jpx-popup-trigger {
-            cursor: pointer;
-        }
-
         #settings-container .multiSelect-summary {
             width: 100%;
             max-width: 680px;
-        }
-
-        #settings-container .field-picker-popup {
-            display: block;
-            width: 100%;
-        }
-
-        #settings-container .field-picker-popup-panel {
-            width: min(920px, calc(100vw - 80px));
-            max-height: min(520px, 72vh);
-            overflow: auto;
-            padding: 8px;
-        }
-
-        #settings-container .field-picker-wrap {
-            display: flex;
-            gap: 12px;
-            align-items: flex-start;
-            flex-wrap: wrap;
         }
 
         #settings-container .field-picker-select {
@@ -3203,8 +3250,9 @@ function initDo() {
 
     window.addEventListener('beforeunload', storeTmp);
     document.addEventListener('pointerdown', (e) => {
-        if (!e.target.closest('.jpx-popup-panel') && !e.target.closest('.jpx-popup-trigger')) {
-            document.querySelectorAll('.jpx-popup-panel').forEach(p => p.style.display = 'none');
+        if (!e.target.closest('.jpx-select-host')) closeJpxSelectPanels();
+        if (!e.target.closest('.multiSelect-popup-panel') && !e.target.classList.contains('multiSelect-summary')) {
+            document.querySelectorAll('.multiSelect-popup-panel').forEach(p => p.style.display = 'none');
         }
     });
     const throttledActionManager = jpxUtils.throttle(actionManager, 75);
@@ -5993,25 +6041,29 @@ function openBattleRecords() {
             border-radius: 0;
             border: 1px solid var(--stats-border);
             background: var(--stats-accent-soft);
-            position: relative;
-            overflow: visible;
+            overflow: hidden;
         }
 
-        #filtersDiv .filter-trigger {
-            width: 100%;
-            border: 0;
-            border-radius: 0;
+        #filtersDiv .filter-group > summary {
+            list-style: none;
             cursor: pointer;
             user-select: none;
             padding: 4px 8px;
-            background: var(--stats-accent-soft);
             color: var(--stats-text);
-            font: 700 12px/18px var(--stats-font);
             font-weight: 700;
             text-align: left;
+            border-bottom: 1px solid var(--stats-border);
         }
 
-        #filtersDiv .filter-trigger:hover {
+        #filtersDiv .filter-group > summary::-webkit-details-marker {
+            display: none;
+        }
+
+        #filtersDiv .filter-group[open] > summary {
+            border-bottom-color: var(--stats-border);
+        }
+
+        #filtersDiv .filter-group > summary:hover {
             background: var(--stats-row-hover);
         }
 
@@ -6021,24 +6073,6 @@ function openBattleRecords() {
             flex-wrap: wrap;
             gap: 6px;
             padding: 6px;
-        }
-
-        #filtersDiv .filter-panel {
-            position: absolute;
-            top: calc(100% + 2px);
-            left: 0;
-            z-index: 20;
-            min-width: 220px;
-            max-width: min(520px, calc(100vw - 40px));
-            max-height: 320px;
-            overflow: auto;
-            border: 1px solid var(--stats-border);
-            border-radius: 0;
-            background: var(--stats-panel);
-        }
-
-        #filtersDiv .filter-panel[hidden] {
-            display: none;
         }
 
         #filtersDiv label {
@@ -6427,61 +6461,6 @@ function createFilter() {
     let filtersDiv = newWindow.document.createElement('div');
     filtersDiv.id = 'filtersDiv';
 
-    const renderRecords = () => {
-        getBattleRecordsRender().then(battleRecords => {
-            renderDynamicTable(battleRecords, cfgStats.statsColumns, newWindow.document.body);
-        });
-    };
-
-    const closeFilterPanels = (except = null) => {
-        filtersDiv.querySelectorAll('.filter-panel').forEach(panel => {
-            if (panel !== except) panel.hidden = true;
-        });
-    };
-
-    newWindow.document.addEventListener('pointerdown', (e) => {
-        if (!e.target.closest('#filtersDiv .filter-group')) closeFilterPanels();
-    });
-
-    function createFilterGroup(id, title) {
-        let group = newWindow.document.createElement('div');
-        group.className = 'filter-group';
-        group.id = `${id}-group`;
-
-        let trigger = newWindow.document.createElement('button');
-        trigger.type = 'button';
-        trigger.className = 'filter-trigger';
-        trigger.textContent = title;
-
-        let filterDiv = newWindow.document.createElement('div');
-        filterDiv.id = id;
-        filterDiv.className = 'filter-options filter-panel';
-        filterDiv.hidden = true;
-
-        trigger.addEventListener('click', (e) => {
-            e.stopPropagation();
-            let shouldOpen = filterDiv.hidden;
-            closeFilterPanels(filterDiv);
-            filterDiv.hidden = !shouldOpen;
-        });
-        filterDiv.addEventListener('pointerdown', e => e.stopPropagation());
-
-        group.append(trigger, filterDiv);
-        return { group, trigger, filterDiv };
-    }
-
-    function updateCheckboxTrigger(trigger, title, filterDiv, totalCount) {
-        let checkedLabels = Array.from(filterDiv.querySelectorAll('input:checked')).map(input => t(`sP.${input.value}`));
-        if (checkedLabels.length === totalCount) {
-            trigger.textContent = title;
-            trigger.title = title;
-        } else {
-            let valueText = checkedLabels.length ? checkedLabels.join(', ') : 'None';
-            trigger.textContent = `${title}: ${valueText}`;
-            trigger.title = valueText;
-        }
-    }
-
     let checkboxSortArray = [
         {
             id: 'filter-aggregate',
@@ -6512,14 +6491,25 @@ function createFilter() {
 
     //checkBox Filter
     for (let checkboxSort of checkboxSortArray) {
-        let { group, trigger, filterDiv } = createFilterGroup(checkboxSort.id, checkboxSort.title);
+        let group = newWindow.document.createElement('details');
+        group.className = 'filter-group';
+        group.id = `${checkboxSort.id}-group`;
+        group.open = true;
+
+        let summary = newWindow.document.createElement('summary');
+        summary.textContent = checkboxSort.title;
+
+        let filterDiv = newWindow.document.createElement('div');
+        filterDiv.id = checkboxSort.id;
+        filterDiv.className = 'filter-options';
         for (let checkboxValue of checkboxSort.sortArray) {
             let label = newWindow.document.createElement('label');
             let input = newWindow.document.createElement('input');
             input.type = 'checkbox';
             input.addEventListener('change', function() {
-                updateCheckboxTrigger(trigger, checkboxSort.title, filterDiv, checkboxSort.sortArray.length);
-                renderRecords();
+                getBattleRecordsRender().then(battleRecords => {
+                    renderDynamicTable(battleRecords, cfgStats.statsColumns, newWindow.document.body);
+                });
             });
             input.defaultChecked = true;
             input.value = checkboxValue;
@@ -6528,22 +6518,29 @@ function createFilter() {
             filterDiv.appendChild(label);
         }
 
-        updateCheckboxTrigger(trigger, checkboxSort.title, filterDiv, checkboxSort.sortArray.length);
+        group.append(summary, filterDiv);
         filtersDiv.appendChild(group);
     }
 
     //range Filter
-    let {
-        group: roundTotalGroup,
-        trigger: roundTotalTrigger,
-        filterDiv: roundTotalDiv
-    } = createFilterGroup('filter-roundTotal', t('sP.roundTotal'));
+    let roundTotalGroup = newWindow.document.createElement('details');
+    roundTotalGroup.className = 'filter-group';
+    roundTotalGroup.id = 'filter-roundTotal-group';
+    roundTotalGroup.open = true;
+
+    let roundTotalSummary = newWindow.document.createElement('summary');
+    roundTotalSummary.textContent = t('sP.roundTotal');
+
+    let roundTotalDiv = newWindow.document.createElement('div');
+    roundTotalDiv.id = 'filter-roundTotal';
+    roundTotalDiv.className = 'filter-options';
 
     let roundMinInput = newWindow.document.createElement('input');
     roundMinInput.type = 'number';
     roundMinInput.addEventListener('change', function() {
-        roundTotalTrigger.textContent = `${t('sP.roundTotal')}: ${roundMinInput.value} to ${roundMaxInput.value}`;
-        renderRecords();
+        getBattleRecordsRender().then(battleRecords => {
+            renderDynamicTable(battleRecords, cfgStats.statsColumns, newWindow.document.body);
+        });
     });
     roundMinInput.value = 0;
     roundMinInput.min = '0';
@@ -6552,8 +6549,9 @@ function createFilter() {
     let roundMaxInput = newWindow.document.createElement('input');
     roundMaxInput.type = 'number';
     roundMaxInput.addEventListener('change', function() {
-        roundTotalTrigger.textContent = `${t('sP.roundTotal')}: ${roundMinInput.value} to ${roundMaxInput.value}`;
-        renderRecords();
+        getBattleRecordsRender().then(battleRecords => {
+            renderDynamicTable(battleRecords, cfgStats.statsColumns, newWindow.document.body);
+        });
     });
     roundMaxInput.value = 9999;
     roundMaxInput.min = '0';
@@ -6563,26 +6561,33 @@ function createFilter() {
     rangeSpan.textContent = ' to ';
 
     roundTotalDiv.append(roundMinInput, rangeSpan, roundMaxInput);
-    roundTotalTrigger.textContent = `${t('sP.roundTotal')}: ${roundMinInput.value} to ${roundMaxInput.value}`;
+    roundTotalGroup.append(roundTotalSummary, roundTotalDiv);
     filtersDiv.appendChild(roundTotalGroup);
 
     //number Filter
-    let {
-        group: rowsGroup,
-        trigger: rowsTrigger,
-        filterDiv
-    } = createFilterGroup('filter-rows', '记录条数');
+    let rowsGroup = newWindow.document.createElement('details');
+    rowsGroup.className = 'filter-group';
+    rowsGroup.id = 'filter-rows-group';
+    rowsGroup.open = true;
+
+    let rowsSummary = newWindow.document.createElement('summary');
+    rowsSummary.textContent = '记录条数';
+
+    let filterDiv = newWindow.document.createElement('div');
+    filterDiv.id = 'filter-rows';
+    filterDiv.className = 'filter-options';
     let input = newWindow.document.createElement('input');
     input.type = 'number';
     input.addEventListener('change', function() {
-        rowsTrigger.textContent = `记录条数: ${input.value}`;
-        renderRecords();
+        getBattleRecordsRender().then(battleRecords => {
+            renderDynamicTable(battleRecords, cfgStats.statsColumns, newWindow.document.body);
+        });
     });
     input.value = 50;
     input.min = '0';
     input.step = '1';
     filterDiv.append(input);
-    rowsTrigger.textContent = `记录条数: ${input.value}`;
+    rowsGroup.append(rowsSummary, filterDiv);
     filtersDiv.appendChild(rowsGroup);
 
     return filtersDiv;
@@ -6824,6 +6829,82 @@ function bindConfigNumberInput(input, getValue, setValue) {
 
     input.addEventListener('input', () => commitValue(false));
     input.addEventListener('blur', () => commitValue(true));
+}
+
+function closeJpxSelectPanels(except = null) {
+    document.querySelectorAll('#settings-container .jpx-select-panel').forEach(panel => {
+        if (panel !== except) panel.style.display = 'none';
+    });
+}
+
+function enhanceSelectElement(select) {
+    if (!select || select.multiple || select.dataset.jpxSelectEnhanced === '1') return;
+    if (!select.parentNode) return;
+
+    select.dataset.jpxSelectEnhanced = '1';
+
+    let host = document.createElement('span');
+    host.className = 'jpx-select-host';
+    select.parentNode.insertBefore(host, select);
+    host.appendChild(select);
+    select.classList.add('jpx-select-source');
+
+    let trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'jpx-select-trigger';
+
+    let panel = document.createElement('div');
+    panel.className = 'jpx-select-panel';
+
+    const refreshTrigger = () => {
+        let selected = select.selectedOptions?.[0];
+        trigger.textContent = selected ? selected.textContent : '';
+        trigger.disabled = select.disabled;
+    };
+
+    const renderOptions = () => {
+        panel.textContent = '';
+        Array.from(select.options).forEach(option => {
+            let item = document.createElement('button');
+            item.type = 'button';
+            item.className = 'jpx-select-option';
+            item.textContent = option.textContent;
+            item.disabled = option.disabled;
+            if (option.selected) item.classList.add('is-selected');
+
+            item.addEventListener('click', (e) => {
+                e.stopPropagation();
+                select.value = option.value;
+                select.dispatchEvent(new Event('change', { bubbles: true }));
+                closeJpxSelectPanels();
+                refreshTrigger();
+            });
+
+            panel.appendChild(item);
+        });
+    };
+
+    trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (select.disabled) return;
+
+        let shouldOpen = panel.style.display !== 'block';
+        closeJpxSelectPanels(panel);
+        if (shouldOpen) {
+            renderOptions();
+            panel.style.display = 'block';
+        } else {
+            panel.style.display = 'none';
+        }
+    });
+
+    select.addEventListener('change', refreshTrigger);
+    host.append(trigger, panel);
+    refreshTrigger();
+}
+
+function enhanceSelects(container) {
+    container.querySelectorAll('select:not([multiple])').forEach(enhanceSelectElement);
 }
 
 const fieldRenderers = {
@@ -7187,18 +7268,18 @@ const fieldRenderers = {
                 summary.type = 'text';
                 summary.readOnly = true;
                 summary.placeholder = t('cB.clickToSelect');
-                summary.className = 'multiSelect-summary jpx-popup-trigger jpx-input-wide';
+                summary.className = 'multiSelect-summary jpx-input-wide';
                 summary.onclick = (e) => {
                     e.stopPropagation();
-                    document.querySelectorAll('.jpx-popup-panel').forEach(p => {
-                        let isHidden = panel.style.display !== 'block';
+                    document.querySelectorAll('.multiSelect-popup-panel').forEach(p => {
+                        let isHidden = panel.style.display === 'none';
                         if (p === panel) panel.style.display = isHidden ? 'block' : 'none';
                         else p.style.display = 'none';
                     });
                 };
 
                 let panel = document.createElement('div');
-                panel.className = 'multiSelect-popup-panel jpx-popup-panel';
+                panel.className = 'multiSelect-popup-panel';
                 panel.style.cssText = `
                     display: none; position: absolute; z-index: 100; background: var(--jpx-bg-panel); border: 1px solid var(--jpx-border-subtle); border-radius: 0;
                     padding: 5px 10px; min-width: 200px; max-width: 1000px; max-height: 300px; overflow-y: auto;
@@ -7266,6 +7347,7 @@ const fieldRenderers = {
                 typeSelect.appendChild(option);
             });
             toolbar.appendChild(typeSelect);
+            enhanceSelectElement(typeSelect);
 
             let addBtn = jpxUtils.createButton(toolbar, {
                 text: `${t('add')} ${t(field.label)}`,
@@ -7512,30 +7594,9 @@ const fieldRenderers = {
 
         container.innerHTML = `<div${field.class ? ` class="${field.class}"` : ''} style="margin-top:8px;">${t(field.label)}</div>`;
 
-        let popupHost = document.createElement('div');
-        popupHost.className = 'jpx-popup-host field-picker-popup';
-
-        let summary = createConfigInput('text', { placeholder: t('cB.clickToSelect') }, getUniqueId('fieldPickerSummary'), 'field-picker-summary jpx-popup-trigger jpx-input-wide');
-        summary.readOnly = true;
-        summary.addEventListener('click', (e) => {
-            e.stopPropagation();
-            document.querySelectorAll('.jpx-popup-panel').forEach(p => {
-                let isHidden = pickerPanel.style.display !== 'block';
-                if (p === pickerPanel) pickerPanel.style.display = isHidden ? 'block' : 'none';
-                else p.style.display = 'none';
-            });
-        });
-
-        let pickerPanel = document.createElement('div');
-        pickerPanel.className = 'field-picker-popup-panel jpx-popup-panel';
-        pickerPanel.style.display = 'none';
-        pickerPanel.addEventListener('pointerdown', e => e.stopPropagation());
-
         let pickerWrap = document.createElement('div');
-        pickerWrap.className = 'field-picker-wrap';
-        pickerPanel.appendChild(pickerWrap);
-        popupHost.append(summary, pickerPanel);
-        container.appendChild(popupHost);
+        pickerWrap.style.cssText = 'display: flex; gap: 12px; align-items: flex-start; flex-wrap: wrap;';
+        container.appendChild(pickerWrap);
 
         let inputMap = {};
         let leftFields = field.allFields.filter(f => !dataObj[field.key].some(d => d.id === f.id));
@@ -7566,14 +7627,6 @@ const fieldRenderers = {
             });
         }
 
-        function updateSummary() {
-            let labels = rightFields.map(f => t(f.label));
-            summary.value = labels.length
-                ? `${labels.length}/${field.allFields.length}: ${labels.slice(0, 4).join(', ')}${labels.length > 4 ? '...' : ''}`
-                : '';
-            summary.title = labels.join(', ');
-        }
-
         function refresh(selectedItems = []) {
             leftSelect.innerHTML = leftFields.map((f, i) => `<option value="${i}">${t(f.label)}</option>`).join('');
             rightSelect.innerHTML = rightFields.map((f, i) => `<option value="${i}">${t(f.label)}</option>`).join('');
@@ -7581,7 +7634,6 @@ const fieldRenderers = {
                 if (selectedItems.includes(f)) rightSelect.options[i].selected = true;
             });
             updateDataObj();
-            updateSummary();
             let noAvailableFields = leftFields.length === 0;
             leftSelect.hidden = noAvailableFields;
             addBtn.hidden = noAvailableFields;
@@ -7827,6 +7879,7 @@ const fieldRenderers = {
             });
             select.value = item.key ?? field.options[0]?.key;
             row.appendChild(select);
+            enhanceSelectElement(select);
 
             let inputDiv = document.createElement('div');
             inputDiv.style.cssText = 'display: inline-flex; align-items: baseline; flex-wrap: wrap; gap: 8px;';
@@ -7938,6 +7991,7 @@ const fieldRenderers = {
 function renderField(container, field, dataObj) {
     const renderer = fieldRenderers[field.type];
     if (renderer) renderer(container, field, dataObj);
+    enhanceSelects(container);
 }
 
 function resolveSchema(schema, dataObj) {
