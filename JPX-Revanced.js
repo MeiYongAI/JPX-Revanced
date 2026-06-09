@@ -3412,9 +3412,13 @@ function initDo() {
     document.addEventListener('pointerdown', (e) => {
         if (!e.target.closest('.jpx-select-host')) closeJpxSelectPanels();
         if (!e.target.closest('.multiSelect-popup-panel') && !e.target.classList.contains('multiSelect-summary')) {
-            document.querySelectorAll('.multiSelect-popup-panel').forEach(p => p.style.display = 'none');
+            closeMultiSelectPanels();
         }
     });
+    document.addEventListener('scroll', () => {
+        closeJpxSelectPanels();
+        closeMultiSelectPanels();
+    }, true);
     const throttledActionManager = jpxUtils.throttle(actionManager, 75);
     document.addEventListener('keydown', (e) => onKeyDown(e, throttledActionManager), true);
 
@@ -7032,6 +7036,12 @@ function closeJpxSelectPanels(except = null) {
     });
 }
 
+function closeMultiSelectPanels() {
+    document.querySelectorAll('.multiSelect-popup-panel').forEach(panel => {
+        panel.style.display = 'none';
+    });
+}
+
 function updateSelectHostWidth(select, host) {
     let selected = select.selectedOptions?.[0];
     let text = selected?.textContent || '';
@@ -7118,11 +7128,6 @@ function enhanceSelectElement(select) {
         let title = document.createElement('span');
         title.textContent = getTitle();
         header.appendChild(title);
-
-        jpxUtils.createButton(header, {
-            text: 'x',
-            onClick: () => closeJpxSelectPanels()
-        });
 
         let optionsBox = document.createElement('div');
         optionsBox.className = 'jpx-select-options';
