@@ -1248,15 +1248,49 @@ let cfg = {
             margin-bottom: 5px;
         }
 
-        #settings-container .multiSelect-popup-panel {
+        #settings-container .jpx-popup-host {
+            position: relative;
+            display: inline-block;
+            max-width: 100%;
+        }
+
+        #settings-container .jpx-popup-panel {
+            display: none;
+            position: absolute;
+            top: calc(100% + 2px);
+            left: 0;
+            z-index: 120;
             background: var(--jpx-panel) !important;
             border: 1px solid var(--jpx-border);
             border-radius: 0;
         }
 
+        #settings-container .jpx-popup-trigger {
+            cursor: pointer;
+        }
+
         #settings-container .multiSelect-summary {
             width: 100%;
             max-width: 680px;
+        }
+
+        #settings-container .field-picker-popup {
+            display: block;
+            width: 100%;
+        }
+
+        #settings-container .field-picker-popup-panel {
+            width: min(920px, calc(100vw - 80px));
+            max-height: min(520px, 72vh);
+            overflow: auto;
+            padding: 8px;
+        }
+
+        #settings-container .field-picker-wrap {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            flex-wrap: wrap;
         }
 
         #settings-container .field-picker-select {
@@ -3169,8 +3203,8 @@ function initDo() {
 
     window.addEventListener('beforeunload', storeTmp);
     document.addEventListener('pointerdown', (e) => {
-        if (!e.target.closest('.multiSelect-popup-panel') && !e.target.classList.contains('multiSelect-summary')) {
-            document.querySelectorAll('.multiSelect-popup-panel').forEach(p => p.style.display = 'none');
+        if (!e.target.closest('.jpx-popup-panel') && !e.target.closest('.jpx-popup-trigger')) {
+            document.querySelectorAll('.jpx-popup-panel').forEach(p => p.style.display = 'none');
         }
     });
     const throttledActionManager = jpxUtils.throttle(actionManager, 75);
@@ -5959,29 +5993,25 @@ function openBattleRecords() {
             border-radius: 0;
             border: 1px solid var(--stats-border);
             background: var(--stats-accent-soft);
-            overflow: hidden;
+            position: relative;
+            overflow: visible;
         }
 
-        #filtersDiv .filter-group > summary {
-            list-style: none;
+        #filtersDiv .filter-trigger {
+            width: 100%;
+            border: 0;
+            border-radius: 0;
             cursor: pointer;
             user-select: none;
             padding: 4px 8px;
+            background: var(--stats-accent-soft);
             color: var(--stats-text);
+            font: 700 12px/18px var(--stats-font);
             font-weight: 700;
             text-align: left;
-            border-bottom: 1px solid var(--stats-border);
         }
 
-        #filtersDiv .filter-group > summary::-webkit-details-marker {
-            display: none;
-        }
-
-        #filtersDiv .filter-group[open] > summary {
-            border-bottom-color: var(--stats-border);
-        }
-
-        #filtersDiv .filter-group > summary:hover {
+        #filtersDiv .filter-trigger:hover {
             background: var(--stats-row-hover);
         }
 
@@ -5991,6 +6021,24 @@ function openBattleRecords() {
             flex-wrap: wrap;
             gap: 6px;
             padding: 6px;
+        }
+
+        #filtersDiv .filter-panel {
+            position: absolute;
+            top: calc(100% + 2px);
+            left: 0;
+            z-index: 20;
+            min-width: 220px;
+            max-width: min(520px, calc(100vw - 40px));
+            max-height: 320px;
+            overflow: auto;
+            border: 1px solid var(--stats-border);
+            border-radius: 0;
+            background: var(--stats-panel);
+        }
+
+        #filtersDiv .filter-panel[hidden] {
+            display: none;
         }
 
         #filtersDiv label {
@@ -6379,6 +6427,61 @@ function createFilter() {
     let filtersDiv = newWindow.document.createElement('div');
     filtersDiv.id = 'filtersDiv';
 
+    const renderRecords = () => {
+        getBattleRecordsRender().then(battleRecords => {
+            renderDynamicTable(battleRecords, cfgStats.statsColumns, newWindow.document.body);
+        });
+    };
+
+    const closeFilterPanels = (except = null) => {
+        filtersDiv.querySelectorAll('.filter-panel').forEach(panel => {
+            if (panel !== except) panel.hidden = true;
+        });
+    };
+
+    newWindow.document.addEventListener('pointerdown', (e) => {
+        if (!e.target.closest('#filtersDiv .filter-group')) closeFilterPanels();
+    });
+
+    function createFilterGroup(id, title) {
+        let group = newWindow.document.createElement('div');
+        group.className = 'filter-group';
+        group.id = `${id}-group`;
+
+        let trigger = newWindow.document.createElement('button');
+        trigger.type = 'button';
+        trigger.className = 'filter-trigger';
+        trigger.textContent = title;
+
+        let filterDiv = newWindow.document.createElement('div');
+        filterDiv.id = id;
+        filterDiv.className = 'filter-options filter-panel';
+        filterDiv.hidden = true;
+
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            let shouldOpen = filterDiv.hidden;
+            closeFilterPanels(filterDiv);
+            filterDiv.hidden = !shouldOpen;
+        });
+        filterDiv.addEventListener('pointerdown', e => e.stopPropagation());
+
+        group.append(trigger, filterDiv);
+        return { group, trigger, filterDiv };
+    }
+
+    function updateCheckboxTrigger(trigger, title, filterDiv, totalCount) {
+        let checkedLabels = Array.from(filterDiv.querySelectorAll('input:checked')).map(input => t(`sP.${input.value}`));
+        if (checkedLabels.length === totalCount) {
+            trigger.textContent = title;
+            trigger.title = title;
+        } else {
+            let valueText = checkedLabels.length ? checkedLabels.join(', ') : 'None';
+            trigger.textContent = `${title}: ${valueText}`;
+            trigger.title = valueText;
+        }
+    }
+
     let checkboxSortArray = [
         {
             id: 'filter-aggregate',
@@ -6409,25 +6512,14 @@ function createFilter() {
 
     //checkBox Filter
     for (let checkboxSort of checkboxSortArray) {
-        let group = newWindow.document.createElement('details');
-        group.className = 'filter-group';
-        group.id = `${checkboxSort.id}-group`;
-        group.open = true;
-
-        let summary = newWindow.document.createElement('summary');
-        summary.textContent = checkboxSort.title;
-
-        let filterDiv = newWindow.document.createElement('div');
-        filterDiv.id = checkboxSort.id;
-        filterDiv.className = 'filter-options';
+        let { group, trigger, filterDiv } = createFilterGroup(checkboxSort.id, checkboxSort.title);
         for (let checkboxValue of checkboxSort.sortArray) {
             let label = newWindow.document.createElement('label');
             let input = newWindow.document.createElement('input');
             input.type = 'checkbox';
             input.addEventListener('change', function() {
-                getBattleRecordsRender().then(battleRecords => {
-                    renderDynamicTable(battleRecords, cfgStats.statsColumns, newWindow.document.body);
-                });
+                updateCheckboxTrigger(trigger, checkboxSort.title, filterDiv, checkboxSort.sortArray.length);
+                renderRecords();
             });
             input.defaultChecked = true;
             input.value = checkboxValue;
@@ -6436,29 +6528,22 @@ function createFilter() {
             filterDiv.appendChild(label);
         }
 
-        group.append(summary, filterDiv);
+        updateCheckboxTrigger(trigger, checkboxSort.title, filterDiv, checkboxSort.sortArray.length);
         filtersDiv.appendChild(group);
     }
 
     //range Filter
-    let roundTotalGroup = newWindow.document.createElement('details');
-    roundTotalGroup.className = 'filter-group';
-    roundTotalGroup.id = 'filter-roundTotal-group';
-    roundTotalGroup.open = true;
-
-    let roundTotalSummary = newWindow.document.createElement('summary');
-    roundTotalSummary.textContent = t('sP.roundTotal');
-
-    let roundTotalDiv = newWindow.document.createElement('div');
-    roundTotalDiv.id = 'filter-roundTotal';
-    roundTotalDiv.className = 'filter-options';
+    let {
+        group: roundTotalGroup,
+        trigger: roundTotalTrigger,
+        filterDiv: roundTotalDiv
+    } = createFilterGroup('filter-roundTotal', t('sP.roundTotal'));
 
     let roundMinInput = newWindow.document.createElement('input');
     roundMinInput.type = 'number';
     roundMinInput.addEventListener('change', function() {
-        getBattleRecordsRender().then(battleRecords => {
-            renderDynamicTable(battleRecords, cfgStats.statsColumns, newWindow.document.body);
-        });
+        roundTotalTrigger.textContent = `${t('sP.roundTotal')}: ${roundMinInput.value} to ${roundMaxInput.value}`;
+        renderRecords();
     });
     roundMinInput.value = 0;
     roundMinInput.min = '0';
@@ -6467,9 +6552,8 @@ function createFilter() {
     let roundMaxInput = newWindow.document.createElement('input');
     roundMaxInput.type = 'number';
     roundMaxInput.addEventListener('change', function() {
-        getBattleRecordsRender().then(battleRecords => {
-            renderDynamicTable(battleRecords, cfgStats.statsColumns, newWindow.document.body);
-        });
+        roundTotalTrigger.textContent = `${t('sP.roundTotal')}: ${roundMinInput.value} to ${roundMaxInput.value}`;
+        renderRecords();
     });
     roundMaxInput.value = 9999;
     roundMaxInput.min = '0';
@@ -6479,33 +6563,26 @@ function createFilter() {
     rangeSpan.textContent = ' to ';
 
     roundTotalDiv.append(roundMinInput, rangeSpan, roundMaxInput);
-    roundTotalGroup.append(roundTotalSummary, roundTotalDiv);
+    roundTotalTrigger.textContent = `${t('sP.roundTotal')}: ${roundMinInput.value} to ${roundMaxInput.value}`;
     filtersDiv.appendChild(roundTotalGroup);
 
     //number Filter
-    let rowsGroup = newWindow.document.createElement('details');
-    rowsGroup.className = 'filter-group';
-    rowsGroup.id = 'filter-rows-group';
-    rowsGroup.open = true;
-
-    let rowsSummary = newWindow.document.createElement('summary');
-    rowsSummary.textContent = '记录条数';
-
-    let filterDiv = newWindow.document.createElement('div');
-    filterDiv.id = 'filter-rows';
-    filterDiv.className = 'filter-options';
+    let {
+        group: rowsGroup,
+        trigger: rowsTrigger,
+        filterDiv
+    } = createFilterGroup('filter-rows', '记录条数');
     let input = newWindow.document.createElement('input');
     input.type = 'number';
     input.addEventListener('change', function() {
-        getBattleRecordsRender().then(battleRecords => {
-            renderDynamicTable(battleRecords, cfgStats.statsColumns, newWindow.document.body);
-        });
+        rowsTrigger.textContent = `记录条数: ${input.value}`;
+        renderRecords();
     });
     input.value = 50;
     input.min = '0';
     input.step = '1';
     filterDiv.append(input);
-    rowsGroup.append(rowsSummary, filterDiv);
+    rowsTrigger.textContent = `记录条数: ${input.value}`;
     filtersDiv.appendChild(rowsGroup);
 
     return filtersDiv;
@@ -7110,18 +7187,18 @@ const fieldRenderers = {
                 summary.type = 'text';
                 summary.readOnly = true;
                 summary.placeholder = t('cB.clickToSelect');
-                summary.className = 'multiSelect-summary jpx-input-wide';
+                summary.className = 'multiSelect-summary jpx-popup-trigger jpx-input-wide';
                 summary.onclick = (e) => {
                     e.stopPropagation();
-                    document.querySelectorAll('.multiSelect-popup-panel').forEach(p => {
-                        let isHidden = panel.style.display === 'none';
+                    document.querySelectorAll('.jpx-popup-panel').forEach(p => {
+                        let isHidden = panel.style.display !== 'block';
                         if (p === panel) panel.style.display = isHidden ? 'block' : 'none';
                         else p.style.display = 'none';
                     });
                 };
 
                 let panel = document.createElement('div');
-                panel.className = 'multiSelect-popup-panel';
+                panel.className = 'multiSelect-popup-panel jpx-popup-panel';
                 panel.style.cssText = `
                     display: none; position: absolute; z-index: 100; background: var(--jpx-bg-panel); border: 1px solid var(--jpx-border-subtle); border-radius: 0;
                     padding: 5px 10px; min-width: 200px; max-width: 1000px; max-height: 300px; overflow-y: auto;
@@ -7435,9 +7512,30 @@ const fieldRenderers = {
 
         container.innerHTML = `<div${field.class ? ` class="${field.class}"` : ''} style="margin-top:8px;">${t(field.label)}</div>`;
 
+        let popupHost = document.createElement('div');
+        popupHost.className = 'jpx-popup-host field-picker-popup';
+
+        let summary = createConfigInput('text', { placeholder: t('cB.clickToSelect') }, getUniqueId('fieldPickerSummary'), 'field-picker-summary jpx-popup-trigger jpx-input-wide');
+        summary.readOnly = true;
+        summary.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.querySelectorAll('.jpx-popup-panel').forEach(p => {
+                let isHidden = pickerPanel.style.display !== 'block';
+                if (p === pickerPanel) pickerPanel.style.display = isHidden ? 'block' : 'none';
+                else p.style.display = 'none';
+            });
+        });
+
+        let pickerPanel = document.createElement('div');
+        pickerPanel.className = 'field-picker-popup-panel jpx-popup-panel';
+        pickerPanel.style.display = 'none';
+        pickerPanel.addEventListener('pointerdown', e => e.stopPropagation());
+
         let pickerWrap = document.createElement('div');
-        pickerWrap.style.cssText = 'display: flex; gap: 12px; align-items: flex-start; flex-wrap: wrap;';
-        container.appendChild(pickerWrap);
+        pickerWrap.className = 'field-picker-wrap';
+        pickerPanel.appendChild(pickerWrap);
+        popupHost.append(summary, pickerPanel);
+        container.appendChild(popupHost);
 
         let inputMap = {};
         let leftFields = field.allFields.filter(f => !dataObj[field.key].some(d => d.id === f.id));
@@ -7468,6 +7566,14 @@ const fieldRenderers = {
             });
         }
 
+        function updateSummary() {
+            let labels = rightFields.map(f => t(f.label));
+            summary.value = labels.length
+                ? `${labels.length}/${field.allFields.length}: ${labels.slice(0, 4).join(', ')}${labels.length > 4 ? '...' : ''}`
+                : '';
+            summary.title = labels.join(', ');
+        }
+
         function refresh(selectedItems = []) {
             leftSelect.innerHTML = leftFields.map((f, i) => `<option value="${i}">${t(f.label)}</option>`).join('');
             rightSelect.innerHTML = rightFields.map((f, i) => `<option value="${i}">${t(f.label)}</option>`).join('');
@@ -7475,6 +7581,7 @@ const fieldRenderers = {
                 if (selectedItems.includes(f)) rightSelect.options[i].selected = true;
             });
             updateDataObj();
+            updateSummary();
             let noAvailableFields = leftFields.length === 0;
             leftSelect.hidden = noAvailableFields;
             addBtn.hidden = noAvailableFields;
