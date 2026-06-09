@@ -741,6 +741,8 @@ let cfg = {
             inset: 0;
             z-index: 1200;
             background: transparent;
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1523,8 +1525,20 @@ let cfg = {
         }
 
         #settings-container .rule-item.is-disabled {
-            border-style: dashed;
-            background: var(--jpx-bg-soft);
+            border-style: solid;
+            border-color: var(--jpx-danger);
+            border-left: 4px solid var(--jpx-danger);
+            background: var(--jpx-danger-soft);
+        }
+
+        #settings-container .rule-item.is-disabled .rule-item-title {
+            color: var(--jpx-danger);
+            text-decoration: line-through;
+        }
+
+        #settings-container .rule-item.is-disabled .rule-item-meta {
+            color: var(--jpx-danger);
+            font-weight: 700;
         }
 
         #settings-container .rule-item-main {
@@ -1575,6 +1589,8 @@ let cfg = {
             position: absolute;
             inset: 0;
             background: transparent;
+            backdrop-filter: blur(1px);
+            -webkit-backdrop-filter: blur(1px);
             z-index: 12;
             display: flex;
             justify-content: flex-end;
@@ -1595,6 +1611,16 @@ let cfg = {
             display: flex;
             flex-direction: column;
             box-sizing: border-box;
+            transform: translateX(100%);
+            transition: transform 140ms ease-out;
+        }
+
+        #settings-container .rule-editor-overlay.is-open .rule-editor-window {
+            transform: translateX(0);
+        }
+
+        #settings-container .rule-editor-overlay.is-closing .rule-editor-window {
+            transform: translateX(100%);
         }
 
         #settings-container .rule-editor-header {
@@ -7623,16 +7649,34 @@ const fieldRenderers = {
             ruleList.className = 'rule-list';
             workbench.appendChild(ruleList);
 
-            const closeRuleEditor = () => {
+            const closeRuleEditor = (animate = true) => {
                 let host = container.closest('#settings-container') || container;
-                host.querySelector('.rule-editor-overlay')?.remove();
+                let overlay = host.querySelector('.rule-editor-overlay');
+                if (!overlay) return;
+                if (!animate) {
+                    overlay.remove();
+                    return;
+                }
+
+                let editorWindow = overlay.querySelector('.rule-editor-window');
+                overlay.classList.remove('is-open');
+                overlay.classList.add('is-closing');
+
+                const removeOverlay = () => {
+                    if (overlay.parentNode) overlay.remove();
+                };
+
+                if (editorWindow) {
+                    editorWindow.addEventListener('transitionend', removeOverlay, { once: true });
+                }
+                setTimeout(removeOverlay, 220);
             };
 
             const openRuleEditor = (index) => {
                 let item = dataObj[field.key][index];
                 if (!item) return;
 
-                closeRuleEditor();
+                closeRuleEditor(false);
 
                 let host = container.closest('#settings-container') || container;
                 let overlay = document.createElement('div');
@@ -7683,6 +7727,7 @@ const fieldRenderers = {
                     }
                 });
                 host.appendChild(overlay);
+                requestAnimationFrame(() => overlay.classList.add('is-open'));
                 overlay.tabIndex = -1;
                 overlay.addEventListener('keydown', (e) => {
                     if (e.key === 'Escape') finishEdit();
