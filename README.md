@@ -1,11 +1,11 @@
 # JPX-Revanced
 
-JPX userscript for Hentaiverse. Installation file: `JPX-Revanced-260608.js`.
+JPX userscript for Hentaiverse. Installation file: `JPX-Revanced.js`.
 
 如果你想让 Tampermonkey/Violentmonkey 自动更新脚本，把安装地址设置为：
 
 ```text
-https://raw.githubusercontent.com/MeiYongAI/JPX-Revanced/main/JPX-Revanced-260608.js
+https://raw.githubusercontent.com/MeiYongAI/JPX-Revanced/main/JPX-Revanced.js
 ```
 
 ## HV Dark Mode
