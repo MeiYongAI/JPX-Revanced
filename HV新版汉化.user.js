@@ -6396,6 +6396,22 @@
             overflow-y: auto !important;
         }
 
+        /* 军械库菜单汉化后文字变短，HVUT 的侧边按钮又是 absolute，
+           不参与左栏宽度计算，会压到右侧装备列表。让按钮回到文档流，
+           由按钮本身撑开左栏，比硬固定英文宽度更紧凑。 */
+        #armory_left .hvut-am-side {
+            position: static !important;
+            width: 100px !important;
+            margin: 20px 4px 0 !important;
+            box-sizing: border-box !important;
+        }
+
+        #armory_left .armory_tab {
+            box-sizing: border-box !important;
+            width: 100% !important;
+            text-align: center !important;
+        }
+
         /* 1. 压缩表格单元格的垂直间距 */
         #equipaction table td {
             padding: 1px 0px !important; /* 上下仅留1px */
