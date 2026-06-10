@@ -629,22 +629,32 @@ let cfg = {
         .effect-duration {
             display: inline-block;
             width: 24px;
+            height: 14px;
+            line-height: 14px;
             margin-right: -24px;
             position: relative;
+            vertical-align: bottom;
             text-align: center;
             z-index: 2;
+            pointer-events: none;
 
             div {
                 display: inline-block;
-                min-width: 18px;
-                padding: 1px 5px;
+                box-sizing: border-box;
+                min-width: 12px;
+                max-width: 24px;
+                height: 14px;
+                padding: 0 2px;
                 border-radius: 0;
                 background: var(--jpx-overlay);
                 color: var(--jpx-text-on-dark);
-                font-size: 10px;
-                letter-spacing: 0.1px;
+                font-size: 9px;
+                line-height: 12px;
+                letter-spacing: 0;
                 font-weight: bold;
                 border: 1px solid #fffaf0;
+                overflow: hidden;
+                white-space: nowrap;
             }
         }
 
