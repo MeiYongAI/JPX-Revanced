@@ -6335,25 +6335,24 @@ function openBattleRecords() {
         }
 
         .tooltip {
-            position: relative;
             cursor: help;
         }
-        .tooltip:hover::after {
-            display: block;
-            position: absolute;
-            bottom: 100%;
-            right: 0;
-            margin-bottom: 6px;
-            content: attr(data-tooltip);
+        #statsTooltip {
+            display: none;
+            position: fixed;
             border: 1px solid var(--stats-border);
             border-radius: 0;
             background: var(--stats-tooltip-bg);
             color: var(--stats-text);
             padding: 5px 8px;
-            white-space: pre;
-            z-index: 99;
+            white-space: pre-wrap;
+            z-index: 2147483647;
             text-align: left;
-            min-width: max-content;
+            max-width: calc(100vw - 16px);
+            max-height: calc(100vh - 16px);
+            overflow: auto;
+            pointer-events: none;
+            box-sizing: border-box;
         }
 
         @media (max-width: 900px) {
@@ -6902,6 +6901,77 @@ function renderDynamicTable(battleRecords, displayedColumns, parent) {
     tableWrap.id = 'battleStatsWrap';
     tableWrap.appendChild(table);
     parent.appendChild(tableWrap);
+    setupStatsTooltip(tableWrap);
+}
+
+function setupStatsTooltip(root) {
+    const doc = newWindow.document;
+    if (doc._jpxStatsTooltipCleanup) doc._jpxStatsTooltipCleanup();
+
+    doc.querySelector('#statsTooltip')?.remove();
+    const tooltip = doc.createElement('div');
+    tooltip.id = 'statsTooltip';
+    doc.body.appendChild(tooltip);
+
+    const getTarget = (event) => {
+        let target = event.target;
+        if (target && target.nodeType !== 1) target = target.parentElement;
+        const tooltipTarget = target?.closest?.('.tooltip[data-tooltip]');
+        return tooltipTarget && root.contains(tooltipTarget) ? tooltipTarget : null;
+    };
+    const hide = () => {
+        tooltip.style.display = 'none';
+        tooltip.textContent = '';
+    };
+    const place = (event) => {
+        const margin = 8;
+        const offset = 12;
+        tooltip.style.display = 'block';
+
+        const rect = tooltip.getBoundingClientRect();
+        const viewportWidth = doc.documentElement.clientWidth;
+        const viewportHeight = doc.documentElement.clientHeight;
+        let left = event.clientX + offset;
+        let top = event.clientY + offset;
+
+        if (left + rect.width + margin > viewportWidth) {
+            left = event.clientX - rect.width - offset;
+        }
+        if (top + rect.height + margin > viewportHeight) {
+            top = event.clientY - rect.height - offset;
+        }
+
+        tooltip.style.left = `${Math.max(margin, left)}px`;
+        tooltip.style.top = `${Math.max(margin, top)}px`;
+    };
+    const show = (event) => {
+        const target = getTarget(event);
+        const text = target?.dataset?.tooltip;
+        if (!text) {
+            hide();
+            return;
+        }
+        tooltip.textContent = text;
+        place(event);
+    };
+    const onMouseOut = (event) => {
+        const target = getTarget(event);
+        if (!target) return;
+        if (!event.relatedTarget || !target.contains(event.relatedTarget)) hide();
+    };
+
+    root.addEventListener('mouseover', show);
+    root.addEventListener('mousemove', show);
+    root.addEventListener('mouseout', onMouseOut);
+    newWindow.addEventListener('scroll', hide, true);
+
+    doc._jpxStatsTooltipCleanup = () => {
+        root.removeEventListener('mouseover', show);
+        root.removeEventListener('mousemove', show);
+        root.removeEventListener('mouseout', onMouseOut);
+        newWindow.removeEventListener('scroll', hide, true);
+        tooltip.remove();
+    };
 }
 
 //Settings
