@@ -6830,6 +6830,7 @@ function renderDynamicTable(battleRecords, displayedColumns, parent) {
             return { min: parseFloat(value.trim()), color: color?.trim() };
         }).filter(thr => !isNaN(thr.min)).sort((a, b) => b.min - a.min);
     };
+    const isOverallSummaryRow = (record) => record.aggregateType && (record.date === t('sP.Total') || record.date === t('sP.Average'));
 
     for (const record of battleRecords) {
         let tr = newWindow.document.createElement('tr');
@@ -6841,10 +6842,10 @@ function renderDynamicTable(battleRecords, displayedColumns, parent) {
             if (field.styleText) td.style.cssText = field.styleText;
             if (field.doI18n) value = t(`sP.${value}`);
             
-            if (!record.aggregateType && (field.id === 'eqP' || field.id === 'eqL' || field.id === 'eqM') && value > 0) {
+            if (!isOverallSummaryRow(record) && (field.id === 'eqP' || field.id === 'eqL' || field.id === 'eqM') && value > 0) {
                 let eqType = field.id === 'eqP' ? 'Peerless' : (field.id === 'eqL' ? 'Legendary' : 'Magnificent');
                 let eqList = record.revenueRecords?.equipment?.[eqType] || [];
-                if (eqList.length > 0) {
+                if (Array.isArray(eqList) && eqList.length > 0) {
                     td.classList.add('tooltip');
                     let displayList = [...eqList];
                     if (displayList.length > 25) {
