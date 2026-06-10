@@ -90,7 +90,7 @@ const settings = {
     '(Club || Axe) && Slaughter && Ethereal : prefix=#f00, type=bold, suffix=bold',
     '(Rapier || Wakizashi) && (Balance || Nimble) && Ethereal : prefix=#f00, type=bold, suffix=bold',
     'Wakizashi && (Nimble || Battlecaster) && (Fiery || Arctic || Shocking || Tempestuous) : prefix=#f00, type=bold, suffix=bold',
-    '(Estoc || Katana || Longsword || Great Mace || Scythe || Swordchucks) && Slaughter && Ethereal : prefix=#f00, type=bold, suffix=bold',
+    '(Estoc || Katana || Longsword || Great Mace || Mace || Scythe || Swordchucks) && Slaughter && Ethereal : prefix=#f00, type=bold, suffix=bold',
     'Oak && Hallowed && (Destruction || Heimdall) : prefix=#f00, type=bold, suffix=bold',
     'Willow && Demonic && (Destruction || Fenrir) : prefix=#f00, type=bold, suffix=bold',
     'Willow && (Shocking || Tempestuous) && Destruction : prefix=#f00, type=bold, suffix=bold',
@@ -501,6 +501,11 @@ $zh.dict = {
   'Update Wins/Kills': '更新胜场/击杀',
   'Monster Upgrader': '怪物升级器',
   'Power Level Calculator': '战力等级计算器',
+  'Monster Food Stock': '\u602a\u7269\u98df\u7269\u5e93\u5b58',
+  'Monster Chow': '\u602a\u7269\u9972\u6599',
+  'Monster Edibles': '\u602a\u7269\u98df\u54c1',
+  'Monster Cuisine': '\u602a\u7269\u6599\u7406',
+  'Happy Pills': '\u5feb\u4e50\u836f\u4e38',
   'Name': '名称',
   'Class': '种族',
   'Wins': '胜场',
@@ -878,6 +883,27 @@ const $config = {
     $config.settings = $config.get('settings', {});
     if ($config.settings.version !== $config.version) {
       $config.migration();
+    }
+    $config.normalize();
+  },
+  normalize: function () {
+    let changed = false;
+    if (Array.isArray($config.settings.equipNameCode)) {
+      const equipNameCode = $config.settings.equipNameCode.map((code) => {
+        if (typeof code !== 'string' || !/\bGreat Mace\b/.test(code)) {
+          return code;
+        }
+        const without_great_mace = code.replace(/\bGreat Mace\b/g, '');
+        if (/\bMace\b/.test(without_great_mace)) {
+          return code;
+        }
+        changed = true;
+        return code.replace(/\bGreat Mace\b/, 'Great Mace || Mace');
+      });
+      if (changed) {
+        $config.settings.equipNameCode = equipNameCode;
+        $config.save();
+      }
     }
   },
   migration: function () {
@@ -1732,7 +1758,7 @@ const $equip = {
     category: { 'One-handed Weapon': 1, 'Two-handed Weapon': 2, 'Staff': 3, 'Shield': 4, 'Cloth Armor': 5, 'Light Armor': 6, 'Heavy Armor': 7, 'Unknown': 99 },
     type: {
       'Rapier': 1, 'Club': 2, 'Axe': 3, 'Shortsword': 4, 'Wakizashi': 5, 'Dagger': 6,
-      'Estoc': 1, 'Great Mace': 2, 'Scythe': 3, 'Longsword': 4, 'Katana': 5, 'Swordchucks': 6,
+      'Estoc': 1, 'Great Mace': 2, 'Mace': 2, 'Scythe': 3, 'Longsword': 4, 'Katana': 5, 'Swordchucks': 6,
       'Oak Staff': 1, 'Willow Staff': 2, 'Katalox Staff': 3, 'Redwood Staff': 4, 'Ebony Staff': 5,
       'Force Shield': 1, 'Tower Shield': 2, 'Kite Shield': 3, 'Buckler': 4,
       'Phase': 1, 'Gossamer': 2, 'Ironsilk': 3, 'Cotton': 4,
@@ -1768,7 +1794,7 @@ const $equip = {
       const prefix = 'Ethereal|Fiery|Arctic|Shocking|Tempestuous|Hallowed|Demonic|Ruby|Cobalt|Amber|Jade|Zircon|Onyx|Charged|Frugal|Radiant|Mystic|Agile|Reinforced|Savage|Shielding|Mithril';
       const slot = 'Cap|Robe|Gloves|Pants|Shoes|Helmet|Breastplate|Gauntlets|Leggings|Boots|Cuirass|Armor|Greaves|Sabatons';
       const onehanded = 'Axe|Club|Dagger|Rapier|Shortsword|Wakizashi';
-      const twohanded = 'Estoc|Great Mace|Katana|Longsword|Scythe|Swordchucks';
+      const twohanded = 'Estoc|Great Mace|Mace|Katana|Longsword|Scythe|Swordchucks';
       const staff = 'Ebony Staff|Katalox Staff|Oak Staff|Redwood Staff|Willow Staff';
       const shield = 'Buckler|Force Shield|Kite Shield|Tower Shield';
       const acloth = 'Cotton|Gossamer|Ironsilk|Phase';
@@ -4474,6 +4500,7 @@ if (_query.s === 'Character' && _query.ss === 'eq') {
     $persona.save_equipset();
 
     _eq.init();
+    $persona.parse_stats_pane();
 
     /*
     _eq.stats_pane = $persona.parse_stats_pane();
@@ -5925,6 +5952,9 @@ if (_query.s === 'Bazaar' && _query.ss === 'ml' && $config.settings.monsterLab) 
       .msn { height: auto; }
       .hvut-ml-feed { position: absolute; top: 5px; left: 62px; width: 124px; height: 12px; font-size: 8pt; line-height: 12px; }
       div:hover > .hvut-ml-feed { background-color: var(--color-bg-alpha); }
+      .hvut-ml-stock { margin: 3px 0 10px; padding: 5px; border: 1px solid var(--color-border-default); list-style: none; font-size: 8pt; line-height: 14px; text-align: left; }
+      .hvut-ml-stock > li:first-child { margin-bottom: 2px; font-weight: bold; text-align: center; }
+      .hvut-ml-stock > li:not(:first-child) { display: flex; justify-content: space-between; gap: 6px; }
 
       .hvut-ml-summary { position: absolute; top: 38px; left: 10px; max-height: 500px; min-width: 400px; margin: 0; padding: 10px; overflow: auto; border: 1px solid var(--color-border-default); list-style: none; background-color: var(--color-bg-default); font-size: 9pt; line-height: 20px; text-align: left; white-space: nowrap; z-index: 1; }
       .hvut-ml-summary > li:first-child { margin-bottom: 5px; font-weight: bold; }
@@ -6088,9 +6118,25 @@ if (_query.s === 'Bazaar' && _query.ss === 'ml' && $config.settings.monsterLab) 
         $input(['button', 'Update Wins/Kills'], side_div, null, () => { _ml.main.feedall(); });
         $input(['button', 'Monster Upgrader'], side_div, { id: 'hvut-ml-up-button' }, () => { _ml.upgrade.toggle(); });
         $input(['button', 'Power Level Calculator'], side_div, null, () => { _ml.plc.toggle(); });
+        _ml.main.stock(side_div);
 
         if ($config.settings.monsterLabCloseDefaultPopup) {
           $id('messagebox_outer')?.classList.add('hvut-none');
+        }
+      },
+      stock: async function (side_div) {
+        const ul = $element('ul', side_div, ['.hvut-ml-stock']);
+        $element('li', ul, 'Monster Food Stock');
+        try {
+          await $item.once();
+          ['Monster Chow', 'Monster Edibles', 'Monster Cuisine', 'Happy Pills'].forEach((name) => {
+            const li = $element('li', ul);
+            $element('span', li, name);
+            $element('span', li, $item.count(name).toLocaleString());
+          });
+        } catch (e) {
+          $element('li', ul, 'Failed to load');
+          console.log(e);
         }
       },
       click: function (e) {
@@ -9147,13 +9193,21 @@ if (_query.s === 'Bazaar' && _query.ss === 'am' && $id('equiplist')) {
     },
 
     page: {
+      pending: {},
       init: function (doc, screen, assign) {
         $armory.postoken = $id('equipform', doc).elements.postoken?.value;
         $armory.node.submit[screen] = $id('equipsubmit', doc);
         $armory.script.parse(doc, screen, assign);
       },
       load: async function (screen, filter, assign) {
-        const html = await $ajax.fetch(`?s=Bazaar&ss=am&screen=${screen}&filter=${filter || ''}`);
+        const url = `?s=Bazaar&ss=am&screen=${screen}&filter=${filter || ''}`;
+        const key = `${screen}:${filter || ''}`;
+        if (!$armory.page.pending[key]) {
+          $armory.page.pending[key] = $ajax.fetch(url).finally(() => {
+            delete $armory.page.pending[key];
+          });
+        }
+        const html = await $armory.page.pending[key];
         const doc = $doc(html);
         $armory.page.init(doc, screen, assign);
         const table = $qs('#equiplist > table', doc);
@@ -9350,12 +9404,12 @@ if (_query.s === 'Bazaar' && _query.ss === 'am' && $id('equiplist')) {
     },
 
     integrate: {
-      init: function (screen) {
+      init: async function (screen) {
         $armory.node.table.tBodies[0].remove();
         $armory.equiplist = [];
-        $armory.filters.forEach((filter) => {
-          $armory.integrate.load(screen, filter);
-        });
+        for (const filter of $armory.filters) {
+          await $armory.integrate.load(screen, filter);
+        }
       },
       load: async function (screen, filter) {
         const holder = $element('tbody', $armory.node.table, [`/<tr class="hvut-eqp-category"><td colspan="10">Loading... [${filter}]</td></tr>`]);
@@ -9363,7 +9417,7 @@ if (_query.s === 'Bazaar' && _query.ss === 'am' && $id('equiplist')) {
         const equiplist = $equip.list.table(table);
         if (equiplist.length) {
           $armory.equiplist = $armory.equiplist.concat(equiplist);
-          $armory.modify[screen]?.(equiplist, table, filter);
+          await $armory.modify[screen]?.(equiplist, table, filter);
           if (!$id('equipcount')) {
             $qs('.eqselall').replaceWith($qs('.eqselall', table));
           }
