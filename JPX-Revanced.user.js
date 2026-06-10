@@ -6831,6 +6831,23 @@ function renderDynamicTable(battleRecords, displayedColumns, parent) {
         }).filter(thr => !isNaN(thr.min)).sort((a, b) => b.min - a.min);
     };
     const isOverallSummaryRow = (record) => record.aggregateType && (record.date === t('sP.Total') || record.date === t('sP.Average'));
+    const getHvTextTranslator = () => {
+        const candidates = [
+            window.hvTranslateText,
+            typeof unsafeWindow !== 'undefined' ? unsafeWindow.hvTranslateText : null,
+            globalThis.hvTranslateText
+        ];
+        return candidates.find(fn => typeof fn === 'function') || null;
+    };
+    const translateStatsTooltipText = (text) => {
+        const translator = getHvTextTranslator();
+        if (!translator) return text;
+        try {
+            return translator(text) || text;
+        } catch (e) {
+            return text;
+        }
+    };
 
     for (const record of battleRecords) {
         let tr = newWindow.document.createElement('tr');
@@ -6847,14 +6864,13 @@ function renderDynamicTable(battleRecords, displayedColumns, parent) {
                 let eqList = record.revenueRecords?.equipment?.[eqType] || [];
                 if (Array.isArray(eqList) && eqList.length > 0) {
                     td.classList.add('tooltip');
-                    let displayList = [...eqList];
+                    let displayList = eqList.map(name => translateStatsTooltipText(name));
                     if (displayList.length > 25) {
                         displayList = displayList.slice(0, 25);
                         displayList.push(`...及其他 ${eqList.length - 25} 件`);
                     }
                     let tooltipText = displayList.join('\n');
                     td.dataset.tooltip = tooltipText;
-                    td.title = tooltipText;
                 }
             }
 
@@ -6862,7 +6878,6 @@ function renderDynamicTable(battleRecords, displayedColumns, parent) {
                 td.classList.add('tooltip');
                 let tooltipText = `${t('sP.drop')}: ${value.drop.toLocaleString()}\n${t('sP.use')}: ${value.use.toLocaleString()}`;
                 td.dataset.tooltip = tooltipText;
-                td.title = tooltipText;
                 td.textContent = value.balance.toLocaleString();
             } else if (typeof value === 'number') {
                 td.textContent = value.toLocaleString();

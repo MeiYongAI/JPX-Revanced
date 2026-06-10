@@ -6556,6 +6556,19 @@
         return result;
     }
 
+    const hvTranslateText = function(text, element = null) {
+        if (text == null) return text;
+        try {
+            return getTranslatedString(String(text), element);
+        } catch (e) {
+            return text;
+        }
+    };
+    window.hvTranslateText = hvTranslateText;
+    if (typeof unsafeWindow !== 'undefined' && unsafeWindow !== window) {
+        unsafeWindow.hvTranslateText = hvTranslateText;
+    }
+
     /**
      * 文本节点处理器 (重构版)
      * 执行顺序：
