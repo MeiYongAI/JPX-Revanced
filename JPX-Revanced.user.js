@@ -6344,7 +6344,7 @@ function openBattleRecords() {
             bottom: 100%;
             right: 0;
             margin-bottom: 6px;
-            content: attr(content);
+            content: attr(data-tooltip);
             border: 1px solid var(--stats-border);
             border-radius: 0;
             background: var(--stats-tooltip-bg);
@@ -6851,13 +6851,17 @@ function renderDynamicTable(battleRecords, displayedColumns, parent) {
                         displayList = displayList.slice(0, 25);
                         displayList.push(`...及其他 ${eqList.length - 25} 件`);
                     }
-                    td.setAttribute('content', displayList.join('\n'));
+                    let tooltipText = displayList.join('\n');
+                    td.dataset.tooltip = tooltipText;
+                    td.title = tooltipText;
                 }
             }
 
             if (value && typeof value === 'object' && 'drop' in value) {
                 td.classList.add('tooltip');
-                td.setAttribute('content', `${t('sP.drop')}: ${value.drop.toLocaleString()}\n${t('sP.use')}: ${value.use.toLocaleString()}`);
+                let tooltipText = `${t('sP.drop')}: ${value.drop.toLocaleString()}\n${t('sP.use')}: ${value.use.toLocaleString()}`;
+                td.dataset.tooltip = tooltipText;
+                td.title = tooltipText;
                 td.textContent = value.balance.toLocaleString();
             } else if (typeof value === 'number') {
                 td.textContent = value.toLocaleString();
