@@ -1,11 +1,11 @@
 // ==UserScript==
-// @name         HV 新版汉化
+// @name         HV 汉化
 // @namespace    http://tampermonkey.net/
-// @version      2.2
-// @icon         https://hentaiverse.org/y/favicon.png
+// @version     3.0
 // @description  完全重构后新版的HV汉化脚本
-// @author       mbbdzz & MeiYongAI
+// @author       mbbdzz
 // @grant        none
+// @icon           https://hentaiverse.org/y/favicon.png
 // @match        https://hentaiverse.org/*
 // @match        *://*.hentaiverse.org/*
 // @match     https://forums.e-hentai.org/index.php?showtopic=*
@@ -59,6 +59,7 @@
 
     btn.addEventListener('mousedown', function(e) {
         isDragging = false;
+        e.preventDefault(); // 阻止拖动时选中文本
 
         // 计算鼠标点击点距离按钮左上角的偏移
         const shiftX = e.clientX - btn.getBoundingClientRect().left;
@@ -128,7 +129,7 @@
         {
             //顶部导航栏
             //priority: 1,
-            selector: "#hvut-top, #popup_box, #navbar, #towerstart > p:nth-of-type(5), #iwinfo",
+            selector: "#hvut-top, #popup_box, #navbar, #towerstart > p:nth-of-type(5), #iwinfo, #arena_list",
             //excludeSelector:
             //exclude: [
             //    { mode: "prefix", match: "" },
@@ -144,6 +145,7 @@
             translations: {
                 //"原文":"翻译",
                 //"原文": {replace: "翻译",style: "样式"},
+                'PERSISTENT' : '永久区',
                 'Character' : '角色',
                 'Equipment' : '装备',
                 'Abilities' : '技能',
@@ -185,10 +187,10 @@
                 'PFUDOR' : '彩虹小马✖20',
                 'Repair equipment' : '装备需要修理',
                 'Check equipment' : '检查你的装备情况',
-                'Great. You receive a 100% EXP Bonus but stamina drains 50% faster.' : '你现在精力充沛，获得额外100%经验加成，但精力消耗速度增加50%（每场战斗消耗0.03精力,异世界加倍）',
-                'Normal. You are not receiving any bonuses or penalties.' : '正常，你既不会受到额外的奖励也不会受到惩罚（每场战斗消耗0.02精力,异世界加倍）',
-                'Exhausted. You do not receive EXP or drops from monsters, and you cannot gain proficiencies.' : '你已经筋疲力尽，你将无法从怪物处获取任何经验、潜经验、掉落、以及熟练度，直到你的精力恢复到2以上',
-                'You have increased stamina drain due to low riddle accuracy' : '由于你的小马图回答正确率太低，你的精力消耗速率被提高了',
+                'Great. You receive a 100% EXP Bonus but stamina drains 50% faster.' : '你现在体力充沛，获得额外100%经验加成，但体力消耗速度增加50%（每场战斗消耗0.03体力,异世界加倍）',
+                'Normal. You are not receiving any bonuses or penalties.' : '正常，你既不会受到额外的奖励也不会受到惩罚（每场战斗消耗0.02体力,异世界加倍）',
+                'Exhausted. You do not receive EXP or drops from monsters, and you cannot gain proficiencies.' : '你已经筋疲力尽，你将无法从怪物处获取任何经验、潜经验、掉落、以及熟练度，直到你的体力恢复到2以上',
+                'You have increased stamina drain due to low riddle accuracy' : '由于你的小马图回答正确率太低，你的体力消耗速率被提高了',
             },
             patterns: [
                 {
@@ -209,7 +211,8 @@
             ],
             translations: {
                 //提示信息
-                'Stamina:' : '精力状态:',
+                'Isekai bonus:' : '异世界加成:',
+                'Stamina:' : '体力:',
                 'Insufficient credits.' : 'Credits 不足',
                 'There are no items of that type available.' : '购买的物品库存不足',
                 'Item has already been sold.' : '所选物品已售出',
@@ -223,15 +226,16 @@
                 'You do not have enough credits for that.' : '你没有足够的 Credits 来执行操作！',
                 'Invalid or expired token' : '令牌无效或者已过期',
                 'You cannot enter the same arena twice in one day.' : '同一竞技场一天只能进入一次',
-                'You cannot enter the Item World while exhausted.' : '你无法在精力耗竭时进入道具界',
-                'You cannot start a Grindfest while exhausted.' : '你无法在精力耗竭时进入压榨界',
-                'You cannot attempt The Tower again until tomorrow.' : '你今天的塔楼挑战/清通次数已达上限，明天再来吧。',
-                'You do not have enough stamina to start a new Arena.' : '你没有足够的精力开始竞技场挑战',
-                'You do not have enough stamina to enter this Item World.' : '你没有足够的精力进入道具界挑战',
-                'You do not have enough stamina to start a new Grindfest.' : '你没有足够的精力开始压榨界挑战',
-                'You do not have enough stamina to enter The Tower.' : '你没有足够的精力进入塔楼挑战',
+                'You cannot enter the Item World while exhausted.' : '你无法在体力耗竭时进入道具界',
+                'You cannot start a Grindfest while exhausted.' : '你无法在体力耗竭时进入压榨界',
+                'You cannot attempt The Tower again until tomorrow.' : '你今天的塔楼尝试或通关次数已达上限，明天再来吧。',
+                'You do not have enough stamina to start a new Arena.' : '你没有足够的体力开始竞技场挑战',
+                'You do not have enough stamina to enter this Item World.' : '你没有足够的体力进入道具界挑战',
+                'You do not have enough stamina to start a new Grindfest.' : '你没有足够的体力开始压榨界挑战',
+                'You do not have enough stamina to enter The Tower.' : '你没有足够的体力进入塔楼挑战',
                 'System Message' : '系统信息',
                 'Account Suspended' : '账号被禁封',
+                '24-hour cooldown for excessive refunds is in effect' : '训练退款次数过多，请等待24小时',
                 'Snowflake and the moogles are relaxing on the beach. Check back later.' : '雪花女神和莫古利正在海滩休息，请稍后再来',
                 'Snowflake and the moogles are rebooting the universe. Check back later.' : '雪花女神和莫古利正在重启宇宙，请稍后再来',
                 'Snowflake and the moogles are playing in the snow. Check back later.' : '雪花女神和莫古利正在玩雪，请稍后再来',
@@ -259,6 +263,12 @@
                 'Slot only takes scrolls.' : '所选物品槽只能装配卷轴',
                 'Insufficient items.' : '道具不足',
                 'Item is already slotted': '道具已装备',
+                '(No Current Equipment)': '(当前无装备)',
+                'Caffeinated Candy' : '咖啡因糖果（体力+5）',
+                'Caffeinated Candies' : '咖啡因糖果（体力+5）',
+                'Energy Drink' : '能量饮料（体力+10）',
+                'Show this lottery in the bottom bar' : '在底边栏显示本期彩票内容',
+                'Select ALL ponies you see in the image above then hit "Submit Answer" before the time limit runs out.': '请在时间限制结束之前选择你在上图认出的所有小马名称并点击“提交答案”',
             },
             patterns: [
                 // --- 商店买卖与交易 (Shop & Trade) ---
@@ -330,11 +340,11 @@
                 'Offhand Attack' : '副手攻击',
                 'Slashing Damage' : '斩击伤害',
                 'Accuracy' : '命中值',
-                'Crit Multiplier' : '暴击伤害',
+                'Crit Multiplier' : '暴击伤害倍率',
                 'Attack Speed Bonus' : '攻击速度加成',
                 'Domino Strike on hit' : '概率触发顺劈斩',
                 'Magic Attack' : '魔法伤害',
-                'Mana Cost Modifier' : '魔法消耗修正',
+                'Mana Cost Modifier' : '魔力消耗率',
                 'Cast Speed Bonus' : '施法速度加成',
                 'Damage Bonus' : '伤害加成',
                 'Spell Damage Bonus' : '法术伤害加成',
@@ -402,7 +412,7 @@
         {
             //道具分类标签
             //priority: 1,
-            selector:"#filterbar, #popup_box",
+            selector:"#filterbar, #popup_box, .hvut-mm-attach-menu, .hvut-mm-tabs",
             //excludeSelector:
             //exclude: [
             //    { mode: "prefix", match: "" },
@@ -435,6 +445,10 @@
                 'Material': '材料',
                 'Collectable': '收藏品',
                 'Monster Food': '怪物食物',
+                'Figures': '公仔',
+                'Item': '道具',
+                'Equipment': '装备',
+
             },
             patterns: [
                 {
@@ -445,8 +459,8 @@
         },
         {
             //装备分类标签
-            //priority: 1,
-            selector:".hvut-eqp-type, .hvut-eqp-category",
+            priority: 3,
+            selector:".hvut-eqp-type, .hvut-eqp-category, .hvut-eqp-scroll",
             //excludeSelector:
             //exclude: [
             //    { mode: "prefix", match: "" },
@@ -507,6 +521,7 @@
                 'the Thrice-blessed' : ' 恩典(圣抗+)',
                 'the Spirit-ward' : ' 魂护(暗抗+)',
                 'suffixless' : ' 无后缀',
+                'Drakehide' : ' 龙皮(轻)',
             },
             patterns: [
                 {
@@ -518,7 +533,7 @@
         {
             // 装备属性
             priority: 1,
-            excludeSelector:"#equipblurb, .postdetails, .signature, .copyright",
+            excludeSelector:"#equipblurb, .postdetails, .signature, .copyright, #pane_monster, #train_table",
             conditions: [
                 {
                     mode: "regex",
@@ -593,7 +608,6 @@
                 'Attack Accuracy':'攻击命中值',
                 'Attack Critical':'攻击暴击率',
                 'Attack Damage':'攻击伤害',
-                'Parry':'招架值',
                 'Magic Damage':'魔法伤害',
                 'Magic Critical':'魔法暴击率',
                 'Mana Conservation':'魔力消耗降低',
@@ -602,7 +616,11 @@
                 'Physical Mitigation':'物理减伤',
                 'Magical Mitigation':'魔法减伤',
                 'Block':'格挡值',
+                'Block Chance':'格挡值',
                 'Evade':'回避值',
+                'Evade Chance':'回避值',
+                'Parry':'招架值',
+                'Parry Chance':'招架值',
                 'Casting Speed':'施法速度',
                 'Resist':'抵抗值',
                 'Spell Crit':'法术暴击率',
@@ -624,7 +642,7 @@
                 'Forbidden':'黑暗魔法',
                 'Deprecating':'减益魔法',
                 'Supportive':'增益魔法',
-                'Primary Attributes':'主属性加成',
+                'Primary Attributes':'主属性',
                 'Strength':'力量',
                 'Dexterity':'灵巧',
                 'Agility':'敏捷',
@@ -804,6 +822,35 @@
                 'Quintessential' : '第五元素',
                 ' of Priestess' : ' 牧师',
                 ' of the Hulk' : ' 巨物(虚空抗+)',
+                //状态
+                'No such equip' : '装备已消失 id:',
+                //护符属性
+                'Charms':'装备护符',
+                'Capacitor':'魔力',
+                'Juggernaut':'生命',
+                'Butcher':'武器伤害',
+                'Fatality':'攻击暴击伤害',
+                'Overpower':'反招架',
+                'Swift Strike':'攻击速度',
+                'Annihilator':'魔法暴击伤害',
+                'Archmage':'武器魔法伤害',
+                'Economizer':'魔力消耗减免',
+                'Penetrator':'反抵抗',
+                'Spellweaver':'施法速度',
+                'Hollowforged':'虚空升华',
+                'Featherweight':'轻羽',
+                'Swiftness':'攻击速度',
+                ' of Swiftness' : ' 迅捷(攻速+)',
+                'Lesser':'小型',
+                'Greater':'大型',
+                'Cold-proof':'冰霜抗性',
+                'Dark-proof':'黑暗抗性',
+                'Lightning-proof':'闪电抗性',
+                'Fire-proof':'火焰抗性',
+                'Holy-proof':'神圣抗性',
+                'Wind-proof':'疾风抗性',
+                '(L)':'（小）',
+                '(G)':'（大）',
             },
             patterns: [
                 {
@@ -819,6 +866,7 @@
         {
             // 技能页
             priority: 2,
+            excludeSelector:".hvut-top-sub",
             conditions: [
                 {
                     mode: "regex",
@@ -974,6 +1022,7 @@
                 'Increases your spell damage' : '增加你的魔法伤害，',
                 'Increases your critical chance' : '增加你的攻击暴击率，',
                 'Increases your accuracy' : '增加你的攻击命中值，',
+                'Increases your accuracy and damage' : '增加你的攻击命中值和攻击伤害倍率，',
                 'Increases your spell accuracy' : '增加你的法术命中值，',
                 'Increases your attack and magic accuracy' : '增加你的攻击和法术命中值，',
                 'Increases your block' : '增加你的格挡值，',
@@ -1034,6 +1083,7 @@
                 'Magical Mitigation' : '魔法减伤',
                 'Spells Modified' : '咒语效果变化',
                 'Effects Modified' : '效果变化',
+                'Attack Damage Multiplier' : '攻击伤害倍率',
 
                 'Sleep, Confuse' : '沉睡,混乱',
                 'Fiery Blast, Freeze, Shockblast, Gale' : '炎爆术(Ⅰ),冰冻(Ⅰ),烈风(Ⅰ),惩戒(Ⅰ)',
@@ -1165,8 +1215,9 @@
                 },
                 { mode: "prefix", match: "https://forums.e-hentai.org/index.php?showtopic" },
                 { mode: "prefix", match: "https://hentaiverse.org/?s=Bazaar&ss=mm" },
-                { mode: "prefix", match: "https://hentaiverse.org/?s=Bazaar&ss" },
-                { mode: "prefix", match: "https://hentaiverse.org/isekai/?s=Bazaar&ss" },
+                { mode: "regex", match: /^https?:\/\/(?:alt\.)?hentaiverse\.org\/(?:isekai\/)?\?s=Bazaar&ss/ },
+                { mode: "regex", match: /^https?:\/\/(?:alt\.)?hentaiverse\.org\/(?:isekai\/)?$/ },
+                { mode: "regex", match: /^https?:\/\/(?:alt\.)?hentaiverse\.org\/(?:isekai\/)?$/ },
             ],
             translations: {
                 'Health Potion' : '生命药水',
@@ -1184,7 +1235,6 @@
                 'Soul Stone' : '灵魂石',
                 'Flower Vase' : '花瓶',
                 'Bubble-Gum' : '泡泡糖',
-                'Bubble Gum' : '泡泡糖',
 
                 'Infusion of Darkness' : '黑暗魔药',
                 'Infusion of Divinity' : '神圣魔药',
@@ -1222,7 +1272,9 @@
 
                 'Golden Lottery Ticket' : '黄金彩票券',
                 'Token of Blood' : '鲜血令牌',
+                'Token of Bloods' : '鲜血令牌',
                 'Chaos Token' : '混沌令牌',
+                'Chaos Tokens' : '混沌令牌',
                 'Soul Fragment' : '灵魂碎片',
 
                 'Binding of Slaughter':  '粘合剂 基础攻击伤害',
@@ -1581,6 +1633,15 @@
                 'Black Underwear': '黑色内衣',
                 'Choker and Bowtie': '项圈与领带',
 
+                //2026
+                'Wispy Catalyst' : '纤细 催化剂',
+                'Diluted Catalyst' : '稀释 催化剂',
+                'Regular Catalyst' : '平凡 催化剂',
+                'Robust Catalyst' : '稳健 催化剂',
+                'Vibrant Catalyst' : '活力 催化剂',
+                'Coruscating Catalyst' : '闪耀 催化剂',
+                'Final Edition': '终极版',
+
                 //节日及特殊奖杯
                 'Mysterious Box' : '神秘宝盒(等级9)', // 在‘训练：技能推广’调整价格后赠予某些玩家。
                 'Solstice Gift' : '冬至赠礼(等级7)', //  2009 冬至
@@ -1632,6 +1693,7 @@
                 'Marten Pelt': '貂皮(等级8)',//2024 圣诞节
                 'Snowflake Bunny Girl Figure': '兔女郎雪花女神公仔(等级8)',//2025复活节
                 'Bath Salts' : '浴盐(等级8)',//2025 圣诞节
+                'Collector\'s Catalyst Cabinet': '收藏家的催化剂储藏柜(等级8)',//2026复活节
 
                 ///////////////////////////////////////////////////////物品说明
 
@@ -1646,8 +1708,8 @@
                 'Instantly restores a moderate amount of spirit.' : '立刻回复一定量的灵力值.',
                 'Fully restores spirit, and grants a long-lasting spirit restoration effect.' : '灵力值全满,并持续回复一定量的灵力值，持续100回合.',
                 'Fully restores all vitals, and grants long-lasting restoration effects.' : '生命,魔力,灵力全满,并同时产生三种饮剂的效果，持续100回合.',
-                'Restores 10 points of Stamina, up to the maximum of 99. When used in battle, also boosts Overcharge and Spirit by 10% for ten turns.' : '恢复10点精力，但不超过99。如果在战斗中使用，除恢复精力外附带持续10回合每回合增加10%灵力和斗气.',
-                'Restores 5 points of Stamina, up to the maximum of 99. When used in battle, also boosts Overcharge and Spirit by 10% for five turns.' : '恢复5点精力，但不超过99。如果在战斗中使用，除恢复精力外附带持续5回合每回合增加10%灵力和斗气.',
+                'Restores 10 points of Stamina, up to the maximum of 99. When used in battle, also boosts Overcharge and Spirit by 10% for ten turns.' : '恢复10点体力，但不超过99。如果在战斗中使用，除恢复体力外附带持续10回合每回合增加10%灵力和斗气.',
+                'Restores 5 points of Stamina, up to the maximum of 99. When used in battle, also boosts Overcharge and Spirit by 10% for five turns.' : '恢复5点体力，但不超过99。如果在战斗中使用，除恢复体力外附带持续5回合每回合增加10%灵力和斗气.',
                 'There are three flowers in a vase. The third flower is green.' : '花瓶中有三朵花，第三朵是绿色的(玩偶特工)。使用时持续50回合攻击/魔法伤害，攻击/法术命中值与暴击率，回避与抵抗率大幅提升。',
                 'It is time to kick ass and chew bubble-gum... and here is some gum.' : '该是嚼著泡泡糖收拾他们的时候了…这里有一些泡泡糖(极度空间)。使用时持续50回合攻击和魔法伤害提升100%，必定命中且必定暴击',
                 'You gain +25% resistance to Fire elemental attacks and do 25% more damage with Fire magicks.' : '你获得 +25% 的火焰抗性且获得 25% 的额外火焰魔法伤害，持续50回合。',
@@ -1663,6 +1725,19 @@
                 'Grants the Shadow Veil effect.' : '使用产生暗影面纱(提升25%回避值)效果，持续100回合',
                 'Grants the Spark of Life effect.' : '使用产生生命火花(受到致命伤害后消耗25%基础SP，并以50%最大生命复活)效果，持续100回合',
                 'Grants the Absorb, Shadow Veil and Spark of Life effects with twice the normal duration.' : '同时产生吸收，闪避，以及生命火花效果，持续200回合',
+                //水晶
+                'You can fuse this crystal with a monster in the monster tab to increase its Strength' : '你可以用这种水晶在怪物实验室里面为一个怪物提升它的力量',
+                'You can fuse this crystal with a monster in the monster tab to increase its Dexterity' : '你可以用这种水晶在怪物实验室里面为一个怪物提升它的灵巧',
+                'You can fuse this crystal with a monster in the monster tab to increase its Agility' : '你可以用这种水晶在怪物实验室里面为一个怪物提升它的敏捷',
+                'You can fuse this crystal with a monster in the monster tab to increase its Endurance' : '你可以用这种水晶在怪物实验室里面为一个怪物提升它的体质',
+                'You can fuse this crystal with a monster in the monster tab to increase its Intelligence' : '你可以用这种水晶在怪物实验室里面为一个怪物提升它的智力',
+                'You can fuse this crystal with a monster in the monster tab to increase its Wisdom' : '你可以用这种水晶在怪物实验室里面为一个怪物提升它的智慧',
+                'You can fuse this crystal with a monster in the monster tab to increase its Fire Resistance' : '你可以用这种水晶在怪物实验室里面为一个怪物提升它的火焰抗性',
+                'You can fuse this crystal with a monster in the monster tab to increase its Cold Resistance' : '你可以用这种水晶在怪物实验室里面为一个怪物提升它的冰冷抗性',
+                'You can fuse this crystal with a monster in the monster tab to increase its Electrical Resistance' : '你可以用这种水晶在怪物实验室里面为一个怪物提升它的闪电抗性',
+                'You can fuse this crystal with a monster in the monster tab to increase its Wind Resistance' : '你可以用这种水晶在怪物实验室里面为一个怪物提升它的疾风抗性',
+                'You can fuse this crystal with a monster in the monster tab to increase its Holy Resistance' : '你可以用这种水晶在怪物实验室里面为一个怪物提升它的神圣抗性',
+                'You can fuse this crystal with a monster in the monster tab to increase its Dark Resistance' : '你可以用这种水晶在怪物实验室里面为一个怪物提升它的黑暗抗性',
                 //现有文物和奖杯
                 'An advanced technological artifact from an ancient and long-lost civilization. Handing these in at the Shrine of Snowflake will grant you a reward.' : '一个发达古代文明的技术结晶，把它交给雪花神殿的雪花女神来获得你的奖励',
                 'Retrieved as a Toplist Reward for active participation in the E-Hentai Galleries system.' : '作为在E-Hentai画廊系统的活跃排行榜奖励派发，献祭作用与奖杯相同。',
@@ -1679,7 +1754,7 @@
                 'Given to you by Yuki when you defeated her. She looked better without them anyway.' : '击败长门有希后获得的眼镜。她不戴眼镜时看起来好多了。',
                 'An Invisible Pink Unicorn Horn taken from the Invisible Pink Unicorn. It doesn\'t weigh anything and has the consistency of air, but you\'re quite sure it\'s real.' : '从隐形粉红独角兽头上取下来的隐形粉红色的角，它很像空气一样轻，几乎没有重量，但是你很确定它是真实存在的',
                 'A nutritious pasta-based appendage from the Flying Spaghetti Monster.' : '一条用飞行意大利面怪物身上的面团做成的营养附肢。',
-                'A voucher for a free soulbound Peerless equipment piece of your choice. Given to you personally by Snowflake for your devout worship and continued offerings.' : '一张可以根据你的选择兑换一件免费灵魂绑定无双装备的凭证。这是雪花女神对你的虔诚与持续奉献的奖励。',
+                'A voucher for a free soulbound Peerless equipment piece of your choice. Given to you personally by Snowflake for your devout worship.' : '一张可以根据你的选择兑换一件免费灵魂绑定无双装备的凭证。这是雪花女神对你的虔诚与持续奉献的奖励。',
 
                 //强化材料
                 'A cylindrical object filled to the brim with magitech energy. Used to power charms and advanced equipment.' : '一个充斥着奥术能量的圆柱形物体，用于为护身符和先进装备供电',
@@ -1728,19 +1803,177 @@
                 'You can use this token to unlock monster slots in the Monster Lab, as well as to upgrade your monsters.' : '你可以用这些令牌开启额外的怪物实验室槽位，也可以升级你的怪物',
                 'Use this ticket on a lottery to add 100 tickets and double your effective ticket count. Will not increase effective count past 10% of the total tickets sold.' : '你可以使用这张彩券兑换100张当期彩票，并且让自己持有的彩票数量翻倍(效果在开奖时计算，最多不超过总奖池10%)',
                 'Artifacts and Trophies' : '文物和奖杯',
+                //怪物食品
+                'Non-discerning monsters like to munch on this chow.' : '不挑食的初级怪物喜欢吃这种食物',
+                'Mid-level monsters like to feed on something slightly more palatable, like these scrumptious edibles.' : '中级怪物喜欢吃更好吃的食物，比如这种',
+                'High-level monsters would very much prefer this highly refined level of dining if you wish to parlay their favor.' : '如果你想受高等级怪物的青睐的话，请喂它们吃这种精致的食物吧',
+                'Tiny pills filled with delicious artificial happiness. Use on monsters to restore morale if you cannot keep them happy. It beats leaving them sad and miserable.' : '美味的人造药丸，满溢着的幸福，没法让怪物开心的话，就用它来恢复怪物的士气，赶走怪物的悲伤和沮丧吧',
+                //小马
+                'A 1/10th scale figurine of Twilight Sparkle, the cutest, smartest, all-around best pony. According to Pinkie Pie, anyway.' : 'NO.1 暮光闪闪的 1/10 比例缩放公仔。最可爱、最聪明，最全能的小马。(根据萍琪的说法，嗯…) ',
+                'A 1/10th scale figurine of Rainbow Dash, flier extraordinaire. Owning this will make you about 20% cooler, but it probably took more than 10 seconds to get one.' : 'NO.2 云宝黛西的 1/10 比例缩放公仔。杰出的飞行员。拥有这个公仔可以让你多酷大约 20%，但为了得到她你得多花 10 秒！ ',
+                'A 1/10th scale figurine of Applejack, the loyalest of friends and most dependable of ponies. Equestria\'s best applebucker, and founder of Appleholics Anonymous.' : 'NO.3 苹果杰克的 1/10 比例缩放公仔。最忠诚的朋友，最可靠的小马。阿奎斯陲亚最好的苹果采收员，同时也是苹果农庄的创始马。 ',
+                'A 1/10th scale figurine of Fluttershy, resident animal caretaker. You\'re going to love her. Likes baby dragons; Hates grown up could-eat-a-pony-in-one-bite dragons.' : 'NO.4 小蝶的 1/10 比例缩放公仔。小马镇动物的褓姆，大家都喜爱她。喜欢幼龙；讨厌能一口吞掉小马的大龙。 ',
+                'A 1/10th scale figurine of Pinkie Pie, a celebrated connoisseur of cupcakes and confectioneries. She just wants to keep smiling forever.' : 'NO.5 萍琪派的 1/10 比例缩放公仔。一位著名的杯子蛋糕与各式饼干糖果的行家。她只想让大家永远保持笑容。 ',
+                'A 1/10th scale figurine of Rarity, the mistress of fashion and elegance. Even though she\'s prim and proper, she could make it in a pillow fight.' : 'NO.6 瑞瑞的 1/10 比例缩放公仔。时尚与品味的的女主宰。她总是能在枕头大战中保持拘谨矜持。 ',
+                'A 1/10th scale figurine of The Great and Powerful Trixie. After losing her wagon, she now secretly lives in the Ponyville library with her girlfriend, Twilight Sparkle.' : 'NO.7 崔克茜的 1/10 比例缩放公仔。伟大的、法力无边的崔克茜。失去她的篷车后，她现在偷偷的与她的女友暮光闪闪住在小马镇的图书馆中。 ',
+                'A 1/10th scale figurine of Princess Celestia, co-supreme ruler of Equestria. Bored of the daily squabble of the Royal Court, she has recently taken up sock swapping.' : 'NO.8 塞拉斯蒂亚公主的 1/10 比例缩放公仔。阿奎斯陲亚大陆的最高统治者。对每日的皇家争吵感到无聊，她近日开始穿上不成对的袜子。 ',
+                'A 1/10th scale figurine of Princess Luna, aka Nightmare Moon. After escaping her 1000 year banishment to the moon, she was grounded for stealing Celestia\'s socks.' : 'NO.9 露娜公主的 1/10 比例缩放公仔。又名梦靥之月。在结束了一千年的放逐后，她从月球回到阿奎斯陲亚偷走了塞拉斯提娅的袜子。 ',
+                'A 1/10th scale figurine of Apple Bloom, Applejack\'s little sister. Comes complete with a \"Draw Your Own Cutie Mark\" colored pencil and permanent tattoo applicator set.' : 'NO.10 小苹花的 1/10 比例缩放公仔。苹果杰克的小妹。使用了“画出妳自己的可爱标志”彩色铅笔与永久纹身组后，生命更加的完整了。 ',
+                'A 1/10th scale figurine of Scootaloo. Die-hard Dashie fanfilly, best pony of the Cutie Mark Crusaders, and inventor of the Wingboner Propulsion Drive. 1/64th chicken.' : 'NO.11 飞板璐的 1/10 比例缩放公仔。云宝黛西的铁杆年轻迷妹，可爱标志十字军中最棒的小马，以及蠢翅动力推进系统的发明者。有 1/64 的组成成分是鲁莽。 ',
+                'A 1/10th scale figurine of Sweetie Belle, Rarity\'s little sister. Comes complete with evening gown and cocktail dress accessories made of 100% Dumb Fabric.' : 'NO.12 甜贝儿的 1/10 比例缩放公仔。瑞瑞的小妹。在穿上 100% 蠢布料制成的晚礼服与宴会短裙后更加完美了。 ',
+                'A 1/10th scale figurine of Big Macintosh, Applejack\'s older brother. Famed applebucker and draft pony, and an expert in applied mathematics.' : 'NO.13 大麦克的 1/10 比例缩放公仔。苹果杰克的大哥。有名的苹果采收员和大力马，同时也是实用数学的专家。 ',
+                'A 1/10th scale figurine of Spitfire, team leader of the Wonderbolts. Dashie\'s idol and occasional shipping partner. Doesn\'t actually spit fire.' : 'NO.14 飞火的 1/10 比例缩放公仔。惊奇闪电的领导者。云宝黛西的偶像和临时飞行搭档。实际上不会吐火。 ',
+                'A 1/10th scale figurine of Derpy Hooves, Ponyville\'s leading mailmare. Outspoken proponent of economic stimulus through excessive muffin consumption.' : 'NO.15 小呆的 1/10 比例缩放公仔。小马镇上重要的邮差马。直言不讳的主张以大量食用马芬的方式来刺激经济。 ',
+                'A 1/10th scale figurine of Lyra Heartstrings. Features twenty-six points of articulation, replaceable pegasus hoofs, and a detachable unicorn horn.' : 'NO.16 天琴心弦的 1/10 比例缩放公仔。拥有 26 个可动关节，可更换的飞马蹄与一个可拆卸的独角兽角是其特色。 ',
+                'A 1/10th scale figurine of Octavia. Famous cello musician; believed to have created the Octatonic scale, the Octahedron, and the Octopus.' : 'NO.17 奥塔维亚的 1/10 比例缩放公仔。著名的大提琴家；据信创造了八度空间、八面体以及章鱼。 ',
+                'A 1/10th scale figurine of Zecora, a mysterious zebra from a distant land. She\'ll never hesitate to mix her brews or lend you a hand. Err, hoof.' : 'NO.18 泽科拉的 1/10 比例缩放公仔。一位来自远方的神秘斑马。她会毫不迟疑的搅拌她的魔药或助你一臂之力。呃，我是说一蹄之力… ',
+                'A 1/10th scale figurine of Cheerilee, Ponyville\'s most beloved educational institution. Your teachers will never be as cool as Cheerilee.' : 'NO.19 车厘子的 1/10 比例缩放公仔。小马镇最有爱心的教育家。你的老师绝对不会像车厘子这么酷的！ ',
+                'A 1/10th scale bobblehead figurine of Vinyl Scratch, the original DJ P0n-3. Octavia\'s musical rival and wub wub wub interest.' : 'NO.20 维尼尔的 1/10 比例缩放摇头公仔。是 DJ P0n-3 的本名。为奥塔维亚在音乐上的对手，喜欢重低音喇叭。 ',
+                'A 1/10th scale figurine of Daring Do, the thrill-seeking, action-taking mare starring numerous best-selling books. Dashie\'s recolor and favorite literary character.' : 'NO.21 无畏天马的 1/10 比例缩放公仔。追寻刺激，有如动作片主角一般的小马，为一系列畅销小说的主角。是云宝黛西最喜欢的角色，也是带领她进入阅读世界的原因。 ',
+                'A 1/10th scale figurine of Doctor Whooves. Not a medical doctor. Once got into a hoof fight with Applejack over a derogatory remark about apples.' : 'NO.22 神秘博士的 1/10 比例缩放公仔。不是医生。曾经与苹果杰克陷入一场因贬低苹果的不当发言而产生的蹄斗。 ',
+                'A 1/10th scale figurine of Berry Punch. Overly protective parent pony and Ponyville\'s resident lush. It smells faintly of fruit wine.' : 'NO.23 酸梅酒的 1/10 比例缩放公仔。有过度保护倾向的小马，也是小马镇的万年酒鬼。闻起来有淡淡水果酒的气味。 ',
+                'A 1/10th scale figurine of Bon-Bon. Usually seen in the company of Lyra. Suffers from various throat ailments that make her sound different every time you see her.' : 'NO.24 糖糖的 1/10 比例缩放公仔。常常被目击与天琴心弦在一起。患有许多呼吸道相关的疾病，使你每次遇到她的时候她的声音都不同。 ',
+                'A 1/10th scale fluffy figurine of Fluffle Puff. Best Bed Forever.' : 'NO.25 毛毛马的 1/10 比例缩放的毛茸茸玩偶。让你想要永远躺在上面。 ',
+                'A lifesize figurine of Angel Bunny, Fluttershy\'s faithful yet easily vexed pet and life partner. All-purpose assistant, time keeper, and personal attack alarm.' : 'NO.26 天使兔的等身大玩偶。为小蝶忠实且易怒的宠物及伴侣。万能助理、报时器、受到人身攻击时的警报器。 ',
+                'A lifesize figurine of Gummy, Pinkie Pie\'s faithful pet. Usually found lurking in your bathtub. While technically an alligator, he is still arguably the best pony.' : 'NO.27 嘎米的等身大玩偶。是萍琪的忠实宠物。经常被发现潜伏在你的浴缸里。虽然技术上是只短吻鳄，但它仍然可以称得上是最棒的小马。 ',
+                //旧文物
+                'It is dead, and smaller than you expected.' : '它已经死了，而且体型比你想像中还要小。',
+                'So that is where that thing ended up.' : '所以这就是事件的最终下场。',
+                'It would be totally awesome, but you do not have any sharks.' : '这肯定棒呆了！但你没有养鲨鱼。',
+                'The energy cells are completely drained.' : '能量电池已完全用尽。 (BFG=Big Fucking Gun)',
+                'The electromagnetic acceleration rails are bent and twisted. Using it would be bad.' : '电磁加速轨道已折弯和扭曲，使用它会很糟糕。',
+                'Now all you need is some fuel.' : '现在你所需要的是一些燃料。',
+                'Great for blowing up small kingdoms, but you do not know the code to activate it.' : '很适合用来摧毁小王国，但你不知道发射密码。',
+                'Oil for chainsaws.' : '电锯的链条油。',
+                'Fuel for chainsaws. Will not work in flame throwers.' : '电锯专用燃料，不能用在火焰喷射器。',
+                'Spare cutting chain for a chainsaw.' : '电锯的切割链零件。',
+                'Spare guide bar for a chainsaw.' : '电锯的导板零件。',
+                'A booklet with safety information for proper use of a chainsaw.' : '写着正确使用电锯的安全须知的小册子。',
+                'Contains information on the proper care and maintenance of a chainsaw.' : '包含适当的照料与维修方法。',
+                'Unfortunately it is incomplete, and there are no orange portals around.' : '很可惜它是未完成品，周围没有橘色的传送门。',
+                'Being aware that fulfilling its function will also end its existance, this bomb refuses to go off.' : '意识到履行自身的功能也将消灭自己的存在，这个炸弹拒绝爆炸。',
+                'Must be hooked up to an Advanced Power Plant to fire.' : '必须连接大型发电厂才能发射。',
+                'The blade that should be attached to this hilt is gone.' : '本该连接这个剑柄的剑刃不见了。',
+                'A piece to the puzzle.' : '一块拼图。',
+                //季节限定文物
+                'One of only 57 limited edition boxes filled with spent ability points. You\'re not quite sure when you picked this up, but something tells you to hang on to it.' : '57 个限量版盒子的其中一个，里面放满了用过的技能点。你很犹豫是否要捡起它，但有个声音告诉你要紧抓住它不放。',
+                'These gifts were handed out for the 2009 Winter Solstice. It appears to be sealed shut, so you will need to make Snowflake open it.' : '这些礼物在 2009 年冬至发放。看来这似乎是密封包装，所以你需要请雪花来打开它。',
+                'You found these in your Xmas stocking when you woke up. Maybe Snowflake will give you something for them.' : '你醒来时在你的圣诞袜里发现这些东西。说不定雪花会跟你交换礼物。(2009年以来每年圣诞节礼物)',
+                'You found this junk in your Xmas stocking when you woke up. Maybe Snowflake will give you something useful in exchange.' : '你醒来时在你的圣诞袜里发现这个垃圾。把它交给雪花或许她会给你一些好东西作为交换。(2009年以来每年圣诞节礼物)', //0.87更新
+                'This box is said to contain an item of immense power. You should get Snowflake to open it.' : '传说此盒子封印了一件拥有巨大力量的装备。你应该找雪花来打开它。(年度榜单或者年度活动奖品)',
+                'You happened upon this item when you somehow found time to play HV on the gamiest day of the year. It is attached to some strange mechanism.' : '在今年鸟最多的日子，当你不知怎的抓到时间刷 HV 时意外发现这个东西。它和一些奇怪的机械装置接在一起。(《传送门 2》发售纪念)',
+                'A coupon which was handled to you by a festival moogle during the Loot and Harvest Festival. Offer it to Snowflake for some bonus loot.' : '一个在战利与丰收节日期间由节日莫古利送给你的礼券。把它交给雪花可以交换额外的战利品。[2020起中秋节活动]',
+                'A gift for the 2010 Winter Celebrations. Its surface has a mysterious sheen which seems to bend light in strange ways. You will need to make Snowflake open it.' : '2010 年冬天的庆祝活动的礼物。它的表面呈现不可思议的光泽，看样子是用奇妙的方式反射光线。你需要请雪花来打开它。',
+                'If you look it in the mouth, some evil fate may befall you. Hand it to Snowflake instead, and she might give you a little something.' : '如果你检查马嘴，某些恶运可能会降临到你身上。相反地，把它牵给雪花，她会给你一些别的。(2011 圣诞节)',
+                'Whoever got you this apparently doesn\'t know you very well. You have no need for souls. Try giving it to Snowflake, she may reward you with something else.' : '无论是谁给你这个，很显然地他对你不甚了解。你根本不需要灵魂。试着把它交给雪花，也许她会给你一些别的报酬。(2012 圣诞节)',
+                'A mysterious box with six distinct locks. If you ask Snowflake, chances are she happens to have all six keys required to open it.' : '一个有六种钥匙孔的神秘盒子。如果你请教雪花的话，可能她碰巧持有开盒所需的全部六种钥匙。(2013 圣诞节)',
+                'Some geniune and highly decorative reindeer antlers to hang on your wall. Or, you know, trade to Snowflake for something you likely neither want nor need.' : '一些货真价实且极具装饰性的驯鹿鹿角挂在你的墙上。要不，你知道的，和雪花交易把你可能不想要也不需要的东西处理掉。(2014 圣诞节)',
+                'It says "Best Friends Forever." Looking at it fills you with determination.' : '它写着“永远的好朋友。”看着它让你充满决心。(2015 圣诞节)',
+                'A giant dino egg. The entire shell is still intact. The contents seem to have fossilized, and it seems unlikely that it will ever hatch.' : '一个巨大的恐龙蛋。它的壳还保存得很完整呢。内部看起来好像成为化石了，似乎不太可能会孵化。(2016 圣诞节)',
+                'This tooth is very mysterious.' : '这个牙齿非常的神秘(2017 圣诞节)',
+                'A very fragile flower. While you would leave it at home rather than take it into battle, handing it to Snowflake for safekeeping seems like the better choice.' : '一朵非常脆弱的花。虽然你宁愿把它留在家里也不愿带入战斗，但把它交给雪花保管似乎是更好的选择。(2018 圣诞节)',
+                'A heart, made of iron. While it was capable of protecting you from damage once, it seems to have been spent already. You should give it to Snowflake.' : '一颗钢铁制作的心。在它曾经可用时它可以保护你免受一次伤害，但它现在似乎已经被用过了。你应该把它给雪花。(2019 圣诞节)',
+                'A precursor smartgun with autonomous aiming and talking functionality. The name "Skippy" is crudely painted on its side. It seems broken in more ways than one.' : '一把拥有自动瞄准和说话功能的旧世界智能枪。其名称"Skippy"粗犷地喷涂在侧面。它似乎不止一个地方坏了(2020 圣诞节)',
+                'Taru da! It\'s a barrel, which may or may not be filled with yummy nomnoms, but you will never know unless you ask Snowflake to open it.' : '塔鲁达！ 这是一个桶，里面可能装满了美味的nomnoms，也可能没有，但除非你让雪花打开它，否则你永远不会知道。(2021 圣诞节)',
+                'A badge inscribed with your RealPervert identity. Regardless of whether you fell for it or not, you got this for participating in the 2011 April Fools thread.' : '一个刻着你的实名变态身份的胸章。无论你是否信以为真，你参与了 2011 年愚人节主题就会得到这个。',
+                'A 1/10th scale collectible figure of Raptor Jesus. Consolitory prize for those who did not ascend during the May 2011 Rapture.' : '猛禽耶稣的 1/10 比例缩放公仔。给 2011 年 5 月被提发生期间没被送到天上的人开个安慰价格。',
+                'Granted to you by Snowflake for finding and handing in all the eggs during the 2011 Easter Event.' : '由雪花授予你，在 2011 年复活节活动寻得并且献上所有彩蛋的证明。',
+                'Granted to you by Snowflake for finding and handing in some of the eggs during the 2011 Easter Event. Better luck finding all of them next year.' : '由雪花授予你，在 2011 年复活节活动寻得并且献上部分彩蛋的证明。明年一定会幸运找齐全部的。',
+                'Granted to you by Snowflake for finding and handing in all the ponyfeathers during the 2012 Easter Event. Now you, too, can be like Rainbow Dash.' : '由雪花授予你，在 2012 年复活节活动寻得并且献上所有天马的羽毛的证明。现在，你也可以像云宝黛西一样。',
+                'Granted to you by Snowflake for finding and handing in some of the ponyfeathers during the 2012 Easter Event.' : '由雪花授予你，在 2012 年复活节活动寻得并且献上部分天马的羽毛的证明。',
+                'A crystallized Galanthus flower. Granted to you by Snowflake for finding and handing in all the snowflakes during the 2013 Easter Event.' : '结晶化的雪花莲花朵。由雪花授予你，在 2013 年复活节活动寻得并且献上所有雪花的证明。',
+                'A bottle of distilled, 100% pure self-satisfaction. Granted to you by Snowflake for finding and handing in some of the snowflakes during the 2013 Easter Event.' : '一瓶蒸馏过的，100% 纯正的自我满足。由雪花授予你，在 2013 年复活节活动寻得并且献上部分雪花的证明。',
+                'A highly polished and shiny commemorative gold coin. This was created especially by the Royal Equestrian Mint for the 2014 Easter Event.' : '高度抛光且闪亮亮的纪念金币。这是皇家阿奎斯陲亚铸币局专为 2014 复活节活动铸造的。',
+                'An ancient precursor device, once used to inefficiently mine for magic internet money. Awarded for participating in the 2014 Easter Event.' : '古老的旧世代装置，以前被用来为神奇的网络货币执行毫无效率的挖矿。参与 2014 复活节活动的奖赏。',
+                'A USB storage device filled with precursor tentacle porn, extracted from the ancient servers that were recovered during the 2015 Easter Event.' : '塞满了旧世代触手色情档案的随身碟，提取自 2015 复活节活动中复原的古老服务器。',
+                'A coupon for a lifetime 10% discount on a VPS plan. Expired many lifetimes ago. A moogle gave you this for participating in the 2015 Easter Event.' : '一次有效期限内享 10% 折扣的虚拟主机方案优惠券。已逾期多次有效期限之久。这是莫古利送给你当作参与 2015 复活节活动的奖赏。',
+                'An advanced precursor device capable of projecting a miniature rainbow into the sky. Awarded for participating in the 2016 Easter Event.' : '一部旧世界的先进设备，能在天空投射出一道微型彩虹。参与 2016 复活节活动的奖赏。',
+                'An ordinary pot of leprechaun gold designed for use with holographic rainbow projectors. Awarded for participating in the 2016 Easter Event.' : '为搭配全像式彩虹投影机而设计，常见的拉布列康收集的一罐黄金。参与 2016 复活节活动的奖赏。',
+                'A technological curiosity of the past, capable of turning perfectly good fruit into an unpalatable blend of mush. [2017 Easter Event]' : '过去的科技珍品，能够完全的将美味的水果做成难吃的糊状混合物。[2017 复活节活动]',
+                'That was the theory anyway. It is a sickly brown, and does not look particularly appetizing, but Snowflake seems to love them. [2017 Easter Event]' : '这只是理论上。实际它呈现黯淡的褐色，尤其看起来不能引起食欲，但是雪花女神好像很喜欢。[2017 复活节活动]',
+                'A remnant from the last great invasion of undead grammar nazis. It predominately features a swastika stylized with red squiggly lines. [2018 Easter Event]' : '上一次不死人语法纳粹入侵的残余物。它的主要特征是一个带有红色波浪线的纳粹标志。[2018 复活节活动]',
+                'An abstract rendition of "Clippy", believed to be the precursor patron saint of spelling errors. [2018 Easter Event]' : '一个“Office助手”表达，被认为是拼写错误的先驱守护神。[2018 复活节活动]',
+                'A small selection of assorted collectable precursor coins. [2019 Easter Event]' : '一小部分精选的各种收藏品旧币。[2019 复活节活动]',
+                'A first-edition signed copy of "Coping With Change", considered by most numismatists to be *the* authoritative guide to collecting coins. [2019 Easter Event]' : '《应对变化》的初版签名版，被大多数钱币学家视为收集硬币的权威指南。[2019 复活节活动]',
+                'A special kind of omikuji that does not actually tell your fortune, but will instead directly grant you some if you offer it to Snowflake.' : '一种特殊的神签，它并不能帮你预知命运，但是如果你把它献祭给雪花,就可以交换到一些东西。[2020起复活节活动]',
+                'A precursor beak-shaped mask filled with fragrant herbs, said to protect the wearer from disease and miasma but probably doesn\'t. [2020 Easter Event]' : '一种充满香草药的喙状前体面具，据说可以保护佩戴者免受疾病和瘴气的侵害，但实际可能并不能。[2020 复活节活动]',
+                'A paper certifying that the holder was recently vaccinated from some ancient disease. It expired centuries ago and only has historic value. [2021 Easter Event]' : '一张证明持有者最近接种过某种远古疾病疫苗的文件。它已经在好几个世纪前过期，仅具有历史价值。[2021 复活节活动]',
+                'A polishing cloth, pine-scented spray bottle and various other maintenance tools to give your Equipment Cores the love they deserve. [2022 Easter Event]' : '抛光布、松香喷雾瓶和其他各种维护工具，为您的设备核心提供应有的爱。[2022 复活节活动]',
+                'A rare winter decoration from an ancient civilization, serving as a perfect example of its gaudiness and bad taste.' : '一种来自古代文明的罕见冬季装饰品，它的俗丽的美和低劣品味可谓经典范例。(2010 年圣诞节发放)',
+                'A rare 1/10th scale Santa sled featuring ponies instead of reindeer. It\'s decked out in gaudy flashing lights that fortunately ran out of power centuries ago.' : '罕见的圣诞雪橇 1/10 比例缩放模型，是由小马拉着雪橇而不是驯鹿。上面装了一堆超俗的闪光灯，幸好几百年前就没电了。(2011 年圣诞节发放)',
+                'An eternally burning purple heart, fueled by magic and friendship, suspended inside a glass vessel. Saves on lantern oil.' : '一颗永久燃烧的紫色之心，以魔法和友谊为燃料，悬挂在玻璃容器里。省下了灯油。(2012 年圣诞节发放)',
+                'Covers the entire 12th b\'ak\'tun of the Mayan Long Count Calendar, equivalent to 144000 days. Now only good as a very heavy ornate paperweight.' : '完整涵盖长纪历的第 12 个伯克盾，相当于 144000 天。现在只能当作装饰华丽的重型纸镇。(2012 年圣诞节发放)',
+                'An intricately carved sculpture of the Tree of Harmony. The adorning multi-colored elements are slowly pulsating with a gentle glow.' : '一件精雕细琢的谐律之树雕塑品。树上装饰的彩色元素缓缓脉动着温和的光辉。(2013 年圣诞节发放)',
+                'A snowman made of a deep blue and faintly glowing crystal, adorned with round onyx eyes and a carrot-shaped garnet nose. Does not melt during summer.' : '用闪著淡淡光辉的深蓝水晶制作的雪人，镶嵌著圆形缟玛瑙做的眼睛和胡萝卜形状的石榴石鼻子。夏天也不会融化。(2014 年圣诞节发放)',
+                'A little white dog. It\'s fast asleep...' : '一只小白狗。它正熟睡着...(2015 年圣诞节发放)',
+                'A precursor irrigation device, capable of providing sufficient water to around two dozen farm plots. The internal power source was depleted centuries ago.' : '一个旧世界的灌溉设备，能够为周围二十四块耕地喷洒充足的水。内置的电池在几个世纪前就没电了。(2016 年圣诞节发放)',
+                'The giant head of an animatronic mecha-bunn. Rather cute, and rather horrifying.' : '一个巨大的动力机甲头部，相当可爱，也相当恐怖。(2017 年圣诞节发放)',
+                'A colored easter egg, inscribed with the ' : '一个彩色的复活节彩蛋，上面刻着',
+                'letter W.' : '字母S.',
+                'letter N.' : '字母N.',
+                'letter O.' : '字母O.',
+                'letter W.' : '字母W.',
+                'letter F.' : '字母F.',
+                'letter L.' : '字母L.',
+                'letter A.' : '字母A.',
+                'letter K.' : '字母K.',
+                'letter E.' : '字母E.',
+                'If you collect and hand in the entire set, something good might happen.' : '如果你收集并献祭一整套，或许会有什么好事情发生。(2011 复活节)',
+                'The pegasus ponies have lost their feathers! Better give them to Snowflake so she can help them get back on their wings.' : '天马们失去了她们的羽毛！最好交给雪花女神帮她们取回翅膀。(2012 复活节)',
+                'A beautifully crafted, limited edition snowflake.' : '精美的限量版雪花。(2013 复活节)',
+                'The altcoins are running wild! Better give them to Snowflake so she can get rid of them safely.' : '山寨币非常猖獗！最好把它们交给雪花让她安全地销毁。(2014 复活节)',
+                'such altcoin so scare plz give snowflake for much wow' : '这种山寨币特别骇人，请给雪花多一点。汪 (2014 复活节活动)',
+                'An ancient server-grade motherboard. Give to Snowflake to help reassemble the Legendary Precursor Servers.' : '古老的服务器级主板。交给雪花帮忙重组出传说中的旧世代服务器。(2015 复活节活动)',
+                'An ancient server-grade processor module. Give to Snowflake to help reassemble the Legendary Precursor Servers.' : '古老的服务器级处理器模组。交给雪花帮忙重组出传说中的旧世代服务器。(2015 复活节活动)',
+                'An ancient set of server-grade ECC RAM. Give to Snowflake to help reassemble the Legendary Precursor Servers.' : '古老的服务器级错误修正码内存。交给雪花帮忙重组出传说中的旧世代服务器。(2015 复活节活动)',
+                'An ancient 1U rack-mounted server chassis. Give to Snowflake to help reassemble the Legendary Precursor Servers.' : '古老的 1U 机架式服务器机壳。交给雪花帮忙重组出传说中的旧世代服务器。(2015 复活节活动)',
+                'An ancient gigabit ethernet network card. Give to Snowflake to help reassemble the Legendary Precursor Servers.' : '古老的超高速以太网路卡。交给雪花帮忙重组出传说中的旧世代服务器。(2015 复活节活动)',
+                'An ancient server-grade storage device. Give to Snowflake to help reassemble the Legendary Precursor Servers.' : '古老的服务器级储存装置。交给雪花帮忙重组出传说中的旧世代服务器。(2015 复活节活动)',
+                'An ancient dual redundant power supply unit. Give to Snowflake to help reassemble the Legendary Precursor Servers.' : '古老的双冗馀电源供应单元。交给雪花帮忙重组出传说中的旧世代服务器。(2015 复活节活动)',
+                'Someone stole these commemorative easter chickens from the Rainbow Factory. Return a full set to Snowflake to earn their gratitude.' : '有人偷走了彩虹工厂的复活节纪念小鸡。找回整套归还给雪花以赢得她们的感激之情。(2016 复活节)',
+                'A cryogenically preserved ancient lemon.' : '一颗低温保存的古代柠檬。(2017 复活节活动)',
+                'A cryogenically preserved ancient kiwi. The fruit. Not the bird' : '一颗低温保存的古代奇异果。是水果，不是鸟。(2017 复活节活动)',
+                'A cryogenically preserved ancient blueberry.' : '一颗低温保存的古代蓝莓。(2017 复活节活动)',
+                'A cryogenically preserved ancient plum.' : '一颗低温保存的古代李子。(2017 复活节活动)',
+                'A cryogenically preserved ancient mulberry.' : '一颗低温保存的古代桑椹。(2017 复活节活动)',
+                'A cryogenically preserved ancient strawberry.' : '一颗低温保存的古代草莓。(2017 复活节活动)',
+                'A cryogenically preserved ancient orange.' : '一颗低温保存的古代柳橙。(2017 复活节活动)',
+                'A truely aggravating spelling error. Give it to Snowflake.' : '一个确实很严重的拼写错误。把它交给雪花。(2018 复活节活动)',
+                'Alot of people make this mistake. Give it to Snowflake.' : '很多人都会犯这个错误。把它交给雪花。(2018 复活节活动)',
+                'A rather embarassing mistake. Give it to Snowflake.' : '一个相当尴尬的错误。把它交给雪花。(2018 复活节活动)',
+                'Definately one of the more common mistakes you can find. Give it to Snowflake.' : '绝对是你可以找到的最常见的错误之一。把它交给雪花。(2018 复活节活动)',
+                'Mispelling this word is just extra dumb. Give it to Snowflake.' : '拼错这个词实在是相当愚蠢。把它交给雪花。(2018 复活节活动)',
+                'Apparantly a very common error to make. Give it to Snowflake.' : '显然是一个非常常见的错误。把它交给雪花。(2018 复活节活动)',
+                'A suprisingly common mistake. Give it to Snowflake.' : '一个令人惊讶的普遍错误。把它交给雪花。(2018 复活节活动)',
+                'A deprecated category button scattered by the 2019 Easter Event. Give it to Snowflake.' : '2019复活节活动时散落的已被弃用类别按钮。把它交给雪花。',
+                'Some hoarded supplies from the 2020 Easter Event. Give it to Snowflake for redistribution.' : '2020复活节活动时囤积的一些物资。把它交给雪花重新分配。',
+                'The label is faded, but you can barely make out the letters' : '标签已经褪色了，但是你勉强认出了一些字母', //-s-ra--eca、-f-zer、-ode--a、J--s-n、-ov-vax、-put--V、Co--de--a
+                'Give it to Snowflake for analysis.' : '把它交给雪花分析。(2021 复活节活动)',
+                'Lost goods from the new CoreCare™ series of Snowflake-approved products. Give it back to Snowflake.' : '雪花核准的新[核心服务]™系列丢失的产品，把它交换给雪花(2022 复活节活动)。',
+                'Replacement parts for a precursor search engine. Snowflake has been looking for this for a restoration project' : '一个古代搜索引擎的备件,雪花女神正为了一个修复工程搜集他们(2023 复活节活动)',
+                'A curious piece of abstract precursor art, featuring a number of square low-resolution images in a grid pattern. Who would want this? Possibly Snowflake' : '一件有趣的抽象艺术先驱作品，展现了一系列呈网格布局的低分辨率图像,谁会想要这个?大概是雪花吧(2024 复活节活动)',
+                'A part of Snowflake\'s missing bunny girl costume. You could return it to her at the shrine. Or keep it, and wear it when no one is watching.' : '雪花女神丢失的兔女郎装扮中的一部分,你可以在祭坛上交还给她,或者留着它,在没人发现的时候偷偷穿起来(2025 复活节活动)',
+                'A part of Snowflake\'s missing ritual bunny girl costume. You could return it to her at the shrine. Or keep it, and wear it when no one is watching.' : '雪花女神丢失的仪式用兔女郎装扮中的一部分,你可以在祭坛上交还给她,或者留着它,在没人发现的时候偷偷穿起来(2025 复活节活动)',
+                'A replica of a device historians believe to have caused the Great Flood, arguably triggering the demise of the precursor global information network. [Easter 2024]' : '一个古老设备的复制品,历史学家们相信它就是引发古代信息网络崩溃的前兆[2024年复活节].',
+                'An exquisite and particularly fragrant marten pelt that mysteriously smells of apples. Something this fine would make a good offering to Snowflake.' : '一张精致且芳香的豹皮,散发着神秘的苹果味,这么好的东西作为祭品献给雪花女神是再好不过了',
+                'A large 1/4th scale detailed collectible figure featuring Snowflake, the Goddess of Loot and Harvest, wearing her signature ritual bunny girl outfit. [Easter 2025]' : '一个以1/4比例缩放人物公仔，以雪花女神为特色，她是战利品和收获女神，穿着她标志性的仪式兔女郎服装[2025年复活节]。',
+                'Apple-scented precursor bath salts that allegedly alleviates all kinds of ailments. Might make a good present for your favorite goddess.' : '苹果香味的旧时代浴盐，据称可以包治百病。这可能是送给你最喜欢女神的好礼物',
+                'A specially-designed cabinet for displaying Final Edition Catalysts, with prominent silhouetted slots to emphasize any missing ones and encourage completion. (You got all of them, of course.) [Easter 2026]' : '一个专门设计的用于展示终极版催化剂的储物柜，有醒目的预留槽位，以突出展示任何缺失的催化剂，并鼓励你完成收集。（当然，你肯定已经全部收集全了）[2026复活节]',
+                'One of the missing vials from the limited final catalyst production run. It is sealed with a slightly different golden bottlecap to mark the occasion.' : '这是最终限量版催化剂生产批次中遗失的一瓶。为了纪念这一特殊时刻，它被一个略有不同的金色瓶盖密封着。',
             }
         },
         {
             // 技能翻译
             priority: 2,
-            excludeSelector:"#pane_log, #pane_monster",
+            excludeSelector:"#pane_log, #pane_monster, #btii",
             conditions: [
                 {
                     mode: "regex",
                     match: /^https?:\/\/(?:alt\.)?hentaiverse\.org\/(?:isekai\/)?\?s=(?:Character&ss=(?:ab|se)|Battle&ss)/
                 },
-                { mode: "prefix", match: "https://hentaiverse.org/?s=Bazaar&ss=am&screen=modify&filter=" },
-                { mode: "prefix", match: "https://hentaiverse.org/isekai/?s=Bazaar&ss=am&screen=modify&filter=" },
+                { mode: "regex", match: /^https?:\/\/(?:alt\.)?hentaiverse\.org\/(?:isekai\/)?\?s=Bazaar&ss=am&screen=modify&filter=/ },
+                { mode: "regex", match: /^https?:\/\/(?:alt\.)?hentaiverse\.org\/(?:isekai\/)?$/ },
+                { mode: "regex", match: /^https?:\/\/(?:alt\.)?hentaiverse\.org\/(?:isekai\/)?$/ },
             ],
             translations: {
                 'Hastened' : '急速[S]',
@@ -1982,7 +2215,7 @@
                 'Robe' : '🥼长袍',
                 'Breastplate' : '🥼护胸',
                 'Cuirass' : '🥼胸甲',
-                'Power Armor' : '动力(重) 🥼盔甲',
+                'Power Armor' : '*动力甲(重)',
                 'Gloves' : '🤲手套',
                 'Gauntlets' : '🤲手甲',
                 'Pants' : '🦵裤子',
@@ -1991,11 +2224,16 @@
                 'Shoes' : '👣鞋子',
                 'Boots' : '👣靴子',
                 'Sabatons' : '👣马靴',
-
-                'Apply Changes' : '确认更改',
-
-            }
+                'Set 1 is selected' : '套装1已选择',
+                'Set 2 is selected' : '套装2已选择',
+                'Set 3 is selected' : '套装3已选择',
+                'Set 4 is selected' : '套装4已选择',
+                'Set 5 is selected' : '套装5已选择',
+                'Set 6 is selected' : '套装6已选择',
+                'Set 7 is selected' : '套装7已选择',
+            },
         },
+
         {
             // 祭坛
             priority: 2,
@@ -2066,7 +2304,7 @@
                 'Previous Trophy' : '上一种奖杯',
                 'Next Trophy' : '下一种奖杯',
                 'Artifacts' : '文物',
-                'Figures' : '小马雕像',
+                'Figures' : '小马公仔',
                 'Monster Items' : '怪物物品',
                 'Account Balance' : '账户余额',
                 'Market Balance' : '市场余额',
@@ -2161,11 +2399,30 @@
                 'Bidding price must be at least' : '当前物品最低出价为',
                 'Asking price must be at least' : '当前物品最低要价为',
                 'You have to wait a short while between placing each order' : '你创建订单过于频繁，稍后再试',
+                'Restoratives' : '回复品',
+                'Infusions' : '魔药',
+                'Scrolls' : '卷轴',
+                'Crystals' : '水晶',
+                'Materials' : '材料',
+                'Special' : '特殊',
+                'Trophy': '奖杯',
+                'Consumable': '消耗品',
+                'Consumables': '消耗品',
+                'Artifact': '文物',
+                'Artifacts': '文物',
+                'Token': '令牌',
+                'Crystal': '水晶',
+                'Trophies': '奖杯',
+                'Material': '材料',
+                'Collectable': '收藏品',
+                'Monster Food': '怪物食物',
+                'Figures': '公仔',
+                'Item': '道具',
             }
         },
         {
-            // 装备类型
-            priority: 3,
+            // 装备类型过滤器
+            priority: 2,
             conditions: [
                 {
                     mode: "regex",
@@ -2184,6 +2441,7 @@
                 'Shade Armor' : '*暗影甲(轻)',
                 'Chain Armor' : '链甲(重)',
                 'Plate Armor' : '板甲(重)',
+                'Power Armor' : '*动力甲(重)',
                 'Reactive Armor' : '*反应装甲(重)',
                 'Force Shield' : '*力场盾(副)',
             }
@@ -2245,6 +2503,9 @@
                 'Sold the salvage remains' : '出售分解残骸获得了',
                 'Are you sure you want to buy the ' : '确定要购入这 ',
                 'selected equipment' : '件选择的装备吗',
+                'The selected equipment will be sacrified, and fused with your:' : '选中的装备将被融合，用于强化你的',
+                'This has the following effects and base costs:' : '这将带来如下效果',
+                'You are missing some required resources' : '你缺少部分融合所需的资源',
                 'Could not reserve the selected items; usually this means they are no longer available.' : '找不到指定物品,这通常说明它已经不存在了',
                 'Confirm Action' : '操作确认',
                 'Here you can manage your equipment, as well as modify them using Upgrades, Charms and Stat Fusion. Modifications all require that the equipment is soulbound first.' : '在这里，你可以改装你的装备，包括强化装备、安装护符以及通过属性融合对其属性进行修改。所有修改都要求装备首先要为绑定装备',
@@ -2256,7 +2517,6 @@
                 'All equipment has a Condition value which degrades when you are defeated in battle, as well as at a fixed rate depending on the equipment Durability and the number of cleared rounds. Repairs require different Scrap Material corresponding to the equipment type; these can be salvaged from low-grade equipment, or bought from the Item Store or The Market.' : '所有装备都有耐久度，当你在战斗中被击败时，耐久度会降低，并且根据装备的耐久性和战斗的回合数以固定术的速率降低。维修需要与装备类型相对应的不同废料；这些可以从低级装备中回收，也可以从物品商店或市场上购买。',
                 'Magitech equipment and equipment with attached charms will also have an Energy value. Energy is consumed at a fixed rate depending on the number of cleared rounds. Recharging energy requires Energy Cells; these can be salvaged from magitech equipment, or bought from the Item Store or The Market. Attached charms affect the required number of energy cells and can also require other upkeep materials.' : '高级装备和护符带有电量值。根据战斗回合数，电量值会以固定速率消耗。充电需要能量电池；这些可以从高级装备中回收，也可以从物品商店或市场上购买。附加的护符会影响充电所需的能量电池数量，也会增加修理材料的种类。',
                 'When you are defeated in battle, any charms attached to your equipment have a chance to take damage. If a charm is protected by a pouch, this can destroy the pouch, exposing the charm. If the charm is exposed, any damage will cause it to tear. Torn charms and destroyed pouches can be replaced with spare charms and pouches from your inventory; these can be obtained in the Item World or by offering trophies in The Shrine, or bought from other players in The Market.' : '当你在战斗中被击败时，你装备上的任何护符都有可能受到伤害。如果一个护身符被一个袋子保护着，这可能会破坏袋子，露出护符。如果护符暴露出来，任何损坏都会导致它被摧毁。损坏的护符和损坏的袋子可以用库存中的备用护符和袋子代替；这些可以在道具界获得，也可以在祭坛献祭获得，或者在市场上从其他玩家那里购买。',
-                ' Replace Charms & Pouches' : '直接替换护符与护符袋。',
                 'This page allows you to organize your equipment.' : '此页面允许你管理装备。',
                 'Protected equipment require an additional confirmation to select for sell or salvage, to be attached to mooglemails, and to be sacrificed for stat fusion. This protects them from various dangerous actions while not preventing it outright' : '受保护的装备在出售,分解,寄送,属性融合时需要经过额外确认，这可以保护它们免受各种危险行为的影响，同时也不会完全禁止你这么做',
                 'Locked equipment are further protected and will not show up on pages with potentially dangerous actions at all. You can still freely repair, upgrade and modify protected and locked equipment. Equips cannot be both locked and protected' : '锁定的装备得到了进一步的保护，使其根本不会出现在这些具有潜在危险行为的页面上。你仍然可以自由修理、强化和改装受保护和锁定的装备。装备不能同时被锁定和保护',
@@ -2284,16 +2544,16 @@
                 'Soulbinding costs a number of Soul Fragments depending on its quality and how much higher level it is compared to you.' : '灵魂绑定需要花费大量的灵魂碎片，数量取决于装备的品质以及它的装备等级与你的等级差距有多大。',
                 'Available Soul Fragments' : '可用灵魂碎片数',
                 'Here you can purchase tradeable equipment that was sold by other players. Most of the listed equipment can also be purchased by other players at any time, and is regularly cleared out to make room for new stock, so you will want to be quick if you see something you want.' : '在这里，你可以购买其他玩家出售的可交易装备。大多数列出的装备也可以随时由其他玩家购买，并且会定期清理，为新库存腾出空间，所以如果你看到你想要的东西，请尽快下手。',
-                'You can also buy back soulbound, salvaged or untradeable equipment that you previously sold yourself, as well as salvage remains that was sold when you manually salvaged equipment. These cannot be bought by other players, but will only be available for a limited time.' : '你还可以回购之前自己出售的灵魂绑定、已拆解或无法交易的装备，以及分解装备时出售的分解残骸。这些不能被其他玩家购买，但只能在有限的时间内回购。',
+                'You can also buy back soulbound, salvaged or untradeable equipment that you previously sold yourself, as well as salvage remains that was sold when you manually salvaged equipment. These cannot be bought by other players, but will only be available for a limited time.' : '你还可以回购之前自己出售的灵魂绑定、已分解或无法交易的装备，以及分解装备时出售的分解残骸。这些不能被其他玩家购买，但只能在有限的时间内回购。',
                 'Equipment that was automatically sold or salvaged by a traveling salesmoogle during battle cannot be bought back, since it never really existed in the first place.' : '在战斗中自动出售或由自动分解的装备不能回购，因为它从一开始就不存在。',
                 'Current Balance: ' : '资金余额:',
                 'Here you can sell equipment you no longer need in exchange for Credits. Any tradeable equipment you sell can be bought by other players.' : '在这里，你可以出售不再需要的装备以换取Credits。你出售的任何可交易的装备都可以被其他玩家购买。',
-                'If you sell soulbound, salvaged or untradeable equipment, they cannot be bought by anyone else; you can however still buy them back yourself for a limited time, at an exorbitant markup.' : '如果你出售的是灵魂绑定的、已拆解的或无法交易的装备，那这些装备除你之外其他任何人都买不到；意味着你仍然可以在有限的时间内以过高的价格买回它们。',
+                'If you sell soulbound, salvaged or untradeable equipment, they cannot be bought by anyone else; you can however still buy them back yourself for a limited time, at an exorbitant markup.' : '如果你出售的是灵魂绑定的、已分解的或无法交易的装备，那这些装备除你之外其他任何人都买不到；意味着你仍然可以在有限的时间内以过高的价格买回它们。',
                 'Salvaging equipment you no longer need will allow you to extract useful materials that can be used for upgrading or repairing other equipment.' : '分解不再需要的装备将使你能够提取可用于升级或维修其他装备的有用材料。',
-                'After salvaging, in addition to the extracted materials, the equipment itself will turn into Salvage Remains. You can either keep these, or sell them for a small amount of credits. Salvage Remains are only listed under the Salvaged tabs; they cannot be equipped or modified unless they are repaired, which will restore them to their original condition.' : '拆解后，除了提取的材料外，装备本身也将变成拆解残骸。你可以保留这些残骸，也可以以少量credits出售。拆解残骸仅列在拆解选项卡下；除非进行维修，否则无法对其进行装备或改装，这将使其恢复到原始状态。',
-                'Repairing salvage remains will require all the materials you obtained from salvaging them, in addition to the normal repair materials for repairing from zero Condition and Energy.' : '修复拆解残骸将需要你从拆解中获得的所有材料，以及从零耐久和零电量恢复到满的所有修复材料。',
+                'After salvaging, in addition to the extracted materials, the equipment itself will turn into Salvage Remains. You can either keep these, or sell them for a small amount of credits. Salvage Remains are only listed under the Salvaged tabs; they cannot be equipped or modified unless they are repaired, which will restore them to their original condition.' : '分解后，除了提取的材料外，装备本身也将变成分解残骸。你可以保留这些残骸，也可以以少量credits出售。分解残骸仅列在分解选项卡下；除非进行维修，否则无法对其进行装备或改装，这将使其恢复到原始状态。',
+                'Repairing salvage remains will require all the materials you obtained from salvaging them, in addition to the normal repair materials for repairing from zero Condition and Energy.' : '修复分解残骸将需要你从分解中获得的所有材料，以及从零耐久和零电量恢复到满的所有修复材料。',
                 'Salvaging an upgraded equipment will return 90% of the base materials spent upgrading it. It will not return cores or credits, nor any materials used for Stat Fusion.' : '分解后会返还90%的用于升级装备基础材料（低/中/高等级材料）和稀有材料（例如相位/动力/力场碎片等），但不会返还升级所消耗的核心/催化剂/credit,属性融合中消耗的装备也不会返还.',
-                ' Sell Salvage Remains' : '自动出售拆解残骸',
+                ' Sell Salvage Remains' : '自动出售分解残骸',
                 'You have selected a SOULBOUND equipment.' : '你选中了一件魂绑装备',
                 'You have selected a LEGENDARY equipment.' : '你选中了一件传奇装备',
                 'You have selected a PEERLESS equipment.' : '你选中了一件无双装备',
@@ -2353,7 +2613,11 @@
                 'Voidseeker':'虚空祝福',
                 'Destroy Charm':'摧毁护符',
                 'Attach Charm':'安装护符',
-                'attach a new charm in' : '在以下栏位安装新护符吗',
+                'Replace Charm':'替换护符',
+                ' Replace Charms & Pouches':'替换护符或护符袋',
+                'attach a new charm in' : '在以下栏位安装新护符',
+                'replace the worn charm in' : '替换以下栏位的护符袋',
+                'replace the destroyed pouch in' : '替换以下栏位的损坏护符袋',
                 'Slot' : '栏位',
                 'with a' : '加上',
                 'by spending the following materials:' : '消耗材料:',
@@ -2366,8 +2630,9 @@
                 'Unlock Equipment' : '解锁装备',
                 'Confirm Attach' : '确定安装',
                 'Are you sure you want to' : '你确定要',
-                'Stat Fuse Equipment' : '属性融合',
+                'Fuse Equipment Stats' : '属性融合',
                 'Unavailable on Isekai' : '异世界不可用',
+                'Stat Fusion is not available on Isekai' : '属性融合在异世界不可用',
                 'The existing intact charm will be ' : '现有护符将被',
                 'DESTROYED' : '摧毁',
                 'DESTROY' : '摧毁',
@@ -2383,6 +2648,16 @@
                 'Insufficient Charm Points' : '护符点数不足',
                 'Replace Pouch' : '替换护符袋',
                 'Sell Salvaged Equipment' : '出售已分解装备',
+                'Back to Modify Screen' : '返回改装界面',
+                'Select an equipment to fuse with your selected equipment:' : '将为以下装备进行属性融合：',
+                'Stat Fusion allows you sacrifice a similar equipment piece of Legendary grade and above to improve this equipment\'s base stats by +1. The cost of the upgrade depends on the quality and base stats of the equip you are upgrading compared to the equip you are sacrificing.' : '属性融合允许你牺牲一件同类型传奇及以上品质的装备，来将这件装备的基础属性提升+1。升级费用取决于你正在升级的装备与被牺牲装备的品质和基础属性。',
+                'Every fused stat will require ten of the corresponding bindings, and will normally also require an equipment core. However, if the sacrificial equipment is a Peerless or has a higher base for a particular stat, it will not charge a core for that stat, and it will be increased by +2 instead.' : '每融合一点属性需要消耗10个对应的粘合剂，通常还需要一个装备核心。但如果被牺牲的装备是无双品质，或者某项属性的基础值更高，则该属性不会消耗核心，并且会提升+2。',
+                'If any of the stats are already capped, this will add +1 overflow point for each capped stat. These are redistributed to uncapped stats in order of lowest base. Stats can get multiple overflow points if there are more capped than uncapped stats.' : '如果某些属性已经达到上限，每个已达上限的属性会获得+1溢出点数。这些点数会按基础值从低到高的顺序重新分配到未达上限的属性上。如果已达上限的属性多于未达上限的属性，则属性可以获得多个溢出点数。',
+                'Equipment can only be fused if they have the same type and slot; for example, cotton shoes can only be fused with other cotton shoes. Equipment also cannot be sacrificed if it has an upgrade level above zero; if you want to sacrifice something with an upgrade level, you can salvage it first.' : '装备只能在相同类型和部位之间进行融合；例如，棉鞋只能与其他棉鞋融合。升级等级大于零的装备也不能被融合；如果你想融合有升级等级的装备，可以先将其分解。',
+                'Sacrificing salvaged equipment directly is possible, but doing this will add the materials that were gained by salvaging it to the fusion cost.' : '可以直接牺牲已分解的装备，但这样做会将分解该装备所获得的材料计入融合费用中。',
+                'Note that equipment that is sacrified for Stat Fusion will be PERMANENTLY DESTROYED and cannot be recovered' : '请注意，用于属性融合的装备将被永久摧毁，无法恢复',
+                'Are you sure you want to 💥 SACRIFICE 💥 this equipment?' : '你确定要💥牺牲💥这件装备吗？',
+                'It will be PERMANENTLY DESTROYED and CANNOT be recovered.' : '它将被永久销毁且无法恢复。',
             },
             patterns: [
                 {
@@ -2395,7 +2670,7 @@
                 },
                 {
                     pattern: /Selected\s+(\d+)\s+of\s+(\d+)\s+matching equipment available to\s+salvage/i,
-                    replace: "已选择 $1 / $2 件可拆解装备"
+                    replace: "已选择 $1 / $2 件可分解装备"
                 },
                 {
                     pattern: /Selected\s+(\d+)\s+of\s+(\d+)\s+matching equipment available to\s+sell/i,
@@ -2564,13 +2839,6 @@
                 'A Dance with Dragons' : '与龙共舞',
                 'Post-Game Content' : '额外内容',
                 'Secret Pony Level' : '秘密小马关',
-                'Konata' : '泉此方',
-                'Mikuru Asahina' : '朝比奈实玖瑠',
-                'Ryouko Asakura' : '朝仓凉子',
-                'Yuki Nagato' : '长门有希',
-                'Real Life' : '现实生活',
-                'Invisible Pink Unicorn' : '隐形粉红独角兽',
-                'Flying Spaghetti Monster' : '飞行意大利面怪物',
                 'Triple Trio and the Tree' : '大树十重奏',
                 'There are no challenges available at your level. Check back later!' : '没有适用于你当前等级的挑战。努力升级以后再来查看吧！',
                 'Are you sure you wish to start this Arena Challenge' : '确定要开始选定的竞技场挑战吗',
@@ -2610,7 +2878,7 @@
                 'Daily Clears:' : '今日通关次数:',
                 'Welcome to the Grindfest.' : '欢迎来到压榨界',
                 'A Grindfest consists of up to 1000 rounds of battle.' : '压榨界包含1000场连续且难度与收益递增的战斗',
-                'Starting a Grindfest will consume 1 point of Stamina.' : '进入压榨界战斗会消耗1点精力',
+                'Starting a Grindfest will consume 1 point of Stamina.' : '进入压榨界战斗会消耗1点体力',
                 'There is a small credit reward at the end,' : '完成全部的压榨界战斗',
                 'if you make it all the way through.' : '可以获得5000C的奖励',
                 'There are no available equipment of this type.' : '没有可用的装备',
@@ -2636,8 +2904,9 @@
                     mode: "regex",
                     match: /^https?:\/\/(?:alt\.)?hentaiverse\.org\/(?:isekai\/\?s=Battle&ss|\?s=Battle)/
                 },
-                { mode: "prefix", match: "https://hentaiverse.org/?s=Bazaar&ss=am&screen=modify&filter=" },
-                { mode: "prefix", match: "https://hentaiverse.org/isekai/?s=Bazaar&ss=am&screen=modify&filter=" },
+                { mode: "regex", match: /^https?:\/\/(?:alt\.)?hentaiverse\.org\/(?:isekai\/)?\?s=Bazaar&ss=am&screen=modify&filter=/ },
+                { mode: "regex", match: /^https?:\/\/(?:alt\.)?hentaiverse\.org\/(?:isekai\/)?$/ },
+                { mode: "regex", match: /^https?:\/\/(?:alt\.)?hentaiverse\.org\/(?:isekai\/)?$/ },
             ],
             translations: {
                 'Battle Time' : '战斗时间到',
@@ -2672,7 +2941,7 @@
                 'Damages a single enemy. Depending on your equipped weapon, this can place certain status effects on the affected monster. To attack, click here, then click your target. Simply clicking an enemy will also perform a normal attack.' : '普通攻击，取决于你的武器能对怪物造成特定的伤害，单击此处并点击目标怪物进行攻击，没有选中技能法术时仅点击怪物也有相同效果。普通攻击命中怪物可以获得5%~10%斗气。',
                 'Use special skills and magic. To use offensive spells and skills, first click it, then click your target. To use it on yourself, click it twice.' : '使用一个技能或法术。对于攻击和减益技能法术，点击技能然后点击目标怪物，对于治疗和辅助法术，仅需点击技能法术名称。重复点击技能书按钮可以切换技能和法术列表。你可以在HV设置中将常用技能法术放在快捷栏上。',
                 'Use various consumable items that can replenish your vitals or augment your power in various ways.' : '使用战斗补给品中的道具，它们能恢复你的状态或者给你带来各方面提升。',
-                'Toggle Spirit Channeling.' : '切换灵动架式。当你有 100点 以上的斗气可以开启，开启后每次行动消耗 1 点灵力值和 10% 斗气，攻击伤害增加100%，魔力值消耗减少 25%。',
+                'Toggle Spirit Channeling.' : '切换灵动架式。当你有 50点 以上的斗气可以开启，开启后每次行动消耗 1 点灵力值和 10% 斗气，攻击伤害增加100%，魔力值消耗减少 25%。',
                 'Increases your defensive capabilities for the next turn.' : '本回合和下一回合你的物理和魔法减伤增加25%。消耗 10% 斗气恢复 10% 基础生命值 (需要 10%+ 斗气)。',
                 'Reduces the chance that your next spell will be resisted. Your defenses and evade chances are lowered for the next turn.' : '本回合无法进行回避、格挡、招架和抵抗，增加下一回合魔法命中和反抵抗率。消耗 25% 斗气恢复 5% 基础魔力值 (需要 25%+ 斗气)。',
                 'Choose from the Battle Actions highlighted above, and use them to defeat your enemies listed to the right. When all enemies are reduced to zero Health, you win. If your Health reaches zero, you are defeated.' : '选择上面的任意一个行动来打倒右侧的敌人。当所有敌人生命为0时，你获得胜利，当你的生命为0时，你被打败。',
@@ -2680,26 +2949,33 @@
                 'Run away from the current battle.' : '从战斗中逃跑，逃跑可能需要完整的一回合才会生效，在此期间怪物仍然可以攻击。',
                 'Retrieve data on the target.' : '探查目标的情报。',
                 //武器技能
-                'A precision strike towards the sensory organs of your enemy inflicts massive damage and temporarily blinds it.' : '造成500%伤害，并使目标致盲 20 回合。',
-                'Does additional damage to blinded targets.' : '造成1000%伤害，对致盲的目标伤害加倍。 50% 机率使致盲的目标中毒(每回合造成持续伤害且无法闪避) 20 回合。',
-                'Hits up to five targets multiple times.' : '对5名敌人共造成 10~20 次250%的伤害。',
-                'Bash an enemy with your shield to stun it, which opens up for devastating strikes with your weapon.' : '造成500%打击伤害，使目标晕眩 5 回合。造成打击伤害。',
-                'Follow up with an attack that inflicts internal bleeding and causes a large amount of damage if target is stunned.' : '造成500%伤害，必定对已晕眩的敌人造成 90 层流血效果。对眩晕敌人造成4倍伤害。',
+                //双持
+                'A precision strike towards the sensory organs of your enemy inflicts massive damage and temporarily blinds it.' : '造成600%的主手伤害，并使目标致盲。',
+                'Does additional damage to blinded targets.' : '造成1000%主手伤害，对致盲的目标造成2000%主手伤害。 50% 机率使致盲的目标中毒(造成持续伤害，无法闪避，降低10%减伤) 。',
+                'Hits up to five targets multiple times.' : '对最多5名敌人造成 10~21 次300%的主手伤害。',
+                //单手
+                'Bash an enemy with your shield to stun it, which opens up for devastating strikes with your weapon.' : '造成400%打击伤害，使目标晕眩 5 回合',
+                'Follow up with an attack that inflicts internal bleeding and causes a large amount of damage if target is stunned.' : '造成400%伤害，必定对已晕眩的敌人造成 90 层流血效果。对眩晕敌人造成2000%伤害。',
                 'Finish off a mortally wounded enemy. Instantly kills a target with bleed and less than 25% health.' : '造成1000%伤害，扑杀生命值低于 25% 且正在流血的敌人。',
+                //双手
                 'Focus a powerful strike on a single enemy.' : '对单体目标造成1000%伤害,必定暴击。',
-                'Tears through enemy defenses, leaving them vulnerable for followup attacks.' : '对5名敌人造成500%伤害，并给予 3 层穿甲效果',
-                'A mighty swing with your weapon causes all enemies with penetrated armor to stagger.' : '对5名敌人造成500%伤害，并令穿甲单位晕眩 5 回合。',
-                'Focus your magical power into your staff for a precision strike towards the head of your enemy, causing major damage and stunning it.' : '造成100%伤害，使目标晕眩 5 回合，但不会使已晕眩的目标再晕眩。视为法术攻击，可触发魔力合流。',
-                'Massive AoE damage to all enemies on the battlefield.' : '对战场上所有的敌人造成2000%的虚空伤害。',
-                'Damages and temporarily staggers all enemies on the battlefield.' : '对战场上所有的敌人造成500%的虚空伤害并导致其晕眩 5 回合。',
+                'Tears through enemy defenses, leaving them vulnerable for followup attacks.' : '对5名敌人造成400%伤害，并给予 3 层穿甲效果',
+                'A mighty swing with your weapon causes all enemies with penetrated armor to stagger.' : '对5名敌人造成300%伤害，并令穿甲单位晕眩 5 回合。',
+                //二天一流
+                'Channels the power of the heavens for a powerful strike that causes massive carnage.' : '对5名敌人造成400%伤害，并施加3层破甲与100层流血。',
+                //法杖
+                'Focus your magical power into your staff for a precision strike towards the head of your enemy, causing major damage and stunning it.' : '造成600%魔法伤害，使目标晕眩 5 回合，不会刷新目标晕眩时间，可触发魔力合流。',
+                //特技
+                'Massive AoE damage to all enemies on the battlefield.' : '对场上所有的敌人造成2000%的虚空伤害。',
+                'Damages and temporarily staggers all enemies on the battlefield.' : '对场上所有的敌人造成400%的虚空伤害并使其晕眩 5 回合。',
 
                 //辅助咒语(BUFF)
                 'Restores a moderate amount of Health on the target.' : '使目标恢复中量生命值。',
                 'Fully restores the Health of the target.' : '使目标恢复全部生命值。',
-                'The next magical attack against the target has a chance to be absorbed and partially converted to MP.' : '当本回合受到非暴击的法术攻击时将有机率将其无效化并偷取攻击者一部分魔力补充自身。',
+                'The next magical attack against the target has a chance to be absorbed and partially converted to MP.' : '受到非暴击的法术攻击时将有机率将其无效化并偷取攻击者一部分魔力补充自身。',
                 'Speeds up all actions of the target, allowing it to attack more frequently.' : '加速目标的所有行动，使他行动更频繁。',
                 'Places a shield effect on the target, absorbing' : '施加护盾效果，增加自身',
-                'of the damage from all attacks.' : '的物理魔法减伤。',
+                'of the damage from all attacks.' : '的物理与魔法减伤。',
                 'Places a heal over time effect on the target.' : '在目标身上施加持续性治疗效果。',
                 'Surrounds the target with a veil of shadows, making it harder to hit with attacks and spells.' : '一层幻影面纱包围目标，使他不容易被攻击和咒语击中，并使得有几率完全回避目标的攻击。',
                 'Any attack that would one-shot a target with more than 1 HP leaves it alive but on the brink of defeat. The buff is removed when triggered.' : '当目标受到任何致命攻击时会以1HP幸存。辅助效果在触发之后就会消失 (并且消耗玩家的基础灵力值 50%)。',
@@ -2761,8 +3037,8 @@
                 'Instantly restores a moderate amount of spirit.' : '立刻回复一定量的灵力值.',
                 'Fully restores spirit, and grants a long-lasting spirit restoration effect.' : '灵力值全满,并持续回复一定量的灵力值，持续100回合.',
                 'Fully restores all vitals, and grants long-lasting restoration effects.' : '生命,魔力,灵力全满,并同时产生三种饮剂的效果，持续100回合.',
-                'Restores 10 points of Stamina, up to the maximum of 99. When used in battle, also boosts Overcharge and Spirit by 10% for ten turns.' : '恢复10点精力，但不超过99，每回合增加10%的灵力和斗气.',
-                'Restores 5 points of Stamina, up to the maximum of 99. When used in battle, also boosts Overcharge and Spirit by 10% for five turns.' : '恢复5点精力，但不超过99，每回合增加10%的灵力和斗气.',
+                'Restores 10 points of Stamina, up to the maximum of 99. When used in battle, also boosts Overcharge and Spirit by 10% for ten turns.' : '恢复10点体力，但不超过99，每回合增加10%的灵力和斗气.',
+                'Restores 5 points of Stamina, up to the maximum of 99. When used in battle, also boosts Overcharge and Spirit by 10% for five turns.' : '恢复5点体力，但不超过99，每回合增加10%的灵力和斗气.',
                 'There are three flowers in a vase. The third flower is green.' : '你的攻击伤害、魔法伤害提升25%，命中值、暴击率、回避率、抵抗率大幅提升，持续50回合。',
                 'It is time to kick ass and chew bubble-gum... and here is some gum.' : '你的攻击和魔法伤害提升100%。必定命中且必定暴击，持续50回合。',
                 'You gain +25% resistance to Fire elemental attacks and do 25% more damage with Fire magicks.' : '你获得 +25% 的火焰抗性且获得 25% 的额外火焰魔法伤害。',
@@ -2784,7 +3060,7 @@
                 'Focusing' : '专注',
                 'Defending' : '防御',
                 'Fleeing' : '逃跑',
-                'You are mentally prepared for casting a magical attack. The chance for your spell being evaded or resisted is reduced, but so is your chance to avoid attacks.' : '你正集中精力准备释放法术，你的法术被闪避和被抵抗概率降低，但你自身的躲避攻击的能力同样下降。',
+                'You are mentally prepared for casting a magical attack. The chance for your spell being evaded or resisted is reduced, but so is your chance to avoid attacks.' : '你正集中体力准备释放法术，你的法术被闪避和被抵抗概率降低，但你自身的躲避攻击的能力同样下降。',
                 'You are defending from enemy blows. The amount of damage you take is reduced by' : '你正在防御敌人的进攻，你遭受的攻击伤害将减少',
                 'You are running away' : '你正尝试从战场中逃离',
 
@@ -2858,7 +3134,9 @@
                 'This protective veil activates for powerful blows that damage more than' : '根据你灵力盾当前的触发阈值',
                 'of your max HP, absorbing the remainder as spirit damage.' : '当你受到超过该阈值的伤害时，降低受到的生命值损伤至触发阈值，剩余伤害转而以SP承担。',
                 'Any attack that would normally kill the target leaves it alive with a small amount of HP. The buff is removed when triggered.' : '受到任何致命攻击时会以1HP幸存。辅助效果在触发之后就会消失 (并且消耗玩家50%基础灵力)。',
-                'Being brought back by Spark of Life has draped you with this powerful protective shield, increasing your damage resistance for a brief time.' : '被“生命火花”带回战场的你披着此强力的防护盾，你的物理魔法减伤增加75%。',
+                "Cloak of the Fallen": "陨落斗篷",
+                'Being brought back by Spark of Life has draped you with this powerful protective shield, increasing your damage resistance for a brief time.' : '被“生命火花”带回战场的你披着此强力的防护盾，你的物理与魔法减伤增加75%。',
+                'Being brought back by 生命火花[S] has draped you with this powerful protective shield, increasing your damage resistance for a brief time.' : '被“生命火花”带回战场的你披着此强力的防护盾，你的物理魔法减伤增加75%。',
                 'You are able to see the flow of life in all living beings, increasing your attack damage and crit multiplier by 25%.' : '你已到达精通万物生命源流的境界，强化攻击伤害与暴击伤害',
                 'and crit chance by': '和暴击率',
                 'You have reached a high level of attunement with the arcane forces, increasing your magic damage and crit multiplier by 25%.' : '你经由奥术的力量点化而到达更高的境界，强化魔法伤害与暴击伤害',
@@ -2947,7 +3225,7 @@
                 'Soulbind' : '绑定',
                 'Purchase' : '购买',
                 "Sell": "出售",
-                "Salvage": "拆解",
+                "Salvage": "分解",
                 "MENU": "菜单",
                 "Page": "页",
 
@@ -2966,7 +3244,9 @@
                 "Top Navigation Bar": "顶部导航栏设置",
                 "topMenuIntegration": "整合顶部导航栏",
                 "equipmentIntegration": "显示所有装备",
+                "equipShowCharms": "显示装备护符",
                 "equipShowLevel": "显示装备等级",
+                "equipHideDropInfo": "隐藏掉落信息",
                 "equipShowPAB": "显示装备属性加成",
                 "equipmentShopAutoProtect": "装备自动出售保护",
                 "always": "总是",
@@ -3041,7 +3321,7 @@
                 "equipmentShopShowPAB": "显示装备属性加成",
                 "Show equipment's pab": "显示装备属性加成",
                 "equipmentShopConfirm": "装备页面确认设置",
-                "Confirm when selling or salvaging equipment.": "当拆解或出售装备时",
+                "Confirm when selling or salvaging equipment.": "当分解或出售装备时",
                 "confirm less-profitable actions": "对低收益操作进行确认",
                 "equipmentShopProtectFilters": "商店页面保护器",
                 "Show valuable equipment together at the top of the list, and prevent them from being selected by the \"Select All\" button.": "在列表顶部一起显示有价值的装备，并防止它们被“全选”按钮选中",
@@ -3079,10 +3359,7 @@
             //priority: 1,
             //exclude: [{ mode: "prefix", match: "" }],
             conditions: [
-                { mode: "prefix", match: "https://hentaiverse.org/?s=Bazaar&ss=am&screen=soulbind" },
-                { mode: "prefix", match: "https://hentaiverse.org/isekai/?s=Bazaar&ss=am&screen=soulbind" },
-                { mode: "strict", match: "" },
-                { mode: "regex", match: "" },
+                { mode: "regex", match: /^https?:\/\/(?:alt\.)?hentaiverse\.org\/(?:isekai\/)?\?s=Bazaar&ss=am&screen=soulbind/ },
             ],
             translations: {
                 "SF": "魂片",
@@ -3132,6 +3409,7 @@
                 'Purchase Equipment' : '购买装备',
                 'Sell Equipment' : '出售装备',
                 'Salvage Equipment' : '分解装备',
+                'Sacrifice Equipment' : '融合装备',
                 'Confirm Purchase' : '确认购买',
                 'Confirm Sell' : '确认出售',
                 'Confirm Salvage' : '确认分解',
@@ -3139,12 +3417,14 @@
                 'Confirm Upgrade' : '确认升级',
                 'Confirm Select' : '确认选择',
                 'Confirm Destroy' : '确认摧毁',
+                'Confirm Sacrifice' : '确认融合',
                 'Apply Changes' : '应用更改',
                 'Place Sell Order' : '发布卖单',
                 'Place Buy Order' : '发布买单',
                 'Submit Answer' : '提交答案',
                 'Upgrade Equipment' : '升级装备',
-                'Update' : '改价',
+                'Update' : '更新',
+                'Run' : '运行',
                 'Delete' : '删除',
                 'Destroy Charm':'摧毁护符',
                 'Attach Charm':'安装护符',
@@ -3224,11 +3504,35 @@
                 'Sell' : '出售',
                 'Salvage' : '分解',
                 'Tradeables' : '可交易',
+                'Pinned' : '钉选',
                 'Invert' : '反选',
                 'Edit Format' : '编辑格式',
                 'Lock' : '锁定',
                 'Sell' : '出售',
                 'Salvage' : '分解',
+                'send' : '发送',
+                'Clear' : '清除',
+
+                'Gift Summary' : '收集礼物',
+                'Monster Lab Log' : '礼物日志',
+                'Item Prices' : '道具价格设置',
+                'Update Wins/Kills' : '更新数据',
+                'Monster Upgrader' : '怪物升级',
+                'Power Level Calculator' : '战斗力计算器',
+
+                'Add Monster' : '添加怪物',
+                'Salvage' : '分解',
+                'send' : '发送',
+                'Clear' : '清除',
+                'Lock' : '锁定',
+                'Sell' : '出售',
+                'Salvage' : '分解',
+                'send' : '发送',
+                'Clear' : '清除',
+
+                'Bazaar Filters' : '商店过滤器',
+                'Protect Filters' : '自动保护规则',
+
             },
             patterns: [
                 {
@@ -3360,10 +3664,8 @@
         },
         {
             // 外显词缀
-            priority: 2,
-            exclude: [{ mode: "prefix", match: "https://hentaiverse.org/equip/" }],
-            excludeSelector:"#pane_monster",
-            selector: ".eqb, .lc, .showequip, .postcolor, .eqp, #showequip, #pane_log, .hvut-bt-active, #lottery_eqname, .hvut-lt-div, .hvut-bt-equip, .hvut-ss-table, #btcp, #dropbox, .logtable, #bidInterface, .hvut-mm-attach, .hvut-mm-attach-e",
+            priority: 3,
+            selector: ".eqb, .lc, .showequip, .postcolor, .eqp, #showequip, #pane_log, .hvut-bt-active, #lottery_eqname, .hvut-lt-div, .hvut-bt-equip, .hvut-ss-table, #btcp, #dropbox, .logtable, #bidInterface, .hvut-mm-attach, .hvut-mm-attach-e, #equipblurb",
             conditions: [
                 {
                     mode: "regex",
@@ -3747,6 +4049,40 @@
             }
         },
         {
+            //战斗日志-低优先级
+            priority: 1,
+            selector: '#pane_log, #pane_skill, #pane_magic, #pane_item, #btcp',
+            excludeSelector:"#combat-records-table_isekai",
+            //exclude: [
+            //    { mode: "prefix", match: "" },
+            //    { mode: "strict", match: "" },
+            //    { mode: "regex", match: "" },
+            //],
+            conditions: [
+                {
+                    mode: "regex",
+                    match: /^https?:\/\/(?:alt\.)?hentaiverse\.org\/(?:isekai\/)?/
+                },
+            ],
+            translations: {
+                //"原文":"翻译",
+                "points of": " ",
+                "health": { replace: "生命", style: "color:#006400" },
+                "mana":   { replace: "魔力", style: "color:#639AD4" },
+                'spirit': { replace: "灵力", style: "color:#D4637A" },
+                "you": { replace: "你", style: "color:#1E90FF" },
+                "You": { replace: "你", style: "color:#1E90FF" },
+                "Your": { replace: "你的", style: "color:#1E90FF" },
+
+            },
+            patterns: [
+                {
+                    //pattern: /匹配内容/i,
+                    //replace: ""
+                },
+            ]
+        },
+        {
             //战斗日志
             priority: 3,
             selector: '#pane_log, #pane_skill, #pane_magic, #pane_item, #btcp',
@@ -3902,6 +4238,7 @@
                 "Searing Skin": "焦灼皮肤",
                 "Freezing Limbs": "冰封肢体",
                 "explodes": "爆裂并造成",
+                "explodes for": "爆裂并造成",
                 "Turbulent Air": "空气湍流",
                 "Deep Burns": "深层烧伤",
                 "Breached Defense": "防御破坏",
@@ -4004,8 +4341,9 @@
                 "block and partially": "格挡并部分",
                 "partially block and": "格挡了一半又",
                 "resists, and": "抵抗了法术,并",
-                "resists, and was glanced": "被擦伤且抵抗了法术,受到",
+                "resists, and was glanced for": "被擦伤且抵抗了法术,受到",
                 "resists, and was": "抵抗了法术,并被",
+                "was glanced for": "被擦伤后受到了",
                 "saves": "拯救了",
                 "dodges your attack": "闪避了你的攻击",
                 "which parries": "但被其招架了",
@@ -4045,7 +4383,7 @@
                 "hit":               { replace: " 击中了", style: "color:#E63F00" },
                 "and crits":          { replace: " 并暴击了", style: "background:#FF0000;color:#FFFFFF" },
                 "crits":              { replace: " 暴击了", style: "background:#FF0000;color:#FFFFFF" },
-                "which crits! You take":              { replace: " 暴击了你!你受到", style: "background:#FF0000;color:#FFFFFF" },
+                "which crits":              { replace: " 暴击了你", style: "background:#FF0000;color:#FFFFFF" },
                 "and blasts":         { replace: " 并暴击了", style: "background:#FF0000;color:#FFFFFF" },
                 "blasts":             { replace: " 暴击了", style: "background:#FF0000;color:#FFFFFF" },
                 "You use":            { replace: "你使用了", style: "background:#ADFF2F" },
@@ -4090,6 +4428,9 @@
                 "Spirit Stance Engaged":   { replace: "灵动架势开启", style: "background:#FF8888" },
                 "Spirit Stance Exhausted": { replace: "灵动架势无法维持", style: "background:#f5b3c4" },
                 "Spirit Stance Disabled":  { replace: "灵动架势关闭", style: "background:#f5b3c4" },
+                //装备损坏提示
+                "is critically damaged, and is unusable until repaired": { replace: "已彻底损坏，在修复前将无法使用", style: "background:#FF0000;color:#FFFFFF" },
+                "is damaged, and should be repaired soon.": { replace: "已严重损坏，需尽快修理", style: "background:#FF0000;color:#FFFFFF" },
                 // ============================================
                 // 🏆 胜利与结算 (Victory & Loot)
                 // ============================================
@@ -4127,6 +4468,9 @@
                 " escape from the arena": "从竞技场撤离了",
                 " escape from the grindfest": "从压榨界撤离了",
                 "dropped": "掉落了",
+                "damage": "伤害",
+                "are ejected from the item world": "被踢出了道具界",
+                "Arena challenge failed": "擂台挑战失败",
                 // ============================================
                 // 📈 熟练度 (Proficiency)
                 // ============================================
@@ -4177,6 +4521,7 @@
                 'for it' : ' ',
                 'for the remains' : ' ',
                 'and' : '和',
+                'spike shield' : '刺盾',
                 'drops a Health Gem powerup!' : '掉落了一颗生命宝石',
                 'drops a Mana Gem powerup!' : '掉落了一颗魔力宝石',
                 'drops a Spirit Gem powerup!' : '掉落了一颗灵力宝石',
@@ -4185,16 +4530,7 @@
                 'drops a Mana Gem power up!' : '掉落了一颗魔力宝石',
                 'drops a Spirit Gem power up!' : '掉落了一颗灵力宝石',
                 'drops a Mystic Gem power up!' : '掉落了一颗神秘宝石',
-                // ============================================
-                // 💔 基础属性与资源 (Attributes & Resources)
-                // ============================================
-                "points of": " ",
-                "health": { replace: "生命", style: "color:#006400" },
-                "mana":   { replace: "魔力", style: "color:#639AD4" },
-                'spirit': { replace: "灵力", style: "color:#D4637A" },
-                "you": { replace: "你", style: "color:#1E90FF" },
-                "You": { replace: "你", style: "color:#1E90FF" },
-                "Your": { replace: "你的", style: "color:#1E90FF" },
+
             },
             patterns: [
                 // ============================================
@@ -4240,6 +4576,12 @@
 
                 // The effect ... was dispelled
                 { pattern: /The effect (.+) was dispelled\./g, replace: "效果 $1 已被替换" },
+
+                { pattern: /hits (.+) for/g, replace: "击中了 $1 并造成" },
+
+                { pattern: /hit (.+) for/g, replace: "击中了 $1 并造成" },
+
+                { pattern: /crit (.+) for/g, replace: "暴击了 $1 并造成" , style: "background:#FF0000;color:#FFFFFF" },
 
                 // Healing
                 {
@@ -4411,6 +4753,7 @@
                     replace: '造成 $1 伤害',
                     style: "display:inline"
                 },
+
 
                 // ============================================
                 // 🌀 伤害类型名称 (Damage Types - Regex Keys)
@@ -4629,8 +4972,9 @@
                     mode: "regex",
                     match: /^https?:\/\/(?:alt\.)?hentaiverse\.org\/(?:isekai\/)?\?s=Battle/
                 },
-                { mode: "prefix", match: "https://hentaiverse.org/?s=Bazaar&ss=am&screen=modify&filter=" },
-                { mode: "prefix", match: "https://hentaiverse.org/isekai/?s=Bazaar&ss=am&screen=modify&filter=" },
+                { mode: "regex", match: /^https?:\/\/(?:alt\.)?hentaiverse\.org\/(?:isekai\/)?\?s=Bazaar&ss=am&screen=modify&filter=/ },
+                { mode: "regex", match: /^https?:\/\/(?:alt\.)?hentaiverse\.org\/(?:isekai\/)?$/ },
+                { mode: "regex", match: /^https?:\/\/(?:alt\.)?hentaiverse\.org\/(?:isekai\/)?$/ },
             ],
 
             translations: {
@@ -4685,6 +5029,187 @@
             ]
         },
         {
+            //怪物名称
+            //priority: 1,
+            selector:"#pane_monster, #pane_log, #arena_list",
+            //excludeSelector:
+            //ignoreWordBoundary: true,
+            //exclude: [
+            //    { mode: "prefix", match: "" },
+            //    { mode: "strict", match: "" },
+            //    { mode: "regex", match: "" },
+            //],
+            conditions: [
+                {
+                    mode: "regex",
+                    match: /^https?:\/\/(?:alt\.)?hentaiverse\.org\/(?:isekai\/)?/
+                }
+            ],
+            translations: {
+                //"原文":"翻译",
+                'Konata' : '泉此方',
+                'Manbearpig' : '人熊猪',
+                'White Bunneh' : '白兔兔',
+                'Konata' : '泉此方',
+                'Mithra' : '密特拉',
+                'Dalek' : '戴立克',
+                'Skuld' : '诗蔻蒂',
+                'Urd' : '乌尔德',
+                'Verdandi' : '薇儿丹蒂',
+                'Yggdrasil' : '世界树',
+                'Rhaegal' : '雷戈',
+                'Viserion' : '韦赛利昂',
+                'Drogon' : '卓耿',
+                'Recycled Boss Rush' : '循环Boss Rush',
+                'Bottomless Dungeon' : '无尽地牢',
+                'New Game +' : '新游戏+',
+                'Achievement Grind' : '全成就之路',
+                'Time Trial Mode' : '限时挑战模式',
+                'Hardcore Mode' : '硬核模式',
+                'Fluttershy' : '小蝶',
+                'Gummy' : '嘎米',
+                'Rainbow Dash' : '云宝黛西',
+                'Twilight Sparkle' : '暮光闪闪',
+                'Rarity' : '瑞瑞',
+                'Applejack' : '苹果杰克',
+                'Pinkie Pie' : '萍琪派',
+                'Angel Bunny' : '天使兔',
+                'Spike' : '史派克',
+                'Mikuru Asahina' : '朝比奈实玖瑠',
+                'Ryouko Asakura' : '朝仓凉子',
+                'Yuki Nagato' : '长门有希',
+                'Real Life' : '现实生活',
+                'Invisible Pink Unicorn' : '隐形粉红独角兽',
+                'Flying Spaghetti Monster' : '飞行意大利面怪物',
+            },
+            patterns: [
+                {
+                    //pattern: /匹配内容/i,
+                    //replace: ""
+                },
+            ]
+        },
+        {
+            //训练
+            //priority: 1,
+            //selector:
+            //ignoreWordBoundary: true,
+            //exclude: [
+            //    { mode: "prefix", match: "" },
+            //    { mode: "strict", match: "" },
+            //    { mode: "regex", match: "" },
+            //],
+            conditions: [
+                { mode: "prefix", match: "https://alt.hentaiverse.org/?s=Character&ss=tr" },
+                { mode: "prefix", match: "https://hentaiverse.org/?s=Character&ss=tr" },
+            ],
+            translations: {
+                //"原文":"翻译",
+                'Training' : '训练名',
+                'Training completed' : '训练完成',
+                'Effect' : '效果',
+                'Credit Cost' : '花费',
+                'Time' : '时间',
+                'Level' : '等级',
+                'Spent Credits' : '已花费',
+                'Plan Training' : '训练计划',
+                'Cancel Planning' : '取消计划',
+                'Set' : '设置计划',
+                'Total' : '总计',
+
+                'Adept Learner' : '善学者',
+                'Assimilator' : '同化者',
+                'Ability Boost' : '能力提升',
+                'Manifest Destiny' : '天命昭彰',
+                'Scavenger' : '拾荒者',
+                'Luck of the Draw' : '抽签运',
+                'Quartermaster' : '军需官',
+                'Archaeologist' : '考古学家',
+                'Metabolism' : '新陈代谢',
+                'Inspiration' : '鼓舞',
+                'Scholar of War' : '兵法家',
+                'Tincture' : '酊剂',
+                'Pack Rat' : '囤积者',
+                'Dissociation' : '解离症',
+                'Set Collector' : '套装收集者',
+
+                'EXP Bonus' : '经验值加成（与其他经验加成相互乘算）',
+                'Proficiency Experience' : '熟练值获取比例（熟练度获取量取决于经验获取量的一定比例，每级使获取比例提高10%）',
+                'Ability Point' : '技能点',
+                'Mastery Point' : '支配点',
+                'Improved Monster Hunger Drain' : '降低怪物饥饿速度（每一级推测为5%的效果）',
+                'Improved Monster Morale Drain' : '降低怪物士气下降速度（每一级推测为5%的效果）',
+                'Base Loot Drop Chance' : '物品掉落率（每级提升0.1%物品掉落率，基础为10%）',
+                'Base Rare Equipment Chance' : '稀有装备掉落率（提升掉落装备中 相位/暗影/动力/立场 装备的获得几率，满级时几率变为原来的1.25倍）',
+                'Base Equipment Drop Chance' : '装备掉落率（掉落物品中装备的概率为2.5%，每级提升0.05%的概率）',
+                'Base Artifact Drop Chance' : '文物掉落率（掉落物品中文物的概率为0.2%，每级提升0.02%的概率）',
+                'Battle Scroll Slots' : '卷轴栏',
+                'Battle Infusion Slots' : '魔药栏',
+                'Battle Inventory Slots' : '战斗携带品栏',
+                'Persona Slot' : '人物角色栏',
+                'Equipment Set' : '套装栏',
+                '1 H' : '1小时',
+                '2 H' : '2小时',
+                '4 H' : '4小时',
+                '8 H' : '8小时',
+                '12 H' : '12小时',
+                '24 H' : '24小时',
+                '0 H' : '10秒',
+
+                'Here you can exchange your credits for Henjutsu Training in various subjects.' : '在这里你可以消耗credit永久的提升你的各项能力',
+                'Training happens in realtime, and you can only train one skill at a time.' : '一次只能训练一个项目，训练可以随时取消并获得退款',
+
+                'Progress:' : '训练进度:',
+                'You have gained another level in' : '你的训练提升了一级',
+                'You have increased your EXP bonus by 1%!' : '你的经验值加成增加了1%！',
+                'You now get proficiency gains 10% more often!' : '你的熟练度获取比例提升10%！',
+                'You have received an additional' : '你获得了一点额外',
+                'You now have a higher chance of finding items!' : '你现在有更高的几率获得物品掉落！',
+                'You feel a little luckier!' : '你感觉自己更加幸运了一点！',
+                'Equipment will now drop a little more often!' : '你的装备掉落率现在小幅提升！',
+                'You now have a slightly larger chance of uncovering lost artifacts!' : '你发现遗失文物的几率现在有轻微的提升！',
+                //缺：新陈代谢、鼓舞
+                'Your battle scroll slots have been increased!' : '你的卷轴栏现在增加了一格！',
+                'Your battle infusion slots have been increased!' : '你的魔药栏现在增加了一格！',
+                'Your battle inventory space has been increased!' : '你的战斗携带品栏现在增加了一格！',
+                //缺：解离症
+                'You can now use an additional equipment set!' : '你现在可以多配置一套装备套装！',
+            },
+            patterns: [
+                {
+                    //pattern: /匹配内容/i,
+                    //replace: ""
+                },
+            ]
+        },
+        {
+            //字典模板
+            //priority: 1,
+            //selector:
+            //excludeSelector:
+            //ignoreWordBoundary: true,
+            //exclude: [
+            //    { mode: "prefix", match: "" },
+            //    { mode: "strict", match: "" },
+            //    { mode: "regex", match: "" },
+            //],
+            conditions: [
+                { mode: "prefix", match: "" },
+                { mode: "strict", match: "" },
+                { mode: "regex", match: "" },
+            ],
+            translations: {
+                //"原文":"翻译",
+
+            },
+            patterns: [
+                {
+                    //pattern: /匹配内容/i,
+                    //replace: ""
+                },
+            ]
+        },
+        {
             //字典模板
             //priority: 1,
             //selector:
@@ -4736,6 +5261,652 @@
                 },
             ]
         },
+
+
+        {
+            // 登录界面 (来自旧版移植)
+            priority: 2,
+            selector: "body>script[src$=\"hvc.js\"]+div[style]:not([id])",
+            conditions: [
+                { mode: "regex", match: /^https?:\/\/(?:alt\.)?hentaiverse\.org\/(?:isekai\/)?$/ }
+            ],
+            translations: {
+                'You have to log on to access this game.' : '你必须登陆之后才能使用游戏功能',
+                'No account? ' : '还没有帐号？',
+                'Click here to create one' : '点击此处创建一个',
+                '. (It\'s free!)' : ' (免费的)',
+                'User:' : '用户:',
+                'Pass:' : '密码:',
+                'Login!' : '登陆!',
+                'Register' : '注册',
+                'The HentaiVerse a free online game presented by ' : 'HentaiVerse是由E绅士呈现的一个免费在线游戏 ',
+                'E-Hentai.org - The Free Hentai Gallery System' : 'E-Hentai.org - 免费的绅士画廊',
+                'You must be logged on to visit the HentaiVerse.' : '你必须登陆之后才能访问HentaiVerse',
+            },
+            patterns: [
+                { pattern: /^\u00a0or\u00a0$/, replace: '\u00a0或者\u00a0' },
+            ]
+        },
+
+        {
+            // 装备强化界面 (来自旧版移植)
+            priority: 2,
+            selector: "#forge_outer>#rightpane, #forge_cost_div",
+            conditions: [
+                { mode: "regex", match: /^https?:\/\/(?:alt\.)?hentaiverse\.org\/(?:isekai\/)?\?s=Bazaar&ss=eq/ }
+            ],
+            translations: {
+                'Salvaged' : '分解获得',
+                'Returned' : '返还强化材料',
+                'Item not found' : '物品不存在',
+                'Cannot reforge level zero items' : '不能重铸潜能等级为0的装备',
+                'Cannot reforge locked or equipped items' : '不能重铸上锁或者正在穿戴的装备',
+                'Cannot salvage locked or equipped items' : '不能分解上锁或者正在穿戴的装备',
+                'No base salvage could be extracted.' : '重复分解已经分解过的装备不再获得基础材料',
+                'Insufficient materials.' : '材料不足',
+                'Insufficient soul fragments.' : '灵魂碎片不足',
+                'Insufficient amnesia shards.' : '重铸碎片不足',
+                'Equipment Potency Unlocked!' : '解锁了装备潜能！',
+                'Cannot upgrade item' : '无法升级',
+                'Cannot enchant item' : '无法附魔',
+                'Item is already max level' : '装备等级已满',
+                'Cannot fight in equipped items' : '无法进入已装备道具的道具界中',
+                'When used with an equipment piece, this shard will temporarily imbue it with the' : '当用在一件装备上时，会临时给予装备',
+                'When used with a weapon, this shard will temporarily imbue it with the' : '当用在一件武器上时，会临时给予装备',
+                'Suffused Aether enchantment' : '弥漫的以太 的附魔效果',
+                'Featherweight Charm enchantment' : '轻如鸿毛 的附魔效果',
+                'Voidseeker\'s Blessing enchantment' : '虚空探索者的祝福 的附魔效果',
+                'Can be used to reset the unlocked potencies and experience of an equipment piece.' : '可以用于重置装备的潜能等级',
+            },
+            patterns: []
+        },
+
+        {
+            // 采购机器人 (来自旧版移植)
+            priority: 2,
+            selector: "#itshop_outer",
+            conditions: [
+                { mode: "regex", match: /^https?:\/\/(?:alt\.)?hentaiverse\.org\/(?:isekai\/)?\?s=Bazaar&ss=is&screen=bot/ }
+            ],
+            translations: {
+                'No energy items available.' : '没有可用的能量恢复道具',
+            },
+            patterns: []
+        },
+
+        {
+            // 怪物实验室 (来自旧版移植)
+            priority: 2,
+            conditions: [
+                { mode: "regex", match: /^https?:\/\/(?:alt\.)?hentaiverse\.org\/\?s=Bazaar&ss=ml/ }
+            ],
+            translations: {
+                'Unnamed' : '未命名的',
+                'Arthropod' : '节肢动物',
+                'Avion' : '飞禽',
+                'Beast' : '野兽',
+                'Celestial' : '天人',
+                'Daimon' : '魔灵',
+                'Dragonkin' : '龙类',
+                'Elemental' : '元素',
+                'Giant' : '巨人',
+                'Humanoid' : '类人',
+                'Mechanoid' : '机器人',
+                'Reptilian' : '爬行动物',
+                'Sprite' : '妖精',
+                'Undead' : '不死族',
+                'Required Feed:' : '需求食物:',
+                'Feed Tier' : '需喂食食品',
+                'Monster Chow' : '怪物饲料',
+                'Monster Edibles' : '怪物食品',
+                'Monster Cuisine' : '怪物料理',
+                'Chaos Token' : '混沌令牌',
+                'Chaos Tokens' : '混沌令牌',
+                'Happy Pills' : '快乐药丸',
+                'Happy Pill' : '快乐药丸',
+                'Chow' : '饲料',
+                'Chows' : '饲料',
+                'Edibles' : '食品',
+                'Cuisine' : '料理',
+                'Cuisines' : '料理',
+                'Requires' : '需求',
+                'Upgrade Cost' : '强化需要',
+                'Upgrade With' : '升级需要',
+                'Cost' : '消耗',
+                'Needs:' : '需求：',
+                'Stock' : '库存',
+                'None' : '无',
+                'Primary attributes' : '主属性',
+                'Elemental mitigation' : '元素抗性',
+                '元素 mitigation' : '元素抗性',
+                'Other stats' : '其它属性',
+                'Battles Won' : '战斗胜利次数',
+                'Killing Blows' : '怪物击杀数',
+                'Gift Factor' : '送礼概率倍率',
+                'Double Gift' : '双倍礼物几率',
+                'Attack Speed' : '攻击速度',
+                'Health' : '生命',
+                'Phys. Attack' : '物理攻击',
+                'Mag. Attack' : '魔法攻击',
+                'Phys. Defense' : '物理防御',
+                'Mag. Defense' : '魔法防御',
+                'Slashing Mit' : '斩击减伤',
+                'Piercing Mit' : '刺击减伤',
+                'Crushing Mit' : '打击减伤',
+                'Evade' : '闪避率',
+                'Parry' : '招架率',
+                'Block' : '格挡率',
+                'Resist' : '抵抗率',
+                'Anti-' : '反',
+                'Powerlevel' : '战斗力',
+                'MAX' : '已满',
+                'Monsters' : '怪物',
+
+                'Crystal' : '水晶',
+                'PL' : '战力',
+                'Difference' : '差值',
+                'Elemental Mitigations' : '元素减伤',
+
+                'Name' : '名称',
+                'Class' : '种族',
+                'Wins' : '胜场',
+                'Kills' : '击杀',
+                'Gifts' : '胜场',
+                'Morale' : '士气',
+                'Hunger' : '饥饿',
+
+                'Increases the gift factor by ' : '增加送礼概率倍率',
+                'Increases monster damage by' : '增加怪物的伤害',
+                'Increases monster accuracy by' : '增加怪物的命中值',
+                'Decreases effective target evade/block by' : '降低攻击目标的有效回避/格挡值',
+                'Decreases effective target parry/resist by' : '降低攻击目标的有效招架/抵抗值',
+                'Increases monster health by' : '增加怪物的生命值',
+                'Increases monster natural parry by' : '增加怪物的招架值',
+                'Increases monster natural resist by' : '增加怪物的抵抗值',
+                'Increases monster natural evade by' : '增加怪物的回避值',
+                'Increases monster physical mitigation by' : '增加怪物的物理减伤',
+                'Increases monster magical mitigation by' : '增加怪物的魔法减伤',
+                'Increases monster attack speed by' : '增加怪物的攻击速度',
+                'Skill name' : '技能名',
+                'Skill type' : '技能攻击类型',
+                'Empty Slot - Click To Create' : '空槽位 - 点击创建一个怪物',
+                'You still have to feed this monsters enough crystals to reach powerlevel 25 and give it a name to activate it.' : '要激活这个怪物你必须喂食其水晶令其达到战斗力等级25，然后为其取名',
+                'You still have to give this monster a name to activate it' : '你依然需要为这个怪物命名以激活它',
+                'Next upgrade available at powerlevel ' : '强化到下一级需要此怪物达到战斗力等级 ',
+                'There are no free slots left.' : '没有空余的怪物槽可以创建怪物。',
+                'Name is too long (max 50 chars)' : '名字太长（最大50个字符，仅支持字母和数字和非特殊字符)',
+                'Too many spaces' : '名字包含太多空格(包含下划线最多5个，不能连用)',
+                'A monster with that name already exists.' : '已存在此名字怪物',
+                'The name is bad and you should feel bad' : '这个名字不太好，你应该也是这么觉得的',
+                'Monster cannot yet be named.' : '你现在无法为怪物取名',
+                'Monster is not sufficiency high powerlevel' : '此怪物还没有达到能强化此能力的等级',
+                'Monster can no longer be deleted.' : '此怪物已经无法删除',
+                'Insufficient happy pills' : '快乐药丸不足',
+                'Insufficient Happy Pills' : '快乐药丸不足',
+                'Insufficient food' : '食物不足',
+                'Insufficient Monster Chow' : '怪物饲料不足',
+                'Insufficient Monster Edibles' : '怪物食品不足',
+                'Insufficient Monster Cuisine' : '怪物料理不足',
+                'Insufficient tokens' : '令牌不足',
+                'Insufficient crystals' : '水晶不足',
+                'At full morale' : '情绪已满',
+                'At full hunger' : '饥饿度已满',
+                'brought you a gift' : '送来了礼物',
+                'brought you some gifts' : '送来了一些礼物',
+                'Received some' : '获得了一些',
+                'Received a' : '获得了',
+                'You can fuse this crystal with a monster in the monster tab to increase its Strength' : '你可以用这种水晶在怪物实验室里面为一个怪物提升它的力量',
+                'You can fuse this crystal with a monster in the monster tab to increase its Dexterity' : '你可以用这种水晶在怪物实验室里面为一个怪物提升它的灵巧',
+                'You can fuse this crystal with a monster in the monster tab to increase its Agility' : '你可以用这种水晶在怪物实验室里面为一个怪物提升它的敏捷',
+                'You can fuse this crystal with a monster in the monster tab to increase its Endurance' : '你可以用这种水晶在怪物实验室里面为一个怪物提升它的体质',
+                'You can fuse this crystal with a monster in the monster tab to increase its Intelligence' : '你可以用这种水晶在怪物实验室里面为一个怪物提升它的智力',
+                'You can fuse this crystal with a monster in the monster tab to increase its Wisdom' : '你可以用这种水晶在怪物实验室里面为一个怪物提升它的智慧',
+                'You can fuse this crystal with a monster in the monster tab to increase its Fire Resistance' : '你可以用这种水晶在怪物实验室里面为一个怪物提升它的火焰抗性',
+                'You can fuse this crystal with a monster in the monster tab to increase its Cold Resistance' : '你可以用这种水晶在怪物实验室里面为一个怪物提升它的冰冷抗性',
+                'You can fuse this crystal with a monster in the monster tab to increase its Electrical Resistance' : '你可以用这种水晶在怪物实验室里面为一个怪物提升它的闪电抗性',
+                'You can fuse this crystal with a monster in the monster tab to increase its Wind Resistance' : '你可以用这种水晶在怪物实验室里面为一个怪物提升它的疾风抗性',
+                'You can fuse this crystal with a monster in the monster tab to increase its Holy Resistance' : '你可以用这种水晶在怪物实验室里面为一个怪物提升它的神圣抗性',
+                'You can fuse this crystal with a monster in the monster tab to increase its Dark Resistance' : '你可以用这种水晶在怪物实验室里面为一个怪物提升它的黑暗抗性',
+                'Vigor' : '力量',
+                'Finesse' : '灵巧',
+                'Swiftness' : '敏捷',
+                'Fortitude' : '体质',
+                'Cunning' : '智力',
+                'Knowledge' : '智慧',
+                'Flames' : '火焰',
+                'Frost' : '冰冻',
+                'Lightning' : '闪电',
+                'Tempest' : '疾风',
+                'Devotion' : '神圣',
+                'Corruption' : '暗黑',
+                'Unlock slots' : '解锁栏位',
+                'Upgrade monsters' : '怪物升级',
+                'Total Usage' : '总消耗',
+
+
+            },
+            patterns: [
+                { pattern: /^Scavenging$/, replace: '寻宝' },
+                { pattern: /^Fortitude$/, replace: '坚毅' },
+                { pattern: /^Brutality$/, replace: '野蛮' },
+                { pattern: /^Accuracy$/, replace: '准确' },
+                { pattern: /^Precision$/, replace: '精密' },
+                { pattern: /^Overpower$/, replace: '压制' },
+                { pattern: /^Interception$/, replace: '拦截' },
+                { pattern: /^Dissipation$/, replace: '弥散' },
+                { pattern: /^Evasion$/, replace: '闪避' },
+                { pattern: /^Defense$/, replace: '防御' },
+                { pattern: /^Warding$/, replace: '魔防' },
+                { pattern: /^Swiftness$/, replace: '迅捷' },
+                { pattern: /^Damage$/, replace: '伤害类型' },
+                { pattern: /^Magical$/, replace: '魔法' },
+                { pattern: /^Physical$/, replace: '物理' },
+                { pattern: /^Slashing$/, replace: '斩击' },
+                { pattern: /^Piercing$/, replace: '刺击' },
+                { pattern: /^Crushing$/, replace: '打击' },
+                { pattern: /^Power$/, replace: '伤害' },
+                { pattern: /^Special$/, replace: '特殊' },
+                { pattern: /^Fire$/, replace: '火焰' },
+                { pattern: /^Cold$/, replace: '冰霜' },
+                { pattern: /^Elec$/, replace: '闪电' },
+                { pattern: /^Wind$/, replace: '疾风' },
+                { pattern: /^Holy$/, replace: '神圣' },
+                { pattern: /^Dark$/, replace: '黑暗' },
+                { pattern: /^Void$/, replace: '虚空' },
+                { pattern: /^Primary$/, replace: '主属性' },
+                { pattern: /^Element$/, replace: '元素抗性' },
+            ]
+        },
+
+        {
+            // 创建怪物说明 (来自旧版移植)
+            priority: 2,
+            selector: "#monstercreate_right",
+            conditions: [
+                { mode: "regex", match: /^https?:\/\/(?:alt\.)?hentaiverse\.org\/\?s=Character&ss=mo/ }
+            ],
+            translations: {
+                'About Monster Creation:' : '关于怪物的创建:',
+                'You can use the Monster Lab to create monsters that will roam free in the HentaiVerse. The monsters you create will be mixed in with the normal battles in all forms of play.' : '你可以用怪物实验室创造属于你的自创怪，这些怪物会在HV的世界里面自由遨游.这些你的自创怪会在任何普通模式的战斗中出现.',
+                'The monsters you create will start out weak, but can be upgraded by infusing them with Power Crystals, and by unlocking special perks with Chaos Tokens.' : '这些你的自创怪起初相当脆弱，但是它们可以被能量水晶升级，以及通过混沌令牌进行特殊强化',
+                'To get started, select a monster class from the list to the left' : '要开始创建怪物的话，请从左侧列表选择一个怪物类型',
+                'The class determines a number of factors:' : '不同的怪物类型决定了',
+                'The starting primary stats' : '怪物的初始属性',
+                'The starting damage resistances' : '初始抗性',
+                'Which melee attack types the monster can do' : '伤害类型',
+                '(Future) Upgrade paths and specializations' : '升级路线和特殊技能（未实装）',
+                'Choose Melee Damage Type' : '选择近战伤害类型',
+                'After selecting a class, select the desired primary attack type of the monster to create it. ' : '在选择怪物的类型之后，点击属性下方按钮选择你一个你想要的怪物基础攻击类型，',
+                'You will then be able to feed it some crystals and name it to make it active in the game.' : '然后你就可以通过喂食以及取名的方法激活这只怪物。怪物会定期赠送各种素材以及粘合剂作为礼物回馈玩家。',
+                'Create new monster with base damage type of' : '选择要创建的怪物的基础攻击类型',
+                'Strength':'力量',
+                'Dexterity':'灵巧',
+                'Agility':'敏捷',
+                'Endurance':'体质',
+                'Intelligence':'智力',
+                'Wisdom':'智慧',
+                // 节肢动物
+                'Arthropods are a diverse phylum of invertebrate animals distinguished by having a segmented body with jointed appendages, encased in a hard exoskeleton. ' : '节肢动物是一种多元无脊椎动物且身体具有分节特性的动物门之一，节肢动物通常包裹在一个坚硬的外骨骼中。',
+                'Variants include insects, spiders and scorpions, and they exist in many different forms and sizes. Remains of humanoid arthropods have been discovered in old ruins, but it is unknown whether such animals still exist, and whether or not they are intelligent.' : '其变种还包括昆虫、蜘蛛和蝎子等，它们有许多不同的形状和大小。在古老的废墟中已经发现了人形节肢动物的遗骸，但是这些动物是否仍然存在，它们是否存在智能，目前尚不清楚。',
+                'Arthropods are typically equipped with crushing melee attacks using claws and similar appendages, or piercing attacks with stingers. There are rumors of massive mutated members of the species, large enough to crush other creatures with the sheer bulk of their bodies.' : '节肢动物通常使用爪子或者其他类似爪子的武器进行打击攻击，或者使用刺进行突刺打击，还有传言曾说，有一些巨大变异种，大到可以直接用身体撞击摧毁大部分其他生物。',
+                'Their natural armor provides a high degree of resistance against slashing attacks, but they are vulnerable to blunt weapons. The exoskeleton provides a heightened defense against most elemental attacks.' : '它们天然的装甲提供了非常高的斩击耐性，而且外骨骼的存在令其对绝大部分元素魔法具有抗性，但是它们对打击攻击的抵抗力非常薄弱。',
+                // 飞禽
+                'Avions, also known as Aves or simply Birds, are a class of vertebrate endothermic animals distinguished by having wings. Variations exists, but typical Avions are bipedal with strong talons on their feet, covered in feathers, and equipped with a powerful beak. All Avions in the HentaiVerse have the ability to fly; non-flying birdlike creatures are classified as Beasts.' : '飞禽，也被称作鸟类或者干脆是鸟，是一种有翅膀的温血脊椎动物，虽然也有一些变异种存在，但是典型的鸟类双足均有爪子，全身覆盖着羽毛，并有强大的喙，在HV里面，所有的鸟类默认均会飞行，不会飞行的鸟类被分类至"野兽"一类。',
+                'Avions can specialize into using their beak for piercing attacks or talons for slashing attacks. The superior mobility and keen eyesight of higher level avions let them accurately target weak or unprotected parts of their opponent, giving them a high chance of scoring critical hits or temporarily cripple the target. The naturally high mobility also makes it particularly hard to land good hits with piercing weapons.' : '鸟类精通用它们的喙进行刺击或者使用爪子进行斩击攻击，卓越的视力与高机动性使鸟类很擅长攻击敌人的弱点，令它们的攻击有高暴击率与高致残性，鸟类的高机动性也使其很难被刺击武器命中。',
+                'While fast and agile, they do not have strong physical defenses. Due to their feather-covered body and flying nature, they are weak to fire and wind-based magicks. The fact that they are not grounded does however mean that they are resistant to electrical attacks.' : '虽然鸟类速度快而且敏捷，但他们没有强大的物理防御能力。由于它们的羽毛覆盖的身体和飞行的性质，它们普遍弱火与风。不过事实上，鸟类由于没有接地，所以它们可以抵抗闪电攻击。',
+                // 野兽
+                'Beasts cover the wide range of vertebrate air-breathing animals known as Mammals. There are many variations in this class, but the majority are quadrupeds of sizes varying from smaller than mice to larger than elephants.' : '野兽这种种类囊括了广大呼吸氧气的脊椎动物，它们通常被认作是哺乳动物。它们的种类多种多样，但是主要由四足动物组成，从老鼠到大象，各种体型的野兽都存在。',
+                'Beasts are typically either covered in fur or feathers, or more rarely, clad in a thick hairless hide. The fur makes them somewhat weak to fire-based magicks, but resistant to wind- and cold-based attacks. Most have average defense against physical weapons, but some have evolved a hard armor of keratin around vital points which heightenes these defenses significantly.' : '野兽通常覆盖有羽毛或者毛皮，极少数野兽没有毛皮，用厚厚的表皮保护自己，它们对大部分物理攻击都有防御力，由于有些野兽进化出了专门应对打击的坚硬表皮，所以它们对打击攻击的抵抗力较强。',
+                'Their natural range of weapons allow them to bite down with sharp teeth, shred their foes with large claws, and impale them on pointy tusks. The most powerful beasts can simply use the sheer bulk of their body to crush a target.' : '它们广泛的分布范围允许野兽使用锋利的牙齿刺穿它们的敌人或者使用利爪撕碎它们，最强大的野兽甚至只用身体撞击就可以击溃绝大部分敌人。',
+                'Rumors persist about terrible Beasts corrupted beyond all recognition with dark magicks, but those who have encountered them are not in a state to give a coherent description of their abilities.' : '有确切传闻说，存在一些被黑魔法腐化的野兽，但是遇到它们的人都没有办法对它们做出连贯准确的描述。',
+                // 天人
+                'Celestials are supernatural divine beings that reside on a different plane of existence. From time to time, some of these beings enter our world for reasons they usually choose not to divulge to outsiders. While worshipped by some individuals and groups as inherently good, it is suspected that those who leave have their own agendas that do not necessarily mesh well with that ideal.' : '天人是一种超自然而且神圣的存在，他们居住在不同的星球上，有些时候一些天人也会因为一些不想被外人知道的原因进入我们世界。天人的固有特性使其被一些个人和团体所崇拜，但也有些人怀疑那些脱离大部队擅离的天人可能不是想象中的那么完美。',
+                'Appearing as lithe humanoid creatures who refuse to wear any form of armor, they have below average resistance to most physical attacks but make up for it with high agility. They have high resistance to elemental magicks, and are nearly impervious to divine attacks. They are however very weak against forbidden magicks.' : '天人作为一种轻盈的人形生物拒绝任何形势的盔甲，因此他们的物理抗性很低，但是动作敏捷，天人有很高的元素魔法抗性，而且有很高的神圣魔法抗性，但是它们对黑暗魔法的抗性很弱。',
+                'Celestials can use a wide variety of humanoid armaments, but for unknown reasons they do not employ piercing weapons in their arsenal. Higher level celestials can imbue their weapons with pure divine power that lets their melee attacks deal holy damage.' : '天人可以使用各种各样的装备，不过因为一些不明的原因，它们没有刺击用的武器，一些更高层次的天人可以使用神圣魔法的力量，它们可以给近战攻击附带上神圣属性伤害。',
+                // 魔灵
+                'Daimons are supposedly corporeal manifestations of impure and often malevolent supernatural spirits that, some say, originate from the same plane of existance as Celestials. Their exact nature and relation to Celestials is however unknown.' : '魔灵，它们在自然中的存在通常被推测为一种不纯净和恶毒的精神集合体，有人说，它们和天人起源于同一位面，不过它们和天人确切的关系尚未为人们所知。',
+                'These spirits can take on any number of different appearances, but tend to choose one specifically tailored to the fears of their opponent. To allow for this shape changing capability, they do not wear any armor or use any other form of humanoid weaponry. This leaves them weak to physical attacks.' : '这些精神体外观各异，不过它们通常会选择敌人最恐惧的模样出现，为了保持这种能力的持续使用，魔灵不装备任何铠甲和装备，这使得它们无法进行物理攻击。',
+                'Like Celestials, they have high resistances to elemental magicks. They are almost imprevious to forbidden magicks, but highly vulnerable to divine attacks.' : '与天人类似，魔灵对元素魔法具有高抗性，对黑暗魔法具有很高抗性，但是惧怕物理攻击和神圣魔法。',
+                'Instead of forged weapons, these creatures take advantage of their physical malleability to reshape parts of their own body into blade-like weapons or sharp implements that they use for slashing and stabbing attacks. Higher level daimons are said to be able to conjure weapons of pure darkness that can bypass all defenses not especially enchanted to withstand it.' : '比起使用锻造的武器，魔灵更擅长使用自己身体塑性而成的肢体武器，这些肢体武器像刀片和尖刺一样锐利，使得魔灵可以使用刺击和斩击攻击，高阶的魔灵据说可以召唤纯净黑暗武器，能无视除了黑暗抗性之外的所有抗性对敌人造成伤害。',
+                // 龙类
+                'Dragonkin consist of Dragons, Drakes, and all other creatures that could be mistaken for giant flying fire-breathing lizards. That is however somewhat of an over-simplification as not all Dragonkin can fly, while breath attacks are not always fire, and are only fully developed in mature members of the species.' : '龙类包括龙，双足飞龙，以及一切会被认为是巨大的飞天喷火蜥蜴的生物，这种分类可能有点过于简化，因为并不是所有的龙类都有飞行能力，它们的吐息也不一定是火焰，只有它们之中发展最为成熟的那些种类才具有这些特性。',
+                // 元素
+                'Elementals are metaphysical beings that manifest as crystalline beings of pure elemental energy. It is thought that they can change between different elemental forms at will, but this has never been observed in battle.' : '元素生物是一种抽象的存在，表现为纯粹元素的结晶，通常它们被认为可以自由的切换自身的元素魔法的形态，但是从来没有在战斗中观测到这种情况。',
+                // 巨人
+                'Giants are huge, slow and stupid. The only reason they still thrive as a species is their extreme natural aggression and immense strength, combined with the fact that they are highly amused by smashing anything they can get a hold of.' : '巨人是一种缓慢巨大而且愚蠢的生物，它们之所以能茁壮成长的原因是因为它们自身极端的侵略性以及极强的力量，加上它们对粉碎一切它们能抓住的物体都非常感兴趣。',
+                // 类人
+                'Humanoids comprise the various intelligent bipedal primates found in the world. While they have no notable supernatural powers nor beastlike strength, and are largely covered in a soft and delicate skin which grants only minor protection from the elements, a variety of armor and weapons fill the gaps in their natural defenses and give them a surprisingly large amount of flexibility in their offensive capabilities.' : '类人类生物通常包括世界上发现的各种有智能的灵长类动物。虽然它们没有明显的超自然能力和野兽般的力量，而且大部分被柔软细腻的肌肤所保护，这使得它们对元素魔法几乎没有抵抗力，但是它们可以使用各式各样的铠甲和武器保护自己，使得这些生物具有惊人的延展性和潜力。',
+                // 机械
+                'Mechanoids are essentially living machines, remnants of ancient and highly advanced civilizations. The art of making such machinations has been long lost, but many still roam the world, oblivious of the fate that has befallen their deceased masters.' : '机器人本质上是一种有生命的机械，是古文明的遗物，制造这种阴谋般的产物的技术已经失传已久，很多机器人在世界游荡，在命运的指引下，不经意间邂逅了它们已故的主人。',
+                'Many variants of Mechanoids exist, from large bipedal machines forged for destruction to smaller humanoid builds created for peaceful purposes. Some were originally fitted with a wide variety of weaponry, but due to wear and lack of maintenance, most of the Mechanoids that are still functional equip themselves with simple melee weapons.These are typically blade- and spike-shaped attachments in place of a limb or other tool.' : '机器人存在许多变种，由巨大的战斗双足机械到小型的民用人形机器人均有存在，一些机器人原本配备了多种武器装备，但是因为缺乏维护，大部分机器人还是只能使用简单的近战武器进行攻击，比如安装在肢体上的锯片以及穗形尖刺进行攻击。',
+                'There are however rumors of terrible machines that are capable of searing a creature to the bones with a stream of fire, or shatter their bodies with a torrent of deadly metal.' : '不过有传言说，一些可怕的机器人能用火焰把其他生物烧焦，或者用一堆致命的金属构造物刺穿敌人的身体。',
+                'Mechanoids are highly resistant to wind and cold-based magicks, and due to their artificial nature, they are almost imprevious to divine attacks. Their internal systems are however highly vulnerable to electrical shocks. Most have armor worn brittle with age, but stories of preserved heavily armored variants are told by the few who are fortunate enough to survive such an encounter.' : '机器人具有很高的疾风和冰冷以及火焰抗性，得益于它们的人工构造，它们对神圣魔法也有很强的抗性，但是它们的内部系统极度惧怕电击，大部分机器人的铠甲已经随时间风化，但是也存在一些保留了大部分铠甲的幸运儿。',
+                // 爬行动物
+                'Reptilians are cold-blooded creatures that thrive in and near water. They comprise animals like crocodiles, snakes, turtles and lizards, but also intelligent biped humanoid variants that have evolved independently of their fellow primates. Their skin is covered in scales or scutes, and some have hardened shells covering parts of their bodies.' : '爬行动物就是所谓的冷血动物，通常生活在水边，包括鳄鱼、蛇、海龟和蜥蜴等动物，也有独立于灵长类动物进化的智能两足人型变体存在，它们的皮肤覆盖着鳞片或鳞甲，有硬化甲壳覆盖身体的大部分部位',
+                // 妖精
+                'Sprites are diminuitive beings that seldom get involved in the Big World, prefering to remain with their own kin in the hidden places of the land where nature is still thick and undisturbed. Only a small minority choose to seek out the human world, where their high intelligence and small size make them excel for many tasks, ranging from accounting to assassination.' : '妖精是一种纤小的存在，它们通常极少进入人类的"大世界"，宁愿留在自己的熟悉的在土地或者不受干扰的隐蔽场所中。只有少数妖精会选择进入人类的世界，在那里他们的高智力和小尺寸使它们擅长执行许多任务，从会计到暗杀。',
+                'Sprites are not a single species, but most of the big folk will be hard pressed to tell a pixie apart from a faery. They are commonly armed with using tiny swords and rapiers, and while they do not have much strength to put behind a thrust, their ability to seek out the most vulnerable parts of a target still make them a force to be reckoned with.' : '妖精并不是一种单一的物种，但是大部分人都难以分辨小精灵与精灵的区别，它们通常手持微小的剑或者细剑，而且通常没有多少力量用剑进行刺击攻击，但是它们能寻找敌人最脆弱的地点进行攻击依然是妖精一个不可小视的能力。',
+                'Higher level Sprites can master powerful magicks, and many an unwary adventurer have engaged them recklessly only to be sent to an early grave.' : '高阶的妖精掌握了强大的法术，可以早早的把那些轻敌的冒险家送入坟墓。',
+                'Physically weak, the best way of dealing with them is swatting them with a crushing attack, but they are fast and hard to hit. Their tiny size also makes them difficult to hit them with stabbing weapons. All Sprites have some resistance to elemental magicks, and depending on their natural affinity they can even be fully imprevious to some elements. They are however naturally weak to the forbidden magicks.' : '妖精的物理抗性较弱，惧怕打击攻击，但是动作极其敏捷，难以击中，所以使用刺击武器更加难以击中它们，所有的妖精对元素魔法都有一定的抗性，而且因为它们的自然亲和力，它们对神圣魔法也有一定的抵抗，但是它们非常惧怕黑暗魔法。',
+                // 不死族
+                'Undeads are animated necrotic remnants of living beings, cursed to an eternal lifeless existance with no warmth or joy. They range from mindless brutes such as zombies and animated skeletons, to higher undeads that have preserved parts of their mind but lost their soul, like liches, vampires and banshees.' : '不死族就是一些会动的残肢断尸，被诅咒而成为永生的存在的它们没有温暖和快乐的概念，它们的范围从无主的野兽尸骸比如亡灵或者僵尸，到高等的亡灵与巫妖，它们在保留意识的同时也失去了它们的灵魂。',
+                'Having no need to maintain a body temperature and no vital processes that can be disturbed by electricity, undeads are highly resistant to cold and electrical magicks. Being born from darkness itself also makes them imprevious to forbidden magicks, but they are vulnerable to divine attacks and fire magicks.' : '尸体没有保持体温的必要，也不惧怕电的伤害，使其有较高的冰冷与闪电抗性，诞生与黑暗魔法本身的它们也对黑暗魔法有极高的抗性，但是它们惧怕神圣魔法和火焰魔法的攻击。',
+                'Piercing and crushing attacks are ineffective due to a lack of weak points, but cutting off limbs works reasonably well.' : '刺击与打击对亡灵并没有多大的意义，但是切断它们的四肢倒是非常有效的战术。',
+                'Mindless undeads tend to use simple melee implements like swords, or just crush their targets using their own limbs. Higher level undeads can use more sophisticated weaponry, and some even master deadly forms of forbidden magicks.' : '无主的亡灵们通常倾向于使用简单的近战武器比如剑，一些干脆使用自己的肢体进行打击攻击，更高级别的亡灵会使用更复杂的武器，甚至有精通黑暗魔法的大法师存在',
+
+            },
+            patterns: []
+        },
+
+        {
+            // 彩票界面 (来自旧版移植)
+            priority: 4,
+            selector: "div:not([id])>#leftpane, div:not([id])>#rightpane",
+            conditions: [
+                { mode: "regex", match: /^https?:\/\/(?:alt\.)?hentaiverse\.org\/\?s=Bazaar&ss=l[ta]/ }
+            ],
+            translations: {
+                'January' : '1 月',
+                'February' : '2 月',
+                'March' : '3 月',
+                'April' : '4 月',
+                'May' : '5 月',
+                'June' : '6 月',
+                'July' : '7 月',
+                'August' : '8 月',
+                'September' : '9 月',
+                'October' : '10 月',
+                'November' : '11 月',
+                'December' : '12 月',
+                '1st:' : '1 日',
+                '3rd:' : '3 日',
+                '2nd:' : '2 日',
+                'th:' : ' 日',
+                'Grand Prize for' : '一等奖',
+                '2nd Prize' : '二等奖',
+                '3rd Prize' : '三等奖',
+                '4th Prize' : '四等奖',
+                '5th Prize' : '五等奖',
+                'Equip Winner:' : '装备中奖者:',
+                'Core Winner:' : '核心中奖者:',
+                'TBD' : '暂未开奖',
+                'You currently have' : '你目前拥有',
+                'Each ticket costs' : '购买一张彩票将花费',
+                'You already spent a Golden Lottery Ticket.' : '你已经使用了一张黄金彩票券',
+                'Choose number to buy' : '输入购买数量',
+                'sold tickets' : '张已售出的彩票',
+                'Stock:' : '库存：',
+                'The Weapon Lottery lets you spend GP on a chance to win the specific equipment piece shown on the left.' : '使用GP购买武器彩票有机会赢取"无双"武器',
+                'Each lottery period lasts 24 hours. At midnight UTC, a drawing is held, and a new lottery period starts.' : '每期彩票发行期为24小时，武器彩票于协调世界时 0点 开奖，同时发行新一期彩票',
+                'In addition to normal tickets, you can also spend a Golden Lottery Ticket to add 100 tickets and double your effective ticket count at the time of drawing. This will not increase the effective ticket count past 10% of the total purchased tickets. Golden Lottery Tickets can only be acquired as a consolation prize from the lottery.' : '你也可以使用黄金彩票券兑换100张彩票，并且让自己持有的彩票数量翻倍（效果在开奖时计算，最高不超过10%总售出彩票）。黄金彩票券只能通过购买彩票中奖获得。每人每期最多可购买20000张彩票',
+                'The number of items granted by the 2nd-5th prize will increase with the size of the pot. You can only ever win one of the prizes no matter how many tickets you purchase.' : '2-5等奖的奖品数量取决于彩池的大小，无论你购买了多少注彩票，你只能中一个奖项，如果你不想要一等奖装备，那么你可以点击一等奖下面的DO NOT WANT按钮，这会令你放弃头奖装备，取而代之如果你抽中头奖你将获得对应的装备核心',
+                'The Armor Lottery lets you spend GP on a chance to win the specific equipment piece shown on the left.' : '使用GP(画廊点数)购买防具彩票有机会获得"无双"防具',
+                'Each lottery period lasts 24 hours. At noon UTC, a drawing is held, and a new lottery period starts.' : '每期彩票发行期为24小时，防具彩票于协调世界时 12点 开奖，同时发行新一期彩票',
+                'Today\'s ticket sale is closed.' : '本期彩票售卖已结束',
+                'Today\'s drawing is in' : '距离今日开奖还剩',
+                'hours and' : '小时',
+                'hours' : '小时',
+                'minutes' : '分钟',
+                'Ticket sales will close up to ten' : '彩票售卖将于开奖前 10',
+                'before this time.' : '结束',
+                'You cannot opt out unless you have at least one ticket.' : '你必须至少购买一张彩票才能选择放弃头奖争夺',
+                'You will not participate in the drawing for the grand prize of this lottery.' : '你已经放弃参与本次彩票的头奖争夺',
+                'No longer available' : '装备已不存在',
+                'Winner:' : '获奖者:',
+                'Cannot opt out without buying a ticket first' : '你必须至少购买一张彩票才能决定是否参与头奖争夺',
+                'Too many tickets - may not have more than 20,000 tickets per drawing' : '购买数量超过上限 - 每期彩票你最多只能拥有2万张',
+                'Must buy at least one ticket' : '最低起购数量1张',
+                'No golden tickets to spend' : '你没有黄金彩票券可以使用',
+                'Already opted out' : '已经决定过放弃头奖',
+                'This lottery is closed' : '本期彩票售卖已结束',
+                'Insufficient GP' : 'GP不足',
+            },
+            patterns: [
+                { pattern: /You hold ([\d,]+) of/, replace: '你拥有 $1 /' },
+                { pattern: /(\d+)(?:st|nd|rd|th):/, replace: '$1日:' },
+            ]
+        },
+
+        {
+            // 小马引导图 (来自旧版移植)
+            priority: 2,
+            selector: "#riddlemaster",
+            conditions: [
+                { mode: "regex", match: /^https?:\/\/(?:alt\.)?hentaiverse\.org\/(?:isekai\/)?/ }
+            ],
+            translations: {
+                'RiddleMaster' : '御谜士',
+                'The RiddleMaster' : '御谜士',
+                'Answer the riddle:' : '回答谜语:',
+                'Submit' : '提交',
+                'Skip' : '跳过',
+                'Submit Answer' : '提交答案',
+                'Timer' : '剩余时间',
+            },
+            patterns: []
+        },
+
+        {
+            // 系统消息补充 (来自旧版移植)
+            priority: 4,
+            conditions: [
+                { mode: "regex", match: /^https?:\/\/(?:alt\.)?hentaiverse\.org\/(?:isekai\/)?/ }
+            ],
+            translations: {
+                'No such equipment' : '装备不存在',
+                'Equipment is too high level to equip.' : '你无法穿戴比自己等级高的装备',
+                'That item cannot be used as an offhand with that main weapon.' : '除了装备太刀时可以在副手装备脇差，否则在装备双手武器时不能在副手装备物品',
+                'Cannot equip the same item in two slots.' : '不能把相同的装备同时穿戴在两个部位上',
+                'You cannot afford to train that.' : '你没有足够 Credits 训练指定项目',
+                'You cannot start a new training at this time' : '你现在无法开始训练新项目',
+                'You have already maxed that training.' : '该训练已经满级',
+                'There is no such skill' : '所指定技能不存在',
+                'Insufficient credits, kupo!' : 'Credits 不足，咕波！',
+                'Insufficient items, kupo!' : '物品不足，咕波！',
+                'Equipment not found, kupo!' : '装备不存在，咕波！',
+                'Equipment cannot be attached, kupo!' : '无法附带该装备，咕波！',
+                'The mail moogle cannot carry more than 10 items at a time, kupo!' : '每封邮件最多只能添加10个附件，咕波！',
+                'CoD must be at least 10 credits, kupo!' : '货到付款(CoD)至少需要设置 10 Credits，咕波！',
+                'Insufficient hath, kupo!' : 'Hath 不足，咕波！',
+                'No amount specified, kupo!' : '没有指定数量，咕波！',
+                'That item cannot be attached, kupo!' : '所选物品无法邮寄，咕波！',
+                'Mail does not exist, kupo!' : '邮件不存在，咕波！',
+                'You need to be a donator to attach items, kupo!' : '你需要捐助e绅士才可以在异世界邮局添加附件，咕波！',
+                'Cannot set CoD without attachments, kupo!' : '你必须至少附带一件附件才能设置货到付款(CoD)，咕波！',
+                'You cannot afford the postage, kupo!' : '你负担不起邮资，咕波！(没有购买hath能力"邮资已付"时每发一封邮件10C手续费，且设置CoD时会有额外的费用)',
+                'You must at minimum specify a recipient and subject, kupo!' : '你必须至少设定一个收件人和主题，咕波！',
+                'You must at minimum specify a subject, kupo!' : '你必须至少填写主题，咕波！',
+                'Invalid or missing recipient, kupo!' : '收件人不存在，咕波！',
+                'You cannot read that, kupo!' : '你无法阅读该邮件，咕波！',
+                'Messaging yourself must be the ultimate form of social withdrawal, kupo! Seek help, kupo!' : '给自己发邮件是社交退缩的终极形式，咕波！去找些别的乐子吧，咕波！',
+                'Mail cannot be returned, kupo!' : '此邮件已无法退回，咕波！',
+                'Message has no attachment, kupo!' : '此邮件没有附件，咕波！',
+                'Received Paid CoD' : '收到CoD收货支付款',
+                'was added to your balance.' : '已添加到你的余额。',
+                'Invalid reward class' : '所选奖励类型不可用',
+                'Invalid reward type' : '所选奖励类型不可用',
+                'No such item' : '物品不存在',
+                'You do not have enough of that trophy' : '你没有足够的奖杯执行此次献祭',
+                'Snowflake has blessed you with some of her power!' : '雪花女神用她的力量祝福了你！',
+                'Your strength' : '你的力量',
+                'Your dexterity' : '你的灵巧',
+                'Your agility' : '你的敏捷',
+                'Your endurance' : '你的体质',
+                'Your intelligence' : '你的智力',
+                'Your wisdom' : '你的智慧',
+                'was increased by' : '提升了',
+                'Follower peerless granted!' : '获得雪花信徒的无双奖励！',
+                'Snowflake has blessed you with an item!' : '雪花女神祝福了你！',
+                'Received' : '获得了',
+                'Sold it for' : '已自动出售获得',
+                'Salvaged it for' : '已自动分解获得',
+                'Hit Space Bar to offer another item like this.' : '按空格键可以重复执行上一个相同的献祭',
+                'Insufficent credits in market account' : '市场账户余额不足',
+                'Insufficent credits in credit balance' : '个人账户余额不足',
+                'Insufficient items available' : '你没有足够数量该物品可供出售',
+                'You do not have a sufficient market balance to place that order' : '你没有足够的市场余额可供投放当前买单',
+                'Bidding price must be at least' : '当前物品最低出价为',
+                'Asking price must be at least' : '当前物品最低要价为',
+                'You have to wait a short while between placing each order' : '你创建订单过于频繁，稍后再试',
+                'brought you a gift' : '送来了礼物',
+                'brought you some gifts' : '送来了一些礼物',
+                'Received some' : '获得了一些',
+                'Received a' : '获得了',
+                'That name is bad and you should feel bad.' : '这名字不好，你知道吧？',
+            },
+            patterns: [
+                { pattern: /Your bid price must be at least (.+?) to overbid the current buy orders/, replace: '如果要加价超出目前最高买价你必须最少出价 $1' },
+                { pattern: /Your ask price must be at most (.+?) to undercut the current sell orders/, replace: '如果要减价低于目前最低卖价你必须开价不超过 $1' },
+                { pattern: /Equipment (\d+) is currently equipped/, replace: '装备 $1 当前正在穿戴' },
+            ]
+        },
+
+        {
+            // 导航菜单补充 (来自旧版移植)
+            priority: 1,
+            selector: "#navbar",
+            conditions: [
+                { mode: "regex", match: /^https?:\/\/(?:alt\.)?hentaiverse\.org\/(?:isekai\/)?/ }
+            ],
+            translations: {
+                'Check Attributes' : '检查属性点分配！',
+                'Check Abilities' : '检查技能！',
+                'Check attributes' : '检查属性点分配！',
+                'Check abilities' : '检查技能！',
+                'Repair armor' : '护甲需要修理！',
+                'Repair weapon' : '武器需要修理！',
+                'Armor Damage' : '护甲已损坏！',
+                'Weapon Damage' : '武器已损坏！',
+                'You Got Mail' : '你有新邮件',
+            },
+            patterns: [
+                { pattern: /^Repair$/, replace: '装备修理' },
+                { pattern: /^Salvage$/, replace: '装备分解' },
+                { pattern: /^Reforge$/, replace: '装备重铸' },
+                { pattern: /^Soulfuse$/, replace: '装备魂绑' },
+                { pattern: /^Upgrade$/, replace: '装备强化' },
+                { pattern: /^Enchant$/, replace: '装备附魔' },
+            ]
+        },
+
+        {
+            // 状态栏补充 (来自旧版移植)
+            priority: 2,
+            selector: "#eqch_stats",
+            conditions: [
+                { mode: "regex", match: /^https?:\/\/(?:alt\.)?hentaiverse\.org\/(?:isekai\/)?/ }
+            ],
+            translations: {
+                'Statistics' : '状态栏',
+                'Fighting Style' : '战斗风格',
+                'Unarmed' : '空手',
+                'Dualwield' : '双持',
+                'Offhand Strike on hit' : '在副手击中时触发 副手打击',
+                'Niten Ichiryu' : '二天一流',
+                'Physical Attack' : '物理攻击',
+                'attack base damage' : '基础攻击力',
+                'hit chance' : '命中率',
+                'crit chance' : '暴击率',
+                '% damage' : '% 暴击伤害量',
+                'attack speed bonus' : '攻击速度加成',
+                'Magical Attack' : '魔法攻击',
+                'magic base damage' : '基础魔法伤害',
+                'mana cost modifier' : '魔力消耗修正',
+                'cast speed bonus' : '施法速度加成',
+                'Vitals' : '状态值',
+                'health points' : '生命值',
+                'magic points' : '魔力值',
+                'magic regen per tick' : '魔力恢复量',
+                'spirit points' : '灵力值',
+                'spirit regen per tick' : '灵力恢复量',
+                'Defense' : '防御',
+                'physical mitigation' : '物理减伤',
+                'magical mitigation' : '魔法减伤',
+                'evade chance' : '回避率',
+                'block chance' : '格挡率',
+                'parry chance' : '招架率',
+                'resist chance' : '抵抗率',
+                'Specific Mitigation' : '属性减伤',
+                'Spell Damage Bonus' : '魔法伤害加成',
+            },
+            patterns: []
+        },
+
+        {
+            // 训练补充 (来自旧版移植)
+            priority: 2,
+            selector: "#train_outer",
+            conditions: [
+                { mode: "regex", match: /^https?:\/\/(?:alt\.)?hentaiverse\.org\/(?:isekai\/)?\?s=Character&ss=tr/ }
+            ],
+            translations: {
+                'Here you can exchange your credits for Henjutsu 训练名 in various subjects.' : '在这里你可以消耗credit永久的提升你的各项能力',
+                '训练名 happens in realtime, and you can only train one skill at a time.' : '一次只能训练一个项目，训练可以随时取消并获得退款',
+            },
+            patterns: [
+                { pattern: /\b1 H\b/, replace: '1小时' },
+                { pattern: /\b2 H\b/, replace: '2小时' },
+                { pattern: /\b4 H\b/, replace: '4小时' },
+                { pattern: /\b8 H\b/, replace: '8小时' },
+                { pattern: /\b12 H\b/, replace: '12小时' },
+                { pattern: /\b24 H\b/, replace: '24小时' },
+                { pattern: /\b0 H\b/, replace: '10秒' },
+            ]
+        },
+
+        {
+            // 祭坛补充 (来自旧版移植)
+            priority: 2,
+            selector: "#shrine_right, #shrine_offertext, #accept_equip",
+            conditions: [
+                { mode: "regex", match: /^https?:\/\/(?:alt\.)?hentaiverse\.org\/(?:isekai\/)?\?s=Bazaar&ss=sh/ }
+            ],
+            translations: {
+                'One-Handed Weapon' : '单手武器',
+                'Two-Handed Weapon' : '双手武器',
+                'Ranged Weapon' : '远程武器',
+            },
+            patterns: [
+                { pattern: /need (\d+) more/, replace: '还需要额外 $1 个以升级献祭' },
+                { pattern: /Offer (.+) for :/, replace: '献祭 $1 换取' },
+                { pattern: /You have (\d+ \/ \d+) items required for this offering/, replace: '当前持有 $1 个所需物品' },
+            ]
+        },
+
+        {
+            // 市场补充 (来自旧版移植)
+            priority: 2,
+            selector: "#market_outer",
+            conditions: [
+                { mode: "regex", match: /^https?:\/\/(?:alt\.)?hentaiverse\.org\/(?:isekai\/)?\?s=Bazaar&ss=mk/ }
+            ],
+            translations: {
+                'Previous' : '上一个',
+                'Next' : '下一个',
+                'Please wait a bit longer before making another account transfer' : '转账操作过于频繁，请稍后再试',
+            },
+            patterns: [
+                { pattern: /per (\d+)/, replace: '(每 $1 件)' },
+            ]
+        },
+
+        {
+            // 设置补充 (来自旧版移植)
+            priority: 2,
+            selector: "#settings_outer",
+            conditions: [
+                { mode: "regex", match: /^https?:\/\/(?:alt\.)?hentaiverse\.org\/(?:isekai\/)?\?s=Character&ss=se/ }
+            ],
+            translations: {
+                'Apply Changes' : '确认更改',
+            },
+            patterns: [
+                { pattern: /^Sell (\w+)$/, replace: '自动出售 $1 或更低品质' },
+                { pattern: /^Salvage (\w+)$/, replace: '自动分解 $1 或更低品质' },
+                { pattern: / Armor$/, replace: '护甲' },
+            ]
+        },
+
 
     ];
 
@@ -5135,106 +6306,94 @@
         }
     ];
 
-// 4. 通用翻译处理函数
-function translateSystemMsg(msg) {
-    if (!msg) return msg;
+    // 4. 通用翻译处理函数
+    function translateSystemMsg(msg) {
+        if (!msg) return msg;
 
-    // 优先尝试完全匹配
-    if (sysMessages[msg]) {
-        return sysMessages[msg];
+        // 优先尝试完全匹配
+        if (sysMessages[msg]) {
+            return sysMessages[msg];
+        }
+
+        // 其次尝试正则匹配
+        for (let i = 0; i < sysRegex.length; i++) {
+            if (sysRegex[i].reg.test(msg)) {
+                return msg.replace(sysRegex[i].reg, sysRegex[i].repl);
+            }
+        }
+        // 如果都没匹配上，返回原文 (方便你看到原文后续添加到字典里)
+        return msg;
+    }
+    function transItem(name) {
+        const cleanName = name.replace(/^["']|["']$/g, '').trim();
+        // 2. 用干净的名字查字典
+        const translated = dynamicItemDict[cleanName];
+        // 3. 如果查到了，返回翻译结果
+        if (translated) {
+            return translated;
+            // 如果你想给翻译后的词加上中文引号，可以用下面这行代替上面这行：
+            // return `“${translated}”`;
+        }
+        // 4. 如果没查到，返回原始值 (这里的 name 是包含引号的原文，保留它以防误操作)
+        return name;
     }
 
-    // 其次尝试正则匹配
-    for (let i = 0; i < sysRegex.length; i++) {
-        if (sysRegex[i].reg.test(msg)) {
-            return msg.replace(sysRegex[i].reg, sysRegex[i].repl);
+    // 5. 覆盖原生 alert
+    window.alert = function (message) {
+        const translated = translateSystemMsg(message);
+        nativeAlert(translated); // 调用备份的原生函数，显示翻译后的文字
+    };
+
+    // 6. 覆盖原生 confirm (如果有 "确定/取消" 框)
+    window.confirm = function (message) {
+        const translated = translateSystemMsg(message);
+        return nativeConfirm(translated);
+    };
+
+    // 7. 覆盖原生 prompt (如果有输入框)
+    window.prompt = function (message, _default) {
+        const translated = translateSystemMsg(message);
+        return nativePrompt(translated, _default);
+    };
+
+    // ================= 0. 基础配置与缓存 =================
+    const translationCache = new WeakMap();
+    const processedMarks = new WeakSet();
+    const TRANSLATED_NODES = new WeakSet(); // 标记已完全翻译的文本节点，避免重复处理
+    const UI_SELECTORS = "input[type='submit'], input[type='button'], button, option, optgroup, label, input[placeholder], [title]";
+    function escapeRegExp(str) { return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+    // 日志区高频更新节点黑名单——这些节点的内容变化极快但翻译价值低
+    const LOG_SKIP_SELECTORS = '#pane_log, #pane_skill, #pane_magic, #pane_item';
+    let _lastLogSkipCheck = 0;
+
+    // ================= 1. 论坛结构保护逻辑 =================
+    function normalizeStyledTextInPostcolor() {
+        const posts = document.getElementsByClassName('postcolor');
+        for (let i = 0; i < posts.length; i++) {
+            let el = posts[i];
+            el.innerHTML = el.innerHTML
+                .replace(/<span[^>]*>/gi, "")
+                .replace(/<\/span>/gi, "")
+                .replace(/<!--.*?-->/g, "")
+                .replace(/<mark[^>]*>/gi, "")
+                .replace(/<\/mark>/gi, "")
+                .replace(/<b>/gi, "")
+                .replace(/<\/b>/gi, "");
         }
     }
-    // 如果都没匹配上，返回原文 (方便你看到原文后续添加到字典里)
-    return msg;
-}
-function transItem(name) {
-    const cleanName = name.replace(/^["']|["']$/g, '').trim();
-    // 2. 用干净的名字查字典
-    const translated = dynamicItemDict[cleanName];
-    // 3. 如果查到了，返回翻译结果
-    if (translated) {
-        return translated;
-        // 如果你想给翻译后的词加上中文引号，可以用下面这行代替上面这行：
-        // return `“${translated}”`;
-    }
-    // 4. 如果没查到，返回原始值 (这里的 name 是包含引号的原文，保留它以防误操作)
-    return name;
-}
 
-// 5. 覆盖原生 alert
-window.alert = function (message) {
-    const translated = translateSystemMsg(message);
-    nativeAlert(translated); // 调用备份的原生函数，显示翻译后的文字
-};
-
-// 6. 覆盖原生 confirm (如果有 "确定/取消" 框)
-window.confirm = function (message) {
-    const translated = translateSystemMsg(message);
-    return nativeConfirm(translated);
-};
-
-// 7. 覆盖原生 prompt (如果有输入框)
-window.prompt = function (message, _default) {
-    const translated = translateSystemMsg(message);
-    return nativePrompt(translated, _default);
-};
-
-// ================= 0. 基础配置与缓存 =================
-const translationCache = new WeakMap();
-const processedMarks = new WeakSet();
-const UI_SELECTORS = "input[type='submit'], input[type='button'], button, option, optgroup, label, input[placeholder], [title]";
-function escapeRegExp(str) { return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
-
-// ================= 1. 论坛结构保护逻辑 =================
-function normalizeStyledTextInPostcolor() {
-    const posts = document.getElementsByClassName('postcolor');
-    for (let i = 0; i < posts.length; i++) {
-        let el = posts[i];
-        el.innerHTML = el.innerHTML
-            .replace(/<span[^>]*>/gi, "")
-            .replace(/<\/span>/gi, "")
-            .replace(/<!--.*?-->/g, "")
-            .replace(/<mark[^>]*>/gi, "")
-            .replace(/<\/mark>/gi, "")
-            .replace(/<b>/gi, "")
-            .replace(/<\/b>/gi, "");
-    }
-}
-
-// ==========================================
-// 样式修正 (修复汉化后的排版错位)
-// ==========================================
-(function addCustomStyles() {
-    const style = document.createElement('style');
-    style.innerHTML = `
+    // ==========================================
+    // 样式修正 (修复汉化后的排版错位)
+    // ==========================================
+    (function addCustomStyles() {
+        const style = document.createElement('style');
+        style.innerHTML = `
         #eqbaserolls table td {
             padding: 0px 2px !important;
             line-height: 1.15 !important;
         }
         #eqbaserolls {
             overflow-y: auto !important;
-        }
-
-        /* 军械库菜单汉化后文字变短，HVUT 的侧边按钮又是 absolute，
-           不参与左栏宽度计算，会压到右侧装备列表。让按钮回到文档流，
-           由按钮本身撑开左栏，比硬固定英文宽度更紧凑。 */
-        #armory_left .hvut-am-side {
-            position: static !important;
-            width: 100px !important;
-            margin: 20px 4px 0 !important;
-            box-sizing: border-box !important;
-        }
-
-        #armory_left .armory_tab {
-            box-sizing: border-box !important;
-            width: 100% !important;
-            text-align: center !important;
         }
 
         /* 1. 压缩表格单元格的垂直间距 */
@@ -5261,369 +6420,763 @@ function normalizeStyledTextInPostcolor() {
     document.head.appendChild(style);
 })();
 
-// ================= 2. 匹配规则与分层编译 (修正边界匹配) =================
-const currentUrl = location.href;
-let matchedRules = [];
+    // ================= 2. 匹配规则与分层编译 (修正边界匹配) =================
+    const currentUrl = location.href;
+    let matchedRules = [];
 
-// URL 匹配逻辑
-for (const item of pageTranslations) {
-    if (item.exclude && Array.isArray(item.exclude)) {
-        const isExcluded = item.exclude.some(cond => {
+    // URL 匹配逻辑
+    for (const item of pageTranslations) {
+        if (item.exclude && Array.isArray(item.exclude)) {
+            const isExcluded = item.exclude.some(cond => {
+                if (cond.mode === "strict") return currentUrl === cond.match;
+                if (cond.mode === "prefix") return currentUrl.startsWith(cond.match);
+                if (cond.mode === "regex") return cond.match instanceof RegExp && cond.match.test(currentUrl);
+                return false;
+            });
+            if (isExcluded) continue;
+        }
+        const isMatched = item.conditions.some(cond => {
             if (cond.mode === "strict") return currentUrl === cond.match;
             if (cond.mode === "prefix") return currentUrl.startsWith(cond.match);
             if (cond.mode === "regex") return cond.match instanceof RegExp && cond.match.test(currentUrl);
             return false;
         });
-        if (isExcluded) continue;
+        if (isMatched) matchedRules.push(item);
     }
-    const isMatched = item.conditions.some(cond => {
-        if (cond.mode === "strict") return currentUrl === cond.match;
-        if (cond.mode === "prefix") return currentUrl.startsWith(cond.match);
-        if (cond.mode === "regex") return cond.match instanceof RegExp && cond.match.test(currentUrl);
-        return false;
+
+    // 1. 按优先级【降序】排列 (100 -> 1)
+    matchedRules.sort((a, b) => (Number(b.priority) || 1) - (Number(a.priority) || 1));
+
+    const executionQueue = matchedRules.map(rule => {
+        const dict = rule.translations || {};
+        const keys = Object.keys(dict).sort((a, b) => b.length - a.length);
+
+        // 【新增】：读取规则中的 flag
+        const shouldCheckBoundary = !rule.ignoreWordBoundary;
+
+        const staticRegex = keys.length > 0
+        ? new RegExp(keys.map(key => {
+            const escaped = escapeRegExp(key);
+            // 只有当 shouldCheckBoundary 为 true 时，才给单词加边界
+            if (shouldCheckBoundary && /^\w+$/.test(key)) {
+                return `\\b${escaped}\\b`;
+            }
+            return escaped;
+        }).join('|'), 'g')
+        : null;
+
+        return {
+            priority: Number(rule.priority) || 1,
+            selector: rule.selector || null,
+            excludeSelector: rule.excludeSelector || null,
+            // 【新增】：将 flag 传递给执行队列，供 Part 4 使用
+            ignoreWordBoundary: rule.ignoreWordBoundary || false,
+            dict: dict,
+            keys: keys,
+            staticRegex: staticRegex,
+            patterns: rule.patterns || []
+        };
     });
-    if (isMatched) matchedRules.push(item);
-}
 
-// 1. 按优先级【降序】排列 (100 -> 1)
-matchedRules.sort((a, b) => (Number(b.priority) || 1) - (Number(a.priority) || 1));
+    // ================= 3. 辅助函数 =================
 
-const executionQueue = matchedRules.map(rule => {
-    const dict = rule.translations || {};
-    const keys = Object.keys(dict).sort((a, b) => b.length - a.length);
+    function applyStyleToNode(node, matchIndex, matchLength, newText, style) {
+        try {
+            const range = document.createRange();
+            range.setStart(node, matchIndex);
+            range.setEnd(node, matchIndex + matchLength);
 
-    // 【新增】：读取规则中的 flag
-    const shouldCheckBoundary = !rule.ignoreWordBoundary;
+            const mark = document.createElement('mark');
+            mark.className = 'trans-styled';
+            // 重置 mark 默认样式，应用自定义样式
+            mark.style.cssText = "background: transparent; color: inherit; padding: 0; margin: 0;" + style;
+            mark.innerHTML = newText;
 
-    const staticRegex = keys.length > 0
-    ? new RegExp(keys.map(key => {
-        const escaped = escapeRegExp(key);
-        // 只有当 shouldCheckBoundary 为 true 时，才给单词加边界
-        if (shouldCheckBoundary && /^\w+$/.test(key)) {
-            return `\\b${escaped}\\b`;
+            processedMarks.add(mark);
+
+            range.deleteContents();
+            range.insertNode(mark);
+            return true;
+        } catch (e) {
+            console.error("[Translation Error] Style injection failed:", e);
+            return false;
         }
-        return escaped;
-    }).join('|'), 'g')
-    : null;
-
-    return {
-        priority: Number(rule.priority) || 1,
-        selector: rule.selector || null,
-        excludeSelector: rule.excludeSelector || null,
-        // 【新增】：将 flag 传递给执行队列，供 Part 4 使用
-        ignoreWordBoundary: rule.ignoreWordBoundary || false,
-        dict: dict,
-        keys: keys,
-        staticRegex: staticRegex,
-        patterns: rule.patterns || []
-    };
-});
-
-// ================= 3. 辅助函数 =================
-
-function applyStyleToNode(node, matchIndex, matchLength, newText, style) {
-    try {
-        const range = document.createRange();
-        range.setStart(node, matchIndex);
-        range.setEnd(node, matchIndex + matchLength);
-
-        const mark = document.createElement('mark');
-        mark.className = 'trans-styled';
-        // 重置 mark 默认样式，应用自定义样式
-        mark.style.cssText = "background: transparent; color: inherit; padding: 0; margin: 0;" + style;
-        mark.innerHTML = newText;
-
-        processedMarks.add(mark);
-
-        range.deleteContents();
-        range.insertNode(mark);
-        return true;
-    } catch (e) {
-        console.error("[Translation Error] Style injection failed:", e);
-        return false;
     }
-}
 
-function getPlainText(text, translationsDict) {
-    if (!text) return text;
-    const val = translationsDict[text];
-    if (val) {
-        return (typeof val === 'object' && val.replace) ? val.replace : val;
+    function getPlainText(text, translationsDict) {
+        if (!text) return text;
+        const val = translationsDict[text];
+        if (val) {
+            return (typeof val === 'object' && val.replace) ? val.replace : val;
+        }
+        return text;
     }
-    return text;
-}
 
-// ================= 4. 翻译核心引擎  =================
-/**
+    // ================= 4. 翻译核心引擎  =================
+    /**
      * 纯文本替换器 (用于 UI 元素)
      * 逻辑顺序：正则 -> 字典 (按优先级分层执行)
      */
-function getTranslatedString(text, element) {
-    if (!text || !text.trim()) return text;
-    // --- 新增：如果禁用日志汉化且元素在日志区，返回原文 ---
-    if (IS_LOG_TRANS_DISABLED && element && element.closest('#pane_log')) {
-        return text;
-    }
-    let result = text;
-    for (const group of executionQueue) {
-        if (group.selector && element && !element.closest(group.selector)) continue;
-        if (group.excludeSelector && element && element.closest(group.excludeSelector)) continue;
-
-        // 1. 正则替换
-        for (const p of group.patterns) {
-            if (!p.style) result = result.replace(p.pattern, p.replace);
+    function getTranslatedString(text, element) {
+        if (!text || !text.trim()) return text;
+        // --- 新增：如果禁用日志汉化且元素在日志区，返回原文 ---
+        if (IS_LOG_TRANS_DISABLED && element && element.closest('#pane_log')) {
+            return text;
         }
-        // 2. 字典替换
-        if (group.staticRegex) {
-            result = result.replace(group.staticRegex, (m) => getPlainText(m, group.dict));
-        }
-    }
-    return result;
-}
+        let result = text;
+        for (const group of executionQueue) {
+            if (group.selector && element && !element.closest(group.selector)) continue;
+            if (group.excludeSelector && element && element.closest(group.excludeSelector)) continue;
 
-/**
+            // 1. 正则替换
+            for (const p of group.patterns) {
+                if (!p.style) result = result.replace(p.pattern, p.replace);
+            }
+            // 2. 字典替换
+            if (group.staticRegex) {
+                result = result.replace(group.staticRegex, (m) => getPlainText(m, group.dict));
+            }
+        }
+        return result;
+    }
+
+    /**
      * 文本节点处理器 (重构版)
      * 执行顺序：
      * 1. 纯文本正则 (修正文本)
      * 2. 样式正则 (切割节点)
      * 3. 样式字典 (切割节点)
      * 4. 纯文本字典 (最终替换)
+     *
+     * 优化：已完全处理节点跳过；日志区高频节点快速路径
      */
-function translateTextNode(node) {
-    if (!node || node.nodeType !== 3) return;
-    const parent = node.parentNode;
-    if (!parent || processedMarks.has(parent)) return;
-    if (['SCRIPT', 'STYLE', 'TEXTAREA'].includes(parent.tagName)) return;
-    // --- 新增：如果禁用日志汉化且父节点在日志区，直接跳过 ---
-    if (IS_LOG_TRANS_DISABLED && parent.closest('#pane_log')) {
-        return;
-    }
+    function translateTextNode(node) {
+        if (!node || node.nodeType !== 3) return;
+        const parent = node.parentNode;
+        if (!parent || processedMarks.has(parent)) return;
+        if (['SCRIPT', 'STYLE', 'TEXTAREA'].includes(parent.tagName)) return;
+        // 已标记为完全处理的节点跳过
+        if (TRANSLATED_NODES.has(node)) return;
 
-    let text = node.nodeValue;
-    if (!text.trim()) return;
-    if (translationCache.get(node) === text) return;
-
-    // 遍历每一个规则组 (按优先级)
-    for (const group of executionQueue) {
-        // A. 作用域与排除检查
-        if (group.selector && !parent.closest(group.selector)) continue;
-        if (group.excludeSelector && parent.closest(group.excludeSelector)) continue;
-
-        // ================= STEP 1: 纯文本正则 (Plain Regex) =================
-        // 优先执行，确保文本被清洗或修正，为后续匹配做准备
-        let hasTextChanged = false;
-        for (const p of group.patterns) {
-            if (!p.style) {
-                const newText = text.replace(p.pattern, p.replace);
-                if (newText !== text) {
-                    text = newText;
-                    hasTextChanged = true;
+        // ===== 内联标签合并翻译 =====
+        // 仅对较长的完整句子（>30字符）进行内联合并翻译，避免干扰装备属性等单词/短语的样式翻译
+        // 跳过已包含 trans-styled 标记的父节点（样式翻译已处理过，合并会破坏结构）
+        const INLINE_TAGS = new Set(['STRONG', 'B', 'EM', 'I', 'U', 'MARK', 'SPAN', 'FONT']);
+        if (parent.childNodes.length > 1 && !processedMarks.has(parent) && !parent.querySelector('.trans-styled')) {
+            let allInline = true;
+            let textContent = '';
+            for (const child of parent.childNodes) {
+                if (child.nodeType === 3) {
+                    textContent += child.nodeValue;
+                } else if (child.nodeType === 1 && INLINE_TAGS.has(child.tagName)) {
+                    textContent += child.textContent;
+                } else if (child.nodeType === 1) {
+                    allInline = false;
+                    break;
                 }
             }
-        }
-        // 如果文本发生了变化，立即更新 DOM 和缓存，确保后续逻辑基于新文本
-        if (hasTextChanged) {
-            node.nodeValue = text;
-            translationCache.set(node, text);
-        }
-
-        // ================= STEP 2: 样式正则 (Style Regex) =================
-        // 能够切割节点的正则
-        for (const p of group.patterns) {
-            if (p.style) {
-                const regex = new RegExp(p.pattern);
-                const match = regex.exec(text);
-                if (match) {
-                    const replaceText = (typeof p.replace === 'function') ? p.replace(...match) : match[0].replace(regex, p.replace);
-                    // 命中样式 -> 立即执行并返回 (打断当前节点的后续处理，等待 DOM 变动回调)
-                    if (applyStyleToNode(node, match.index, match[0].length, replaceText, p.style)) return;
-                }
-            }
-        }
-
-        // ================= STEP 3: 样式字典 (Style Dict) =================
-        // 能够切割节点的字典
-        for (const key of group.keys) {
-            const target = group.dict[key];
-            if (typeof target === 'object' && target.style) {
-                const idx = text.indexOf(key);
-                if (idx !== -1) {
-                    // 边界检查逻辑 (保留之前的 ignoreWordBoundary 功能)
-                    if (!group.ignoreWordBoundary && /^\w+$/.test(key)) {
-                        const charBefore = idx > 0 ? text[idx - 1] : " ";
-                        const charAfter = idx + key.length < text.length ? text[idx + key.length] : " ";
-                        if (/\w/.test(charBefore) || /\w/.test(charAfter)) {
-                            continue;
+            // 仅对长度超过30字符的文本进行内联合并（完整句子），短文本走正常流程保留样式
+            if (allInline && textContent.trim().length > 30) {
+                let translated = textContent;
+                let hasMatch = false;
+                for (const group of executionQueue) {
+                    if (group.selector && !parent.closest(group.selector)) continue;
+                    if (group.excludeSelector && parent.closest(group.excludeSelector)) continue;
+                    if (group.staticRegex) {
+                        const newText = translated.replace(group.staticRegex, (m) => getPlainText(m, group.dict));
+                        if (newText !== translated) { translated = newText; hasMatch = true; }
+                    }
+                    for (const p of group.patterns) {
+                        if (!p.style) {
+                            const newText = translated.replace(p.pattern, p.replace);
+                            if (newText !== translated) { translated = newText; hasMatch = true; }
                         }
                     }
-
-                    // 命中样式 -> 立即执行并返回
-                    if (applyStyleToNode(node, idx, key.length, target.replace, target.style)) return;
+                }
+                if (hasMatch) {
+                    // 逐个修改文本节点，不破坏DOM结构（避免其他脚本引用失效）
+                    // 注意：中文翻译通常比英文短，remaining 可能提前耗尽
+                    let remaining = translated;
+                    for (const child of parent.childNodes) {
+                        if (child.nodeType === 3) {
+                            const origLen = child.nodeValue.length;
+                            const take = Math.min(remaining.length, origLen);
+                            child.nodeValue = remaining.substring(0, take);
+                            remaining = remaining.substring(take);
+                        } else if (child.nodeType === 1 && INLINE_TAGS.has(child.tagName)) {
+                            const origLen = child.textContent.length;
+                            const take = Math.min(remaining.length, origLen);
+                            const innerText = remaining.substring(0, take);
+                            remaining = remaining.substring(take);
+                            // 递归修改内联标签内的文本节点
+                            let ir = innerText;
+                            for (const inner of child.childNodes) {
+                                if (inner.nodeType === 3) {
+                                    const il = inner.nodeValue.length;
+                                    const itake = Math.min(ir.length, il);
+                                    inner.nodeValue = ir.substring(0, itake);
+                                    ir = ir.substring(itake);
+                                }
+                            }
+                        }
+                    }
+                    processedMarks.add(parent);
+                    return;
                 }
             }
         }
 
-        // ================= STEP 4: 纯文本字典 (Plain Dict) =================
-        // 当前层级的字典替换 (无样式)
-        if (group.staticRegex) {
-            const newText = text.replace(group.staticRegex, (m) => getPlainText(m, group.dict));
-            if (newText !== text) {
-                text = newText;
+        let text = node.nodeValue;
+        if (!text.trim()) return;
+        if (translationCache.get(node) === text) return;
+
+        // --- 日志区快速路径：仅检查是否在日志区且禁用了日志翻译 ---
+        if (IS_LOG_TRANS_DISABLED) {
+            // 使用简单的 parent 检查避免每次都 querySelector 整个 DOM
+            const now = Date.now();
+            if (now - _lastLogSkipCheck > 100) {
+                _lastLogSkipCheck = now;
+                if (parent.closest('#pane_log')) { TRANSLATED_NODES.add(node); return; }
+            } else if (_isInLogPane(parent)) {
+                TRANSLATED_NODES.add(node);
+                return;
+            }
+        }
+
+        let hasAnyMatch = false;
+        // 遍历每一个规则组 (按优先级)
+        for (const group of executionQueue) {
+            // A. 作用域与排除检查
+            if (group.selector && !parent.closest(group.selector)) continue;
+            if (group.excludeSelector && parent.closest(group.excludeSelector)) continue;
+
+            // ================= STEP 1: 纯文本正则 (Plain Regex) =================
+            let hasTextChanged = false;
+            for (const p of group.patterns) {
+                if (!p.style) {
+                    const newText = text.replace(p.pattern, p.replace);
+                    if (newText !== text) {
+                        text = newText;
+                        hasTextChanged = true;
+                        hasAnyMatch = true;
+                    }
+                }
+            }
+            if (hasTextChanged) {
                 node.nodeValue = text;
                 translationCache.set(node, text);
             }
-        }
-    }
-    // 循环结束，所有层级处理完毕
-}
 
-function translateUIElement(el) {
-    if (!el || processedMarks.has(el)) return;
-    const attrsToTranslate = ['value', 'placeholder', 'title'];
-    attrsToTranslate.forEach(attr => {
-        const original = el.getAttribute ? el.getAttribute(attr) : el[attr];
-        if (original && original.trim()) {
-            const cacheKey = `cache_${attr}`;
-            if (el[cacheKey] === original) return;
-            const translated = getTranslatedString(original, el);
-            if (translated !== original) {
-                if (el.setAttribute) el.setAttribute(attr, translated);
-                else el[attr] = translated;
-                el[cacheKey] = translated;
+            // ================= STEP 2: 样式正则 (Style Regex) =================
+            for (const p of group.patterns) {
+                if (p.style) {
+                    const regex = new RegExp(p.pattern);
+                    const match = regex.exec(text);
+                    if (match) {
+                        const replaceText = (typeof p.replace === 'function') ? p.replace(...match) : match[0].replace(regex, p.replace);
+                        if (applyStyleToNode(node, match.index, match[0].length, replaceText, p.style)) return;
+                    }
+                }
+            }
+
+            // ================= STEP 3: 样式字典 (Style Dict) =================
+            for (const key of group.keys) {
+                const target = group.dict[key];
+                if (typeof target === 'object' && target.style) {
+                    const idx = text.indexOf(key);
+                    if (idx !== -1) {
+                        if (!group.ignoreWordBoundary && /^\w+$/.test(key)) {
+                            const charBefore = idx > 0 ? text[idx - 1] : " ";
+                            const charAfter = idx + key.length < text.length ? text[idx + key.length] : " ";
+                            if (/\w/.test(charBefore) || /\w/.test(charAfter)) {
+                                continue;
+                            }
+                        }
+                        if (applyStyleToNode(node, idx, key.length, target.replace, target.style)) return;
+                    }
+                }
+            }
+
+            // ================= STEP 4: 纯文本字典 (Plain Dict) =================
+            if (group.staticRegex) {
+                const newText = text.replace(group.staticRegex, (m) => getPlainText(m, group.dict));
+                if (newText !== text) {
+                    text = newText;
+                    node.nodeValue = text;
+                    translationCache.set(node, text);
+                    hasAnyMatch = true;
+                }
             }
         }
+        // 标记为已处理，避免 DOM 变动时重复翻译
+        TRANSLATED_NODES.add(node);
+    }
+
+    // 日志区快速判断（缓存 parent 链检查结果）
+    function _isInLogPane(el) {
+        let p = el;
+        while (p) {
+            if (p.id === 'pane_log') return true;
+            p = p.parentElement;
+        }
+        return false;
+    }
+
+    function translateUIElement(el) {
+        if (!el || processedMarks.has(el)) return;
+        const attrsToTranslate = ['value', 'placeholder', 'title'];
+        attrsToTranslate.forEach(attr => {
+            const original = el.getAttribute ? el.getAttribute(attr) : el[attr];
+            if (original && original.trim()) {
+                const cacheKey = `cache_${attr}`;
+                if (el[cacheKey] === original) return;
+                const translated = getTranslatedString(original, el);
+                if (translated !== original) {
+                    if (el.setAttribute) el.setAttribute(attr, translated);
+                    else el[attr] = translated;
+                    el[cacheKey] = translated;
+                }
+            }
+        });
+        if (['BUTTON', 'OPTION', 'OPTGROUP', 'LABEL'].includes(el.tagName)) {
+            if (el.childNodes.length === 1 && el.childNodes[0].nodeType === 3) return;
+        }
+    }
+
+    // ================= 5. 执行逻辑 =================
+    function applyAll(root = document.body) {
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+        let node;
+        while (node = walker.nextNode()) translateTextNode(node);
+
+        if (root.matches && root.matches(UI_SELECTORS)) translateUIElement(root);
+        if (root.querySelectorAll) {
+            root.querySelectorAll(UI_SELECTORS).forEach(translateUIElement);
+        }
+    }
+
+    const observer = new MutationObserver(mutations => {
+        // 防抖：合并短时间内的大量 DOM 变动
+        const nodesToProcess = new Set();
+        const uiToProcess = new Set();
+
+        mutations.forEach(m => {
+            if (m.type === 'childList') {
+                m.addedNodes.forEach(n => {
+                    if (n.nodeType === 1) nodesToProcess.add(n);
+                    else if (n.nodeType === 3) nodesToProcess.add(n);
+                });
+            } else if (m.type === 'characterData') {
+                nodesToProcess.add(m.target);
+            } else if (m.type === 'attributes') {
+                uiToProcess.add(m.target);
+            }
+        });
+
+        // 批量处理文本节点
+        nodesToProcess.forEach(n => {
+            if (n.nodeType === 1) applyAll(n);
+            else if (n.nodeType === 3) translateTextNode(n);
+        });
+        // 批量处理 UI 元素
+        uiToProcess.forEach(el => translateUIElement(el));
     });
-    if (['BUTTON', 'OPTION', 'OPTGROUP', 'LABEL'].includes(el.tagName)) {
-        if (el.childNodes.length === 1 && el.childNodes[0].nodeType === 3) return;
-    }
-}
 
-// ================= 5. 执行逻辑 =================
-function applyAll(root = document.body) {
-    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
-    let node;
-    while (node = walker.nextNode()) translateTextNode(node);
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        characterData: true,
+        attributes: true,
+        attributeFilter: ['value', 'placeholder', 'title']
+    });
 
-    if (root.matches && root.matches(UI_SELECTORS)) translateUIElement(root);
-    if (root.querySelectorAll) {
-        root.querySelectorAll(UI_SELECTORS).forEach(translateUIElement);
-    }
-}
-
-const observer = new MutationObserver(mutations => {
-    mutations.forEach(m => {
-        if (m.type === 'childList') {
-            m.addedNodes.forEach(n => {
-                if (n.nodeType === 1) applyAll(n);
-                else if (n.nodeType === 3) translateTextNode(n);
+    document.addEventListener('mousedown', e => {
+        const target = e.target.closest(UI_SELECTORS);
+        if (target) {
+            [10, 50, 200].forEach(delay => {
+                setTimeout(() => translateUIElement(target), delay);
             });
         }
-        else if (m.type === 'characterData') {
-            translateTextNode(m.target);
-        }
-        else if (m.type === 'attributes') {
-            translateUIElement(m.target);
-        }
-    });
-});
+    }, true);
 
-observer.observe(document.body, {
-    childList: true,
-    subtree: true,
-    characterData: true,
-    attributes: true,
-    attributeFilter: ['value', 'placeholder', 'title']
-});
+    function initLogToggleButton() {
+        const logPane = document.getElementById('pane_log');
+        if (!logPane) return;
 
-document.addEventListener('mousedown', e => {
-    const target = e.target.closest(UI_SELECTORS);
-    if (target) {
-        [10, 50, 200].forEach(delay => {
-            setTimeout(() => translateUIElement(target), delay);
+        const btn = document.createElement('button');
+        btn.id = 'logTransToggleBtn';
+        btn.textContent = IS_LOG_TRANS_DISABLED ? '日志汉化: 关' : '日志汉化: 开';
+
+        // 样式设定 (颜色为蓝色，区别于主开关)
+        Object.assign(btn.style, {
+            position: 'fixed',
+            zIndex: '10001',
+            padding: '4px 8px',
+            fontSize: '12px',
+            cursor: 'move',
+            backgroundColor: IS_LOG_TRANS_DISABLED ? '#666' : '#2196F3',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '3px',
+            boxShadow: '0 2px 5px rgba(0,0,0,0.3)',
+            userSelect: 'none',
+            touchAction: 'none'
+        });
+
+        // 读取保存的位置
+        const savedTop = localStorage.getItem('logBtnTop') || '100px';
+        const savedLeft = localStorage.getItem('logBtnLeft') || (window.innerWidth - 100 + 'px');
+        btn.style.top = savedTop;
+        btn.style.left = savedLeft;
+
+        document.body.appendChild(btn);
+
+        // --- 拖动逻辑 ---
+        let isDragging = false;
+        let startX, startY;
+
+        btn.addEventListener('mousedown', (e) => {
+            isDragging = false;
+            e.preventDefault(); // 阻止拖动时选中文本
+            startX = e.clientX;
+            startY = e.clientY;
+
+            const shiftX = e.clientX - btn.getBoundingClientRect().left;
+            const shiftY = e.clientY - btn.getBoundingClientRect().top;
+
+            function moveAt(pageX, pageY) {
+                // 如果移动距离超过 5px，判定为拖拽
+                if (Math.abs(pageX - startX) > 5 || Math.abs(pageY - startY) > 5) {
+                    isDragging = true;
+                }
+                const newTop = pageY - shiftY + 'px';
+                const newLeft = pageX - shiftX + 'px';
+                btn.style.top = newTop;
+                btn.style.left = newLeft;
+                localStorage.setItem('logBtnTop', newTop);
+                localStorage.setItem('logBtnLeft', newLeft);
+            }
+
+            function onMouseMove(e) { moveAt(e.pageX, e.pageY); }
+
+            document.addEventListener('mousemove', onMouseMove);
+            document.onmouseup = () => {
+                document.removeEventListener('mousemove', onMouseMove);
+                document.onmouseup = null;
+            };
+        });
+
+        // 防止拖拽松开时触发点击
+        btn.addEventListener('click', (e) => {
+            if (isDragging) {
+                e.preventDefault();
+                return;
+            }
+            IS_LOG_TRANS_DISABLED = !IS_LOG_TRANS_DISABLED;
+            localStorage.setItem('LogTransDisabled', IS_LOG_TRANS_DISABLED);
+            location.reload();
         });
     }
-}, true);
 
-function initLogToggleButton() {
-    const logPane = document.getElementById('pane_log');
-    if (!logPane) return;
+    // 启动
+    normalizeStyledTextInPostcolor();
+    applyAll(document.body);
+    initLogToggleButton(); // <--- 添加这一行
 
-    const btn = document.createElement('button');
-    btn.id = 'logTransToggleBtn';
-    btn.textContent = IS_LOG_TRANS_DISABLED ? '日志汉化: 关' : '日志汉化: 开';
+    // =========== 图片按钮汉化 ===========
+    // 通过 CSS content 替换将图片按钮翻译为中文
+    (function initImgTranslate() {
+        // 仅在 HV 页面启用（排除论坛）
+        if (!location.hostname.includes('hentaiverse.org')) return;
 
-    // 样式设定 (颜色为蓝色，区别于主开关)
-    Object.assign(btn.style, {
-        position: 'fixed',
-        zIndex: '10001',
-        padding: '4px 8px',
-        fontSize: '12px',
-        cursor: 'move',
-        backgroundColor: IS_LOG_TRANS_DISABLED ? '#666' : '#2196F3',
-        color: '#fff',
-        border: 'none',
-        borderRadius: '3px',
-        boxShadow: '0 2px 5px rgba(0,0,0,0.3)',
-        userSelect: 'none',
-        touchAction: 'none'
-    });
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        let styleText = '';
 
-    // 读取保存的位置
-    const savedTop = localStorage.getItem('logBtnTop') || '100px';
-    const savedLeft = localStorage.getItem('logBtnLeft') || (window.innerWidth - 100 + 'px');
-    btn.style.top = savedTop;
-    btn.style.left = savedLeft;
-
-    document.body.appendChild(btn);
-
-    // --- 拖动逻辑 ---
-    let isDragging = false;
-    let startX, startY;
-
-    btn.addEventListener('mousedown', (e) => {
-        isDragging = false;
-        startX = e.clientX;
-        startY = e.clientY;
-
-        const shiftX = e.clientX - btn.getBoundingClientRect().left;
-        const shiftY = e.clientY - btn.getBoundingClientRect().top;
-
-        function moveAt(pageX, pageY) {
-            // 如果移动距离超过 5px，判定为拖拽
-            if (Math.abs(pageX - startX) > 5 || Math.abs(pageY - startY) > 5) {
-                isDragging = true;
+        // 生成普通中文图片
+        function word2img(word, stroke) {
+            const h = 14;
+            canvas.height = h + 2;
+            canvas.width = word.length * h + 5;
+            ctx.font = 'bold ' + h + 'px 微软雅黑,sans-serif';
+            if (stroke) {
+                ctx.strokeStyle = stroke.strokeStyle;
+                ctx.strokeText(word, 0, h);
+                ctx.fillStyle = stroke.fillStyle;
+                ctx.fillText(word, 2, h);
+            } else {
+                ctx.fillStyle = '#202020';
+                ctx.fillText(word, 2, h);
             }
-            const newTop = pageY - shiftY + 'px';
-            const newLeft = pageX - shiftX + 'px';
-            btn.style.top = newTop;
-            btn.style.left = newLeft;
-            localStorage.setItem('logBtnTop', newTop);
-            localStorage.setItem('logBtnLeft', newLeft);
+            return canvas.toDataURL();
+        }
+        function activeWord2img(value) {
+            return word2img(value, { strokeStyle: '#EFD34F', fillStyle: '#5C0D11' });
+        }
+        // 添加 CSS 规则，加 !important 确保覆盖图片源文件
+        function imgRule(src, dataUrl) {
+            return 'img[src*="' + src + '"]{content:url(' + dataUrl + ')!important}';
         }
 
-        function onMouseMove(e) { moveAt(e.pageX, e.pageY); }
-
-        document.addEventListener('mousemove', onMouseMove);
-        document.onmouseup = () => {
-            document.removeEventListener('mousemove', onMouseMove);
-            document.onmouseup = null;
+        // 主菜单大字（角色/商店/战斗/强化/百科）
+        const menuImgs = {
+            '/y/m/Character.png': '角色',
+            '/y/m/Bazaar.png': '商店',
+            '/y/m/Battle.png': '战斗',
+            '/y/m/Forge.png': '强化',
+            '/y/m/Wiki.png': '百科',
         };
-    });
+        Object.entries(menuImgs).forEach(function(_ref) {
+            var img = _ref[0], txt = _ref[1];
+            canvas.height = 21;
+            canvas.width = 120;
+            ctx.font = 'bold 19px 微软雅黑,sans-serif';
+            ctx.fillStyle = '#000';
+            ctx.fillText(txt, 40, 16);
+            styleText += imgRule(img, canvas.toDataURL());
+        });
 
-    // 防止拖拽松开时触发点击
-    btn.addEventListener('click', (e) => {
-        if (isDragging) {
-            e.preventDefault();
-            return;
+        // 通用图片字典（不含战斗页）
+        const imgDict = [
+            { active: '/y/character/persona_create_clone.png', disactive: '/y/character/persona_create_clone_d.png', text: '创建一个克隆角色' },
+            { active: '/y/character/persona_create_blank.png', disactive: '/y/character/persona_create_blank_d.png', text: '创建一个全新角色' },
+            { active: '/y/training/train.png', disactive: '/y/training/train_d.png', text: '训练' },
+            { active: '/y/training/canceltrain.png', text: '取消训练' },
+            { active: '/y/character/apply.png', text: '提交' },
+            { active: '/y/equip/set1_on.png', disactive: '/y/equip/set1_off.png', text: '套装一' },
+            { active: '/y/equip/set2_on.png', disactive: '/y/equip/set2_off.png', text: '套装二' },
+            { active: '/y/equip/set3_on.png', disactive: '/y/equip/set3_off.png', text: '套装三' },
+            { active: '/y/equip/set4_on.png', disactive: '/y/equip/set4_off.png', text: '套装四' },
+            { active: '/y/equip/set5_on.png', disactive: '/y/equip/set5_off.png', text: '套装五' },
+            { active: '/y/equip/set6_on.png', disactive: '/y/equip/set6_off.png', text: '套装六' },
+            { active: '/y/equip/set7_on.png', disactive: '/y/equip/set7_off.png', text: '套装七' },
+            { active: '/y/equip/unequip.png', text: '取消穿戴' },
+            { active: '/y/equip/back.png', text: '返回' },
+            { active: '/y/equip/eqinv_transfer.png', text: '转移装备' },
+            { active: '/y/ab/tageneral.png', disactive: '/y/ab/tdgeneral.png', text: '常规' },
+            { active: '/y/ab/taheavy.png', disactive: '/y/ab/tdheavy.png', text: '重甲' },
+            { active: '/y/ab/tacloth.png', disactive: '/y/ab/tdcloth.png', text: '布甲' },
+            { active: '/y/ab/talight.png', disactive: '/y/ab/tdlight.png', text: '轻甲' },
+            { active: '/y/ab/tadualwield.png', disactive: '/y/ab/tddualwield.png', text: '双持' },
+            { active: '/y/ab/taniten.png', disactive: '/y/ab/tdniten.png', text: '二天' },
+            { active: '/y/ab/taonehanded.png', disactive: '/y/ab/tdonehanded.png', text: '单手' },
+            { active: '/y/ab/tatwohanded.png', disactive: '/y/ab/tdtwohanded.png', text: '双手' },
+            { active: '/y/ab/tastaff.png', disactive: '/y/ab/tdstaff.png', text: '法杖' },
+            { active: '/y/ab/tasupportive1.png', disactive: '/y/ab/tdsupportive1.png', text: '增益魔法1' },
+            { active: '/y/ab/tasupportive2.png', disactive: '/y/ab/tdsupportive2.png', text: '增益魔法2' },
+            { active: '/y/ab/tadeprecating1.png', disactive: '/y/ab/tddeprecating1.png', text: '减益魔法1' },
+            { active: '/y/ab/tadeprecating2.png', disactive: '/y/ab/tddeprecating2.png', text: '减益魔法2' },
+            { active: '/y/ab/tadivine.png', disactive: '/y/ab/tddivine.png', text: '神圣魔法' },
+            { active: '/y/ab/taelemental.png', disactive: '/y/ab/tdelemental.png', text: '元素魔法' },
+            { active: '/y/ab/taforbidden.png', disactive: '/y/ab/tdforbidden.png', text: '黑暗魔法' },
+            { active: '/y/ab/reset_a.png', disactive: '/y/ab/reset_d.png', text: '重置' },
+            { active: '/y/ab/resetall.png', text: '全部重置' },
+            { active: '/y/shops/accept.png', disactive: '/y/shops/accept_d.png', text: '确定' },
+            { active: '/y/shops/enchant.png', disactive: '/y/shops/enchant_d.png', text: '附魔' },
+            { active: '/y/shops/upgrade.png', disactive: '/y/shops/upgrade_d.png', text: '强化' },
+            { active: '/y/shops/rename.png', disactive: '/y/shops/rename_d.png', text: '重命名' },
+            { active: '/y/shops/reforge.png', disactive: '/y/shops/reforge_d.png', text: '重铸选中装备' },
+            { active: '/y/shops/repair.png', disactive: '/y/shops/repair_d.png', text: '修复选中装备' },
+            { active: '/y/shops/repairall.png', disactive: '/y/shops/repairall_d.png', text: '全部修复' },
+            { active: '/y/shops/salvage.png', disactive: '/y/shops/salvage_d.png', text: '分解选中装备' },
+            { active: '/y/shops/showenchants.png', disactive: '/y/shops/showenchants_d.png', text: '查看可用附魔' },
+            { active: '/y/shops/showupgrades.png', disactive: '/y/shops/showupgrades_d.png', text: '查看可用强化' },
+            { active: '/y/shops/soulfuse.png', disactive: '/y/shops/soulfuse_d.png', text: '灵魂绑定装备' },
+            { active: '/y/shops/enteritemworld.png', disactive: '/y/shops/enteritemworld_d.png', text: '进入道具界' },
+            { active: '/y/shops/equipselect.png', text: '返回选择装备' },
+            { active: '/y/shops/addbottask.png', text: '提交自动采购任务' },
+            { active: '/y/shops/sellall.png', text: '全部出售' },
+            { active: '/y/shops/1handed_on.png', disactive: '/y/shops/1handed_off.png', text: '武器：单手' },
+            { active: '/y/shops/2handed_on.png', disactive: '/y/shops/2handed_off.png', text: '武器：双手' },
+            { active: '/y/shops/staff_on.png', disactive: '/y/shops/staff_off.png', text: '武器：法杖' },
+            { active: '/y/shops/shield_on.png', disactive: '/y/shops/shield_off.png', text: '护甲：盾牌' },
+            { active: '/y/shops/acloth_on.png', disactive: '/y/shops/acloth_off.png', text: '护甲：布甲' },
+            { active: '/y/shops/aheavy_on.png', disactive: '/y/shops/aheavy_off.png', text: '护甲：重甲' },
+            { active: '/y/shops/alight_on.png', disactive: '/y/shops/alight_off.png', text: '护甲：轻甲' },
+            { active: '/y/shops/offering.png', disactive: '/y/shops/offering_d.png', text: '献祭' },
+            { active: '/y/shops/lottery_donotwant_a.png', disactive: '/y/shops/lottery_donotwant_d.png', text: '放弃头奖' },
+            { active: '/y/shops/lottery_golden_a.png', disactive: '/y/shops/lottery_golden_d.png', text: '使用黄金彩票券' },
+            { active: '/y/shops/lottery_next_a.png', disactive: '/y/shops/lottery_next_d.png', text: '下一期彩票>' },
+            { active: '/y/shops/lottery_prev_a.png', disactive: '/y/shops/lottery_prev_d.png', text: '<上一期彩票' },
+            { active: '/y/shops/lottery_today_a.png', disactive: '/y/shops/lottery_today_d.png', text: '今天的彩票' },
+            { active: '/y/shops/buytickets.png', disactive: '/y/shops/buytickets_d.png', text: '购买彩票' },
+            { active: '/y/monster/createmonster.png', disactive: '/y/monster/createmonster_d.png', text: '创建怪物' },
+            { active: '/y/monster/drugallmonsters.png', disactive: '/y/monster/drugallmonsters_d.png', text: '安抚所有怪物' },
+            { active: '/y/monster/drugmonster.png', disactive: '/y/monster/drugmonster_d.png', text: '安抚怪物' },
+            { active: '/y/monster/feedallmonsters.png', disactive: '/y/monster/feedallmonsters_d.png', text: '喂养所有怪物' },
+            { active: '/y/monster/feedmonster.png', disactive: '/y/monster/feedmonster_d.png', text: '喂养怪物' },
+            { active: '/y/monster/unlock_slot.png', disactive: '/y/monster/unlock_slot_d.png', text: '解锁新培养槽' },
+            { active: '/y/monster/delete.png', text: '删除' },
+            { active: '/y/monster/next.png', text: '下一个>>' },
+            { active: '/y/monster/prev.png', text: '<<上一个' },
+            { active: '/y/monster/rename.png', text: '重命名' },
+            { active: '/y/monster/saveskills.png', text: '保存技能' },
+            { active: '/y/monster/ml_monstats.png', disactive: '/y/monster/ml_monstats_a.png', text: '怪物状态' },
+            { active: '/y/monster/ml_skilledit.png', disactive: '/y/monster/ml_skilledit_a.png', text: '编辑怪物技能' },
+            { active: '/y/monster/str_a.png', disactive: '/y/monster/str.png', text: '力量' },
+            { active: '/y/monster/dex_a.png', disactive: '/y/monster/dex.png', text: '灵巧' },
+            { active: '/y/monster/agi_a.png', disactive: '/y/monster/agi.png', text: '敏捷' },
+            { active: '/y/monster/end_a.png', disactive: '/y/monster/end.png', text: '体质' },
+            { active: '/y/monster/int_a.png', disactive: '/y/monster/int.png', text: '智力' },
+            { active: '/y/monster/wis_a.png', disactive: '/y/monster/wis.png', text: '智慧' },
+            { active: '/y/monster/fire_a.png', disactive: '/y/monster/fire.png', text: '火焰' },
+            { active: '/y/monster/cold_a.png', disactive: '/y/monster/cold.png', text: '寒冰' },
+            { active: '/y/monster/elec_a.png', disactive: '/y/monster/elec.png', text: '雷电' },
+            { active: '/y/monster/wind_a.png', disactive: '/y/monster/wind.png', text: '狂风' },
+            { active: '/y/monster/holy_a.png', disactive: '/y/monster/holy.png', text: '神圣' },
+            { active: '/y/monster/dark_a.png', disactive: '/y/monster/dark.png', text: '黑暗' },
+            { active: '/y/monster/crsh_a.png', disactive: '/y/monster/crsh.png', text: '敲击' },
+            { active: '/y/monster/prcg_a.png', disactive: '/y/monster/prcg.png', text: '刺击' },
+            { active: '/y/monster/slsh_a.png', disactive: '/y/monster/slsh.png', text: '斩击' },
+            { active: '/y/monster/arthropod_a.png', disactive: '/y/monster/arthropod.png', text: '节肢动物' },
+            { active: '/y/monster/avion_a.png', disactive: '/y/monster/avion.png', text: '飞禽' },
+            { active: '/y/monster/beast_a.png', disactive: '/y/monster/beast.png', text: '野兽' },
+            { active: '/y/monster/celestial_a.png', disactive: '/y/monster/celestial.png', text: '天人' },
+            { active: '/y/monster/daimon_a.png', disactive: '/y/monster/daimon.png', text: '魔灵' },
+            { active: '/y/monster/dragonkin_a.png', disactive: '/y/monster/dragonkin.png', text: '龙类' },
+            { active: '/y/monster/elemental_a.png', disactive: '/y/monster/elemental.png', text: '元素' },
+            { active: '/y/monster/giant_a.png', disactive: '/y/monster/giant.png', text: '巨人' },
+            { active: '/y/monster/humanoid_a.png', disactive: '/y/monster/humanoid.png', text: '类人' },
+            { active: '/y/monster/mechanoid_a.png', disactive: '/y/monster/mechanoid.png', text: '机器人' },
+            { active: '/y/monster/reptilian_a.png', disactive: '/y/monster/reptilian.png', text: '爬行动物' },
+            { active: '/y/monster/sprite_a.png', disactive: '/y/monster/sprite.png', text: '妖精' },
+            { active: '/y/monster/undead_a.png', disactive: '/y/monster/undead.png', text: '不死族' },
+            { active: '/y/arena/pg1_a.png', disactive: '/y/arena/pg1.png', text: '等级 1~100' },
+            { active: '/y/arena/pg2_a.png', disactive: '/y/arena/pg2.png', text: '等级 101~300' },
+            { active: '/y/arena/startchallenge.png', disactive: '/y/arena/startchallenge_d.png', text: '开始挑战' },
+            { active: '/y/grindfest/startgrindfest.png', text: '进入压榨界' },
+            { active: '/y/mmail/writenew.png', text: '写一封新邮件' },
+            { active: '/y/mmail/discard.png', text: '丢弃' },
+            { active: '/y/mmail/reply.png', text: '回复' },
+            { active: '/y/mmail/save.png', text: '保存' },
+            { active: '/y/mmail/send.png', text: '发送' },
+            { active: '/y/mmail/returnmail.png', text: '拒收邮件' },
+            { active: '/y/mmail/recallmail.png', text: '召回邮件' },
+            { active: '/y/mmail/attach_attach.png', text: '附带' },
+            { active: '/y/mmail/attach_credits.png', text: '附带绅士币' },
+            { active: '/y/mmail/attach_equip.png', text: '附带装备' },
+            { active: '/y/mmail/attach_hath.png', text: '附带Hath' },
+            { active: '/y/mmail/attach_item.png', text: '附带物品' },
+            { active: '/y/mmail/attach_removeall.png', text: '移除所有附件' },
+            { active: '/y/mmail/attach_remove.png', text: '移除' },
+            { active: '/y/mmail/setcod.png', text: '设置货到付款(CoD)' },
+            { active: '/y/mmail/attach_takeall.png', text: '确认领取附件' },
+            { active: '/y/userestorative.png', text: '使用精神恢复剂' },
+            { active: '/y/battle/answer.png', text: '回答' },
+            { active: '/y/battle/ponychartbutton.png', text: '名称参考' },
+            { disactive: '/y/shops/lottery_donotwant_s.png', text: '放弃头奖', red: true },
+        ];
+
+        // 生成 CSS
+        imgDict.forEach(function(item) {
+            if (item.disactive) {
+                styleText += imgRule(item.disactive, item.red ? word2img(item.text, { fillStyle: '#ff0000', strokeStyle: 'transparent' }) : word2img(item.text));
+            }
+            if (item.active) {
+                styleText += imgRule(item.active, activeWord2img(item.text));
+            }
+        });
+
+        // 战斗 6 个行动按钮（仅在战斗页添加）
+        if (document.getElementById('pane_log')) {
+            var battleActions = {
+                attack: { n: '攻击', s: '攻击', a: '攻击' },
+                skill: { n: '技能书', s: '技能书', a: '技能书' },
+                items: { n: '道具', s: '道具', a: '道具' },
+                spirit: { n: '灵动架式', s: '灵动架式', a: '灵动架式' },
+                defend: { n: '防御', s: '防御', a: '防御' },
+                focus: { n: '专注', s: '专注', a: '专注' },
+            };
+            Object.entries(battleActions).forEach(function(_ref) {
+                var key = _ref[0], val = _ref[1];
+                styleText += imgRule(key + '_n.png', activeWord2img(val.n));
+                styleText += imgRule(key + '_s.png', word2img(val.s, { strokeStyle: '#F8DA34', fillStyle: '#0030CB' }));
+                styleText += imgRule(key + '_a.png', word2img(val.a, { strokeStyle: '#EE3632', fillStyle: '#000000' }));
+            });
+            var battleBtns = {
+                'arenacontinue.png': '继续下一轮竞技场挑战',
+                'grindfestcontinue.png': '继续下一层压榨界挑战',
+                'itemworldcontinue.png': '深入下一层道具界挑战',
+                'finishbattle.png': '结束战斗',
+            };
+            Object.entries(battleBtns).forEach(function(_ref2) {
+                var key = _ref2[0], txt = _ref2[1];
+                styleText += imgRule(key, activeWord2img(txt));
+            });
+            var battleSkillLabels = {
+                'sbsel_skills_n.png': '技巧',
+                'sbsel_skills_s.png': '技巧',
+                'sbsel_spells_n.png': '法术',
+                'sbsel_spells_s.png': '法术',
+                'skills_innate.png': '先天技巧',
+                'skills_weapon.png': '武器技巧',
+                'magic_curative.png': '治疗法术',
+                'magic_damage.png': '攻击法术',
+                'magic_debuff.png': '乏抑法术',
+                'magic_support.png': '辅助法术',
+            };
+            Object.entries(battleSkillLabels).forEach(function(_ref3) {
+                var key = _ref3[0], txt = _ref3[1];
+                styleText += imgRule(key, activeWord2img(txt));
+            });
         }
-        IS_LOG_TRANS_DISABLED = !IS_LOG_TRANS_DISABLED;
-        localStorage.setItem('LogTransDisabled', IS_LOG_TRANS_DISABLED);
-        location.reload();
-    });
-}
 
-// 启动
-normalizeStyledTextInPostcolor();
-applyAll(document.body);
-initLogToggleButton(); // <--- 添加这一行
+        // 注入样式
+        if (styleText) {
+            try { sessionStorage.removeItem('hv_img_translate'); } catch(e) {}
+            var styleEl = document.createElement('style');
+            styleEl.id = 'hv-img-translate-style';
+            styleEl.textContent = styleText;
+            document.head.appendChild(styleEl);
+            try { sessionStorage.setItem('hv_img_translate', '1'); } catch(e) {}
+        }
+
+        // 怪物实验室饥饿/情绪条汉化（这些是 div 背景图，不是 img）
+        (function initMLBars() {
+            function translateMLBars() {
+                var bars = document.querySelectorAll('.msl > div:nth-child(5) > div');
+                for (var i = 0; i < bars.length; i++) {
+                    var el = bars[i];
+                    if (el.getAttribute('title') !== '饥饿') {
+                        el.setAttribute('title', '饥饿');
+                        var c2 = document.createElement('canvas');
+                        c2.height = 22; c2.width = 200;
+                        var cx = c2.getContext('2d');
+                        cx.font = '12px bold';
+                        cx.strokeStyle = '#000';
+                        cx.strokeRect(63, 6, 122, 10);
+                        cx.fillStyle = '#000';
+                        cx.fillText('饥饿', 30, 15);
+                        el.style.background = 'url(' + c2.toDataURL() + ')';
+                    }
+                }
+                var bars2 = document.querySelectorAll('.msl > div:nth-child(6) > div');
+                for (var j = 0; j < bars2.length; j++) {
+                    var el2 = bars2[j];
+                    if (el2.getAttribute('title') !== '情绪') {
+                        el2.setAttribute('title', '情绪');
+                        var c3 = document.createElement('canvas');
+                        c3.height = 22; c3.width = 200;
+                        var cx2 = c3.getContext('2d');
+                        cx2.font = '12px bold';
+                        cx2.strokeStyle = '#000';
+                        cx2.strokeRect(63, 6, 122, 10);
+                        cx2.fillStyle = '#000';
+                        cx2.fillText('情绪', 30, 15);
+                        el2.style.background = 'url(' + c3.toDataURL() + ')';
+                    }
+                }
+            }
+            // 延迟执行，等待 slot_pane 渲染
+            setTimeout(translateMLBars, 500);
+            setTimeout(translateMLBars, 1500);
+            setTimeout(translateMLBars, 3000);
+            // MutationObserver 监听后续变化
+            var slotPane = document.getElementById('slot_pane');
+            if (slotPane) {
+                var mlObserver = new MutationObserver(function() { translateMLBars(); });
+                mlObserver.observe(slotPane, { childList: true, subtree: true });
+            }
+        })();
+    })();
 })();
