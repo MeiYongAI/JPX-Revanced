@@ -7,9 +7,8 @@
 // @homepageURL    https://forums.e-hentai.org/index.php?showtopic=211883
 // @supportURL     https://forums.e-hentai.org/index.php?showtopic=211883
 // @version        4.2.1
-// @icon         https://hentaiverse.org/y/favicon.png
 // @date           2026-06-08
-// @author         sssss2 & MeiYongAI
+// @author         sssss2
 // @match          *://*.hentaiverse.org/*
 // @match          *://e-hentai.org/*
 // @connect        hentaiverse.org
@@ -397,6 +396,10 @@ $zh.dict = {
   'Forum Link:': '论坛链接：',
   'BEEP TEST': '测试提示音',
   'Default': '默认',
+  'Restore Default': '恢复默认',
+  'Save Settings': '保存设置',
+  'Close Window': '关闭窗口',
+  'Revert Settings': '还原设置',
   'Save': '保存',
   'Close': '关闭',
   'Revert': '还原',
@@ -414,7 +417,7 @@ $zh.dict = {
   'Initializing...': '初始化中...',
   'Waiting...': '等待中...',
   'Failed to load': '加载失败',
-  'No restorative available': '没有可用恢复品',
+  'No restorative available': '无可用体力恢复道具',
   'USE RESTORATIVE': '使用恢复品',
   'MENU': '菜单',
   'Character': '角色',
@@ -456,7 +459,7 @@ $zh.dict = {
   'Holy mage': '圣法',
   'Ability Points': '能力点',
   'Ability Boost': '能力加成',
-  'Training: Assimilator': '训练：Assimilator',
+  'Training: Assimilator': '训练：同化者等级',
   'Can\'t start Training': '无法开始训练',
   'Training completed!': '训练已完成！',
   'failed': '失败',
@@ -512,6 +515,12 @@ $zh.dict = {
   'Equalize Elemental Mitigations': '均衡元素抗性',
   'Increase / Decrease Token Stats': '增减 Token 属性',
   'Primary Attributes': '主属性',
+  'Strength': '力量',
+  'Dexterity': '灵巧',
+  'Agility': '敏捷',
+  'Endurance': '体质',
+  'Intelligence': '智力',
+  'Wisdom': '智慧',
   'Elemental Mitigations': '元素抗性',
   'Update': '更新',
   'Run': '执行',
@@ -566,6 +575,10 @@ $zh.dict = {
   'count': '数量',
   'price': '价格',
   'cod': 'CoD',
+  'Subject:': '主题：',
+  'Options:': '选项：',
+  'CoD Deduction': 'CoD 减免额',
+  'Persistent CoD': '收取主世界 CoD',
   'Equipment name or eid': '装备名称或 EID',
   'user; credits; subject; text (| = new line)\nex)\nsssss2; 10m\nsssss3; 500k; WTB; hi|I want to buy...\nTenboro; 500c\nMoogleMail; 1000h; Thanks': '用户; Credits; 主题; 正文（| = 换行）\n例：\nsssss2; 10m\nsssss3; 500k; WTB; hi|I want to buy...\nTenboro; 500c\nMoogleMail; 1000h; Thanks',
   'Reset Database': '重置数据库',
@@ -587,6 +600,8 @@ $zh.dict = {
   'Text': '正文',
   'Attachment': '附件',
   'CoD (min-max)': 'CoD（最小-最大）',
+  'Show this lottery in the bottom bar': '在底部栏显示此彩票',
+  'No equipment selected.': '未选择装备。',
   'Select All': '全选',
   'Tradeables': '可交易',
   'Pinned': '已固定',
@@ -622,7 +637,7 @@ $zh.dict = {
   'Failed to parse the file\nSelect a valid MoogleMail Database json file': '解析文件失败\n请选择有效的 MoogleMail 数据库 JSON 文件',
   'The MoogleMail records for the selected season in this browser will be deleted.\nAre you sure?': '将删除此浏览器中所选赛季的 MoogleMail 记录。\n确定吗？',
   'This will return the message to the sender.\nAre you sure?': '这会将邮件退回给发件人。\n确定吗？',
-  'Are you sure that you wish to spend a Golden Lottery Ticket?': '确定要消耗一张 Golden Lottery Ticket 吗？',
+  'Are you sure that you wish to spend a Golden Lottery Ticket?': '确定要使用一张黄金奖券吗？',
 };
 function $zh_attr(e, an, av) {
   if (typeof av !== 'string') {
@@ -667,16 +682,18 @@ function confirm_event(n,e,m,c,f) {if(!n){return;}const a=n.getAttribute('on'+e)
 function toggle_button(b,s,h,e,n,d,f) {const c=(l)=>{l.forEach((m)=>{if(m.type==='attributes'&&m.attributeName==='class'){t();}});};const t=()=>{b.value=$zh(e.classList.contains(n)?s:h);};(new MutationObserver(c)).observe(e,{attributes:true,attributeFilter:['class']});if(d==='on'){e.classList.add(n);}else if(d==='off'){e.classList.remove(n);}t();if(!f){f=()=>{e.classList.toggle(n);};}b.addEventListener('click',f);}
 function play_beep(volume=0.2,frequency=500,duration=0.5) {const delay=1;if(!volume){return;}const c=new window.AudioContext();const o=c.createOscillator();const g=c.createGain();o.type='sine';o.frequency.value=frequency;g.gain.value=volume;o.connect(g);g.connect(c.destination);o.start(delay);o.stop(delay+duration);}
 function popup(t) {function r(e){e.preventDefault();e.stopImmediatePropagation();if(e.button===0||e.key==='Enter'||e.key===' '||e.key==='Escape'){w.remove();document.removeEventListener('keydown',r);}}const w=$element('div',document.body,['!position:fixed;top:0;left:0;width:1236px;height:702px;padding:3px 100% 100% 3px;background-color:#0006;z-index:1001;cursor:pointer;display:flex;justify-content:center;align-items:center;'],r);const d=$element('div',w,['/'+t,'!min-width:400px;min-height:100px;max-width:100%;max-height:100%;padding:10px;background-color:#fff;border:1px solid;display:flex;flex-direction:column;justify-content:center;font-size:10pt;color:#333;']);document.addEventListener('keydown',r);return d;}
-function popup_text(m,wd,ht,b=[]) {let v;if(typeof m==='string'){v=m;}else{v=m.join('\n');}const w=$element('div',document.body,['!position:fixed;top:0;left:0;width:1236px;height:702px;padding:3px 100% 100% 3px;background-color:#0006;z-index:1001;display:flex;justify-content:center;align-items:center;']);const d=$element('div',w,['!border:1px solid;padding:5px;background-color:#fff;']);const t=$element('textarea',d,{value:v,spellcheck:false,style:`display:block;margin:0 0 5px;font-size:9pt;line-height:1.5em;width:stretch;min-width:${wd}px;height:${ht}px;white-space:pre;`});function c(){w.remove();}b.forEach((o)=>{$element('input',d,{type:'button',value:o.text},()=>{if(o.click==='default'){t.value=o.value;}else if(o.click==='revert'){t.value=v;}else if(typeof o.click==='function'){o.click(p);}});});$element('input',d,{type:'button',value:'Close'},c);const p={wrapper:w,textarea:t,close:c};return p;}
+function popup_text(m,wd,ht,b=[]) {let v;if(typeof m==='string'){v=m;}else{v=m.join('\n');}const w=$element('div',document.body,['!position:fixed;top:0;left:0;width:1236px;height:702px;padding:3px 100% 100% 3px;background-color:#0006;z-index:1001;display:flex;justify-content:center;align-items:center;']);const d=$element('div',w,['!border:1px solid;padding:5px;background-color:#fff;']);const t=$element('textarea',d,{value:v,spellcheck:false,style:`display:block;margin:0 0 5px;font-size:9pt;line-height:1.5em;width:stretch;min-width:${wd}px;height:${ht}px;white-space:pre;`});function c(){w.remove();}b.forEach((o)=>{$element('input',d,{type:'button',value:o.text},()=>{if(o.click==='default'){t.value=o.value;}else if(o.click==='revert'){t.value=v;}else if(typeof o.click==='function'){o.click(p);}});});$element('input',d,{type:'button',value:'关闭窗口'},c);const p={wrapper:w,textarea:t,close:c};return p;}
 function get_message(d,s) {if(typeof d==='string'){d=$doc(d);}const m=$qsa('#messagebox_inner>p',d).map((p)=>p.textContent);if(s){return m;}else{return m.join('\n');}}
 /* eslint-enable */
 
 const _window = (typeof unsafeWindow === 'undefined') ? window : unsafeWindow;
+// 防止游戏自身 onmouseover="equips.set(...)" 在 dynjs 未加载时抛错。
+_window.equips = _window.equips || {};
 const _query = Object.fromEntries(location.search.slice(1).split('&').map((q) => { const [k, v = ''] = q.split('=', 2); return [decodeURIComponent(k.replace(/\+/g, ' ')), decodeURIComponent(v.replace(/\+/g, ' '))]; }));
 const _servername = location.pathname.includes('/isekai/') ? 'isekai' : 'persistent';
 const _server = {
   name: _servername,
-  season: $id('world_text')?.textContent.match(/\d+ Season \d+/)?.[0] || '1',
+  season: $id('world_text')?.textContent?.match(/\d+ Season \d+|\d+ 赛季 \d+/)?.[0] || '1',
   [_servername]: true, // _server.persistent || _server.isekai
 };
 
@@ -692,69 +709,69 @@ const $config = {
     { key: 'reGalleryAlt', type: 'boolean', label: 'When opening Random Encounter from the gallery, it goes to alt.hentaiverse.org.' },
     { key: 'reBeep', type: 'array', input: 'text', value_type: 'number', value_sep: ',', text: 'Play a beep sound when Random Encounter is ready.\nThe order of values is [volume], [frequency], [duration].\nSet it to 0 to disable.', style: 'width: 150px;', oncreate: (o) => { $input(['button', 'BEEP TEST'], [o.node.input, 'afterend'], null, () => { const validation = $config.validate(o); if (!validation.error) { play_beep(...validation.value); } }); } },
 
-    { tag: 'h1', text: 'Top Navigation Bar' },
-    { key: 'topMenuIntegration', type: 'boolean', label: 'Integrate top menus into one button.' },
-    { key: 'topMenuLinks', type: 'array', input: 'textarea', text: 'Set quick links in the top.\nEach value can be an item in the default menu, or can be defined manually.\nA format is "TITLE | LABEL | URL (| SERVER)?"\nSERVER is optional; It must be either \'persistent\' or \'isekai\' and the link will only be created on that server.\nIf [topMenuIntegration] above is disabled, set the number of items in the list to 8 or less.' },
-    { key: 'confirmStaminaRestorative', type: 'boolean', label: 'Confirm whether to use a stamina restorative item.', server: 'persistent' },
-    { key: 'disableStaminaRestorative', type: 'number', label: 'Disable the stamina restorative button when stamina is above the specified value.', server: 'persistent' },
-    { key: 'warnLowStamina', type: 'number', label: 'Warn when the stamina is below the specified value.' },
+    { tag: 'h1', text: '顶部导航栏设置' },
+    { key: 'topMenuIntegration', type: 'boolean', label: '将顶部菜单集成到左上角的按钮中。' },
+    { key: 'topMenuLinks', type: 'array', input: 'textarea', text: '在顶部设置快速链接。\n每一行可以是默认菜单项目，也可以手动定义。\n格式为 "TITLE | LABEL | URL (| SERVER)?"。\nSERVER 可选，必须是 persistent 或 isekai，链接只会在对应服务器显示。\n如果上面的顶部导航栏无法正常工作，请将列表中的项目数量设置为 8 个或更少。' },
+    { key: 'confirmStaminaRestorative', type: 'boolean', label: '使用能量饮料前需确认。', server: 'persistent' },
+    { key: 'disableStaminaRestorative', type: 'number', label: '当体力超过设定值时，禁用使用能量饮料按钮。', server: 'persistent' },
+    { key: 'warnLowStamina', type: 'number', label: '当体力低于指定值时发出警告。' },
 
-    { tag: 'h1', text: 'Bottom Bar' },
-    { key: 'showCredits', type: 'number', input: 'select', options: ['0:disable', '2:always'], label: 'Show the credits balance.' },
-    { key: 'showEquipCapacity', type: 'number', input: 'select', options: ['0:disable', '1:on battle pages only', '2:always'], label: 'Show the free space in the Equipment Inventory.' },
-    { key: 'warnEquipCapacity', type: 'number', label: 'Warn when the free space in the Equipment Inventory is below the specified value.' },
-    { key: 'trainingNotification', type: 'boolean', label: 'Shows the training in progress and automatically start the next training up to the set level.' },
-    { key: 'lotteryNotification', type: 'boolean', label: 'Show the weapon and the armor which are currently in the lottery.' },
-    { key: 'lotteryFilters', type: 'array', input: 'textarea', text: 'Notify if the new equipment in the lottery qualifies.\n* $pab is not available.', desc: 'equipFilters', validator: 'equipFilters' },
+    { tag: 'h1', text: '底部导航栏设置' },
+    { key: 'showCredits', type: 'number', input: 'select', options: ['0:禁用', '2:始终显示'], label: '显示 Credit 余额。' },
+    { key: 'showEquipCapacity', type: 'number', input: 'select', options: ['0:禁用', '1:仅在战斗中', '2:始终显示'], label: '显示装备仓库剩余空间。' },
+    { key: 'warnEquipCapacity', type: 'number', label: '当装备仓库的剩余容量不足指定数量时发出警告。' },
+    { key: 'trainingNotification', type: 'boolean', label: '显示正在进行的训练，并自动开始下一个训练，直到达到预设的训练目标等级。' },
+    { key: 'lotteryNotification', type: 'boolean', label: '显示目前的武器彩票和防具彩票。' },
+    { key: 'lotteryFilters', type: 'array', input: 'textarea', text: '高亮显示词条正确的彩票抽奖装备。\n* $装备主属性(PAB)筛选暂不可用。', desc: 'equipFilters', validator: 'equipFilters' },
 
-    { tag: 'h1', text: 'Equipment' },
-    { key: 'equipmentIntegration', type: 'boolean', label: 'Integrate all types of equipment into a list.' },
-    { key: 'equipSort', type: 'boolean', label: 'Sort and categorize the equipment list.' },
-    { key: 'equipColor', type: 'boolean', label: 'Set the color of equipment by quality.' },
-    { key: 'equipShowLevel', type: 'boolean', label: 'Show equipment\'s level.' },
-    { key: 'equipShowPAB', type: 'boolean', label: 'Show equipment\'s pab.' },
-    { key: 'equipShowCharms', type: 'boolean', label: 'Show equipment\'s charms in the pop-up' },
-    { key: 'equipHideDropInfo', type: 'boolean', label: 'Hide equipment\'s drop info in the pop-up' },
-    { key: 'equipHoverFunctions', type: 'boolean', label: 'Support keyboard and mouse actions when the mouse cursor is over the equipment.' },
-    { key: 'equipTouchFunctions', type: 'boolean', label: 'Support touch actions on mobile' },
-    { key: 'equipCode', type: 'object', input: 'textarea', text: 'Set the format of the code for the forum.', style: 'height: 80px; white-space: normal;' },
-    { key: 'equipNameCode', type: 'array', input: 'textarea', text: 'Set the rules for codes that decorate the names of equipment.' },
+    { tag: 'h1', text: '装备设置' },
+    { key: 'equipmentIntegration', type: 'boolean', label: '将所有类型的装备整合到装备列表。' },
+    { key: 'equipSort', type: 'boolean', label: '整理和分类装备列表。' },
+    { key: 'equipColor', type: 'boolean', label: '不同等级的装备以不同的颜色显示。' },
+    { key: 'equipShowLevel', type: 'boolean', label: '显示装备的等级。' },
+    { key: 'equipShowPAB', type: 'boolean', label: '显示装备的属性。' },
+    { key: 'equipShowCharms', type: 'boolean', label: '在弹出窗口中显示装备的护符信息。' },
+    { key: 'equipHideDropInfo', type: 'boolean', label: '在弹出窗口中隐藏装备的掉落信息。' },
+    { key: 'equipHoverFunctions', type: 'boolean', label: '当鼠标光标悬停在装备上时，启用键盘和鼠标操作。' },
+    { key: 'equipTouchFunctions', type: 'boolean', label: '启用移动设备上的触屏操作。' },
+    { key: 'equipCode', type: 'object', input: 'textarea', text: '设置论坛代码的格式。', style: 'height: 80px; white-space: normal;' },
+    { key: 'equipNameCode', type: 'array', input: 'textarea', text: '设置美化装备名称的代码规则。' },
 
-    { tag: 'h1', text: 'Equipment Shop' },
-    { key: 'equipmentShopConfirm', type: 'number', input: 'select', options: ['0:default', '1:click checkbox automatically', '2:do not confirm'], label: 'Confirm when selling or salvaging equipment.' },
-    { key: 'equipmentShopAutoProtect', type: 'boolean', label: 'Automatically protect filtered equipment.' },
-    { key: 'equipmentShopPriceDeductFee', type: 'boolean', label: 'Since the Market has a 1% fee, calculate the value of the material as 99% of the price.' },
-    { key: 'equipmentShopProtectFilters', type: 'array', input: 'textarea', text: 'Show valuable equipment together at the top of the list, and prevent them from being selected by the "Select All" button.', desc: 'equipFilters', validator: 'equipFilters' },
-    { key: 'equipmentShopBazaarFilters', type: 'array', input: 'textarea', text: 'Keep valuable equipment in BAZAAR, then hide all other trash.', desc: 'equipFilters', validator: 'equipFilters' },
+    { tag: 'h1', text: '装备商店设置' },
+    { key: 'equipmentShopConfirm', type: 'number', input: 'select', options: ['0:默认', '1:自动点击确认', '2:无需确认'], label: '在出售或分解装备时进行二次确认。' },
+    { key: 'equipmentShopAutoProtect', type: 'boolean', label: '自动保护符合规则的装备。' },
+    { key: 'equipmentShopPriceDeductFee', type: 'boolean', label: '显示实际价格，因为市场会收取 1% 手续费，因此材料的实际价值为价格的 99%。' },
+    { key: 'equipmentShopProtectFilters', type: 'array', input: 'textarea', text: '在列表顶部集中显示高价值的装备，并阻止它们被"全选"按钮选中。', desc: 'equipFilters', validator: 'equipFilters' },
+    { key: 'equipmentShopBazaarFilters', type: 'array', input: 'textarea', text: '在商店中仅显示优质词条的装备，隐藏所有其他低效词条的装备。', desc: 'equipFilters', validator: 'equipFilters' },
 
-    { tag: 'h1', text: 'Monster Lab' },
-    { key: 'monsterLab', type: 'boolean', label: 'Advanced MonsterLab features', server: 'persistent' },
-    { key: 'monsterLabDefaultSort', type: 'string', input: 'select', options: ['index', 'name', 'class', 'pl:power level', 'wins', 'kills', 'gains:new gifts', 'gifts:total gifts', 'morale', 'hunger'], label: 'Set the default value for sorting the list.', server: 'persistent' },
-    { key: 'monsterLabCloseDefaultPopup', type: 'boolean', label: 'Close pop-ups by default.', server: 'persistent' },
+    { tag: 'h1', text: '怪物实验室' },
+    { key: 'monsterLab', type: 'boolean', label: '高级怪物实验室设置。', server: 'persistent' },
+    { key: 'monsterLabDefaultSort', type: 'string', input: 'select', options: ['index:编号', 'name:名称', 'class:类型', 'pl:战力', 'wins:胜场', 'kills:击杀', 'gains:新礼物', 'gifts:总计礼物', 'morale:士气', 'hunger:饥饿度'], label: '设置排序的默认方式。', server: 'persistent' },
+    { key: 'monsterLabCloseDefaultPopup', type: 'boolean', label: '关闭默认弹窗。', server: 'persistent' },
 
-    { tag: 'h1', text: 'The Shrine' },
-    { key: 'shrineHideItems', type: 'array', input: 'textarea', text: 'Hide items to prevent them from being accidentally offered to the Shrine.' },
-    { key: 'shrineFilters', type: 'array', input: 'textarea', text: 'Show the names of rewarded equipment of higher quality only.\n* $pab is not available.', desc: 'equipFilters', validator: 'equipFilters' },
+    { tag: 'h1', text: '祭坛' },
+    { key: 'shrineHideItems', type: 'array', input: 'textarea', text: '隐藏特定奖杯，避免误操作献祭。' },
+    { key: 'shrineFilters', type: 'array', input: 'textarea', text: '只显示高价值的奖励装备。\n* $装备主属性(PAB)筛选暂不可用。', desc: 'equipFilters', validator: 'equipFilters' },
 
-    { tag: 'h1', text: 'MoogleMail' },
-    { key: 'moogleMail', type: 'boolean', label: 'Advanced MoogleMail features' },
+    { tag: 'h1', text: '邮件设置' },
+    { key: 'moogleMail', type: 'boolean', label: '高级邮件功能。' },
 
-    { tag: 'h1', text: 'Battle' },
-    { key: 'equipPanelPosition', type: 'string', input: 'select', options: ['left', 'right'], label: 'Set the position of the pane.' },
-    { key: 'equipPanelRepairThreshold', type: 'number', label: 'Warn if the durability of each equipment is low.' },
-    { key: 'equipPanelItemInventory', type: 'object', input: 'textarea', value_type: 'number', text: 'Show the amount of items in the inventory, and warn if each number is less than the specified value.\nYou can purchase that quantity from the Item Shop by clicking on the item name in the list.\nIf the item name starts with # (#1 : 0, #2 : 0, ...), a space is inserted into the list.' },
+    { tag: 'h1', text: '战斗设置' },
+    { key: 'equipPanelPosition', type: 'string', input: 'select', options: ['left:左侧', 'right:右侧'], label: '设置药水的位置。' },
+    { key: 'equipPanelRepairThreshold', type: 'number', label: '装备耐久度不足设置的数值时，发出警告。' },
+    { key: 'equipPanelItemInventory', type: 'object', input: 'textarea', value_type: 'number', text: '显示道具的剩余数量，如果数量不足，则发出警告。\n你可以通过单击列表中的道具名称，快捷地从物品商店购买指定数量。\n如果物品名称以 # 开头（#1 : 0、#2 : 0 等），列表中会插入空行。' },
   ],
   text: {
     equipHoverFunctions: `
-      [C] Open equipment link in a pop-up
-      [V] Open equipment link in a new tab
-      [L] Show link code
-      [K] Show link code in bbcode format
-      [DOUBLE CLICK] Open equipment link
+      [C] 在弹出窗口中打开装备链接
+      [V] 在新选项卡中打开装备链接
+      [L] 显示装备链接代码
+      [K] 以 BBCode 格式显示链接代码
+      [DOUBLE CLICK] 打开装备链接
     `,
     equipTouchFunctions: `
-      [DOUBLE TAP] Open equipment link
-      [LONG PRESS] Open equipment link
+      [双击屏幕] 打开装备链接
+      [长按屏幕] 打开装备链接
     `,
   },
   desc: {
@@ -821,16 +838,16 @@ const $config = {
       - e.g., Peerless : quality=rainbow, name=bold
     `,
     equipFilters: `Syntax
-      ()   : GROUPING
-      &&   : AND
-      ||   : OR
-      !    : NOT
-      $QUALITY+   : Whether the quality of the equipment is equal to or higher than the given QUALITY
-      $pab=xyz    : Whether the equipment has pab x, y and z
-      $prefix     : Whether the equipment has a prefix
-      $level      : Number, the level of the equipment
-      e.g., Magnificent && Power && !Warding
-      e.g., $Exquisite+ && (Rapier || Shortsword) && Slaughter && $prefix && $pab=sd && $level<250
+      ()   : 组
+      &&   : 和
+      ||   : 或
+      !    : 非
+      $QUALITY+   : 大于指定稀有度
+      $pab=xyz    : 装备提供的主属性类型
+      $prefix     : 装备是否有指定词缀
+      $level      : 数字形式，装备的等级
+      示例：Magnificent && Power && !Warding 代表同时满足稀有度为史诗，非守护词缀的动力甲
+      示例：$Exquisite+ && (Rapier || Shortsword) && Slaughter && $prefix && $pab=sd && $level<250 代表同时满足低于 250 级、稀有度高于精良、杀戮词缀、提供力量和灵巧属性的西洋剑或短剑
     `,
   },
   validator: {
@@ -1056,7 +1073,7 @@ const $config = {
         o.node.text = $element('p', o.node.div, ['/' + text]);
       }
       if (o.input === 'textarea') {
-        $input(['button', 'Default'], o.node.div, null, () => { $config.set_input(o); });
+        $input(['button', 'Restore Default'], o.node.div, null, () => { $config.set_input(o); });
       }
       let desc = $config.desc[o.desc || o.key];
       if (desc) {
@@ -1086,10 +1103,10 @@ const $config = {
     });
 
     const bottom = $element('footer', $config.node.div);
-    $input(['button', 'Save'], bottom, null, () => { $config.save(true); });
-    $input(['button', 'Close'], bottom, null, () => { $config.close(); });
-    $input(['button', 'Revert'], bottom, null, () => { $config.load($config.settings); });
-    $input(['button', 'Default'], bottom, null, () => { $config.load($config.default); });
+    $input(['button', 'Save Settings'], bottom, null, () => { $config.save(true); });
+    $input(['button', 'Close Window'], bottom, null, () => { $config.close(); });
+    $input(['button', 'Revert Settings'], bottom, null, () => { $config.load($config.settings); });
+    $input(['button', 'Restore Default'], bottom, null, () => { $config.load($config.default); });
   },
   open: function (key) {
     if (!$config.node) {
@@ -1420,7 +1437,8 @@ const $re = {
       return;
     }
     $re.init();
-    if ($id('textlog').tBodies[0].lastElementChild.textContent === 'Initializing random encounter ...') {
+    const lastLogText = $id('textlog').tBodies[0].lastElementChild.textContent;
+    if (lastLogText.includes('Initializing random encounter') || lastLogText.includes('初始化随机遭遇')) {
       $re.check();
     }
     const button = $element('div', $id('csp'), ['RE', '!position: absolute; top: 10px; left: 600px; cursor: pointer; font-size: 10pt; font-weight: bold;']);
@@ -1609,10 +1627,13 @@ if (!$id('navbar')) {
 }
 
 // CHECK FONT SETTINGS
-const level_exec = /^(.+) Lv\.(\d+)/.exec($id('level_readout').textContent.trim());
+let level_exec = /^(.+) Lv\.(\d+)/.exec($id('level_readout').textContent.trim());
+if (!level_exec) {
+  level_exec = /^(.+) 等级[:：\s]*(\d+)/.exec($id('level_readout').textContent.trim());
+}
 if (!level_exec) {
   if (_query.ss === 'se') {
-    alert('To use HVUT, You have to set a [Custom Font] first.');
+    alert('要使用 HVUT，需要先设置 [Custom Font]。');
     scrollIntoView($id('settings_cfont').parentNode, $id('settings_outer'));
     const form = $qs('#settings_outer form');
     form.elements.fontlocal.checked = true;
@@ -1632,13 +1653,39 @@ if (!level_exec) {
 const _player = {
   difficulty: level_exec[1],
   level: parseInt(level_exec[2]),
-  stamina: parseInt(/Stamina: (\d+)/.exec($id('stamina_readout').textContent)[1]),
+  stamina: parseInt(/(?:Stamina|体力)[:：]?\s*(\d+)/.exec($id('stamina_readout').textContent)[1]),
   accuracy: $qs('#stamina_readout > div:nth-child(2)').title,
-  condition: $qs('#stamina_readout img[title^="Stamina"]').title,
+  condition: $qs('#stamina_readout img[title^="Stamina"], #stamina_readout img[title*="体力"]').title,
   warn: [],
 };
 
 /* START */
+
+// 兼容游戏本体被其他汉化脚本翻译后的中文属性/面板名。
+const GAME_CN_MAP = {
+  '力量': 'Strength', '灵巧': 'Dexterity', '敏捷': 'Agility',
+  '体质': 'Endurance', '智力': 'Intelligence', '智慧': 'Wisdom',
+  '力': 'S', '灵': 'D', '敏': 'A', '体': 'E', '智': 'I', '慧': 'W',
+  '单手武器': 'One-Handed', '双手武器': 'Two-Handed', '双持武器': 'Dual-wielding', '二天一流': 'Niten Ichiryu',
+  '法杖': 'Staff', '盾牌': 'Shield', '布甲': 'Cloth Armor', '轻甲': 'Light Armor', '重甲': 'Heavy Armor',
+  '主手攻击': 'Mainhand Attack', '副手攻击': 'Offhand Attack', '魔法伤害': 'Magic Attack',
+  '属性减伤': 'Damage Mitigation', '法术伤害加成': 'Spell Damage Bonus',
+  '武器/装备熟练度': 'Equipment proficiency', '法杖/魔法熟练度': 'Magic proficiency',
+  '单手': 'One-Handed', '双手': 'Two-Handed', '双持': 'Dual-wielding',
+  '主手': 'Main Hand', '副手': 'Off Hand', '身体': 'Body', '手部': 'Hands', '腿部': 'Legs', '足部': 'Feet',
+  '生命值增幅': 'HP Tank', '魔力值增幅': 'MP Tank', '灵力值增幅': 'SP Tank',
+  '生命药水效果加成': 'Better Health Pots', '魔力药水效果加成': 'Better Mana Pots', '灵力药水效果加成': 'Better Spirit Pots',
+  '普通': 'Normal', '困难': 'Hard', '噩梦': 'Nightmare', '地狱': 'Hell', '任天堂': 'Nintendo',
+  'I Wanna': 'IWBTH', '彩虹小马': 'PFUDOR',
+};
+const GAME_EN_MAP = {};
+for (const [cn, en] of Object.entries(GAME_CN_MAP)) { GAME_EN_MAP[en] = cn; }
+function gameName(name) {
+  return GAME_CN_MAP[name] || name;
+}
+function gameNameRev(name) {
+  return GAME_EN_MAP[name] || name;
+}
 
 /* eslint-disable one-var */
 var _ch = {},
@@ -3882,24 +3929,24 @@ const $persona = {
       _top.node.div.classList.add('hvut-top-warn');
       _top.node.persona.firstElementChild.classList.add('hvut-warn');
     }
-    if (_player.condition.includes('Stamina: Exhausted') || _player.accuracy || _player.stamina <= $config.settings.warnLowStamina) {
+    if (_player.condition.includes('Stamina: Exhausted') || _player.condition.includes('体力: 精疲力竭') || _player.accuracy || _player.stamina <= $config.settings.warnLowStamina) {
       _top.node.div.classList.add('hvut-top-warn');
       _top.node.stamina.firstElementChild.classList.add('hvut-warn');
-    } else if (_player.condition.includes('Stamina: Great')) {
+    } else if (_player.condition.includes('Stamina: Great') || _player.condition.includes('体力: 精力充沛')) {
       _top.node.stamina.firstElementChild.classList.add('hvut-bonus');
     }
   },
   parse_stats_pane: function (doc) {
     const stats_pane = {};
     $qsa('#stats_scrollable > table', doc).forEach((table) => {
-      const type = table.previousElementSibling.textContent;
+      const type = gameName(table.previousElementSibling.textContent.trim());
       Array.from(table.rows).forEach((tr) => {
         const text = tr.cells[0].textContent;
         let value = parseFloat(text);
         if (text.endsWith('%')) {
           value = Math.round(value * 100) / 10000;
         }
-        let name = tr.cells[1].textContent;
+        let name = gameName(tr.cells[1].textContent.trim());
         if (/(Mainhand|Offhand|Magic) Attack/.test(type)) {
           const attack_type = RegExp.$1;
           if (/(Crushing|Piercing|Slashing|Void) Damage/.test(name)) {
@@ -4305,12 +4352,22 @@ if (_query.s === 'Character' && _query.ss === 'eq') {
     const doc = $doc(html);
     const base = {};
     $qsa('#attr_table tr:nth-last-child(n+2)', doc).forEach((tr) => {
-      base[tr.children[0].textContent] = tr.children[1].textContent;
+      const rawName = tr.children[0].textContent.trim();
+      const value = tr.children[1].textContent;
+      base[rawName] = value;
+      base[gameName(rawName)] = value;
+      base[gameNameRev(rawName)] = value;
     });
     $qsa('#stats_scrollable > table:nth-last-of-type(2) tr').forEach((tr) => {
-      const name = tr.cells[1].textContent;
-      tr.cells[1].textContent = `[${base[name]}] ${name}`;
+      const name = tr.cells[1].textContent.trim();
+      const value = base[name] ?? base[gameName(name)] ?? base[gameNameRev(name)];
+      if (value !== undefined) {
+        tr.cells[1].textContent = `[${value}] ${name}`;
+      }
     });
+    GM_addStyle(/*css*/`
+      #stats_scrollable > table:nth-last-of-type(2) td:first-child { min-width: 35px; }
+    `);
   };
 
   _eq.equip_code = function () {
@@ -4822,6 +4879,14 @@ if (_query.s === 'Character' && _query.ss === 'tr') {
     'Dissociation': { id: 88, b: 1000000, l: 1000000, e: 0 },
     'Set Collector': { id: 96, b: 12500, l: 12500, e: 0 },
   };
+  _tr._cnMap = {
+    '善学者': 'Adept Learner', '同化者': 'Assimilator', '能力提升': 'Ability Boost',
+    '天命昭彰': 'Manifest Destiny', '拾荒者': 'Scavenger', '抽签运': 'Luck of the Draw',
+    '军需官': 'Quartermaster', '考古学家': 'Archaeologist', '新陈代谢': 'Metabolism',
+    '鼓舞': 'Inspiration', '战争学者': 'Scholar of War', '兵法家': 'Scholar of War',
+    '酊剂': 'Tincture', '囤积者': 'Pack Rat', '解离症': 'Dissociation', '套装收集者': 'Set Collector',
+  };
+  _tr._toEN = function (name) { return _tr._cnMap[name] || name; };
 
   _tr.init = function () {
     _tr.node.div = $element('div', [$id('train_outer'), 'afterbegin'], ['!margin: 5px;' + ($config.settings.trainingNotification ? '' : ' display: none;')]);
@@ -4850,12 +4915,13 @@ if (_query.s === 'Character' && _query.ss === 'tr') {
         return;
       }
       const name = tr.cells[0].textContent.trim();
+      const enName = _tr._toEN(name);
       const time = parseFloat(tr.cells[3].textContent);
       const level = parseInt(tr.cells[4].textContent);
       const max = parseInt(tr.cells[6].textContent);
-      _tr.level[name] = level;
+      _tr.level[enName] = level;
 
-      const training = _tr.data[name];
+      const training = _tr.data[enName];
       if (!training) {
         return;
       }
@@ -4865,8 +4931,9 @@ if (_query.s === 'Character' && _query.ss === 'tr') {
       if (training.time) {
         tr.classList.add('hvut-cphu');
         tr.dataset.action = 'change';
-        tr.dataset.name = name;
-        $element('option', _tr.node.select, { text: name, value: name });
+        tr.dataset.name = enName;
+        const opt = $element('option', _tr.node.select, { text: name, value: enName });
+        opt.dataset.enValue = enName;
       }
 
       let spent = 0;
@@ -4882,6 +4949,9 @@ if (_query.s === 'Character' && _query.ss === 'tr') {
 
   _tr.parse_progress = function () {
     _tr.current = $qs('#train_progress > div:nth-child(2) > :first-child')?.textContent;
+    if (_tr.current) {
+      _tr.current = _tr._toEN(_tr.current);
+    }
     if (_tr.current && _tr.data[_tr.current]) {
       _tr.json.current_name = _tr.current;
       _tr.json.current_level = _tr.data[_tr.current].level;
@@ -4915,6 +4985,7 @@ if (_query.s === 'Character' && _query.ss === 'tr') {
   };
 
   _tr.change = function (name, level) {
+    name = _tr._toEN(name);
     const training = _tr.data[name];
     if (!training?.time) {
       _tr.node.select.value = '';
@@ -4926,7 +4997,8 @@ if (_query.s === 'Character' && _query.ss === 'tr') {
     if (!level) {
       level = training.level;
     }
-    _tr.node.select.value = name;
+    const opt = _tr.node.select.querySelector(`option[data-en-value="${CSS.escape(name)}"]`);
+    _tr.node.select.value = opt ? opt.value : name;
     _tr.node.level.value = level;
     _tr.node.level.min = training.level;
     _tr.node.level.max = training.max;
@@ -4934,10 +5006,19 @@ if (_query.s === 'Character' && _query.ss === 'tr') {
     _tr.calc();
   };
 
+  _tr._getSelectedEN = function () {
+    const sel = _tr.node.select;
+    if (!sel.value) return '';
+    const opt = sel.selectedOptions?.[0];
+    if (opt?.dataset?.enValue) return opt.dataset.enValue;
+    const en = _tr._toEN(sel.value);
+    return en && _tr.data[en] ? en : '';
+  };
+
   _tr.calc = function () {
-    const name = _tr.node.select.value;
+    const name = _tr._getSelectedEN();
     const to = parseInt(_tr.node.level.value);
-    if (!name || !to) {
+    if (!name || !to || !_tr.data[name]) {
       return;
     }
 
@@ -4955,10 +5036,11 @@ if (_query.s === 'Character' && _query.ss === 'tr') {
   };
 
   _tr.set = function (reload) {
-    if (_tr.node.select.value) {
-      _tr.json.next_name = _tr.node.select.value;
+    const enName = _tr._getSelectedEN();
+    if (enName) {
+      _tr.json.next_name = enName;
       _tr.json.next_level = parseInt(_tr.node.level.value);
-      _tr.json.next_id = _tr.data[_tr.node.select.value].id;
+      _tr.json.next_id = _tr.data[enName].id;
     } else {
       _tr.json.next_name = '';
       _tr.json.next_level = 0;
@@ -8959,6 +9041,10 @@ if (_query.s === 'Bazaar' && _query.ss === 'am' && $id('equiplist')) {
       $armory.submit.button();
       $armory.scroll.init();
       $armory.hover.init();
+      const selall = $qs('.eqselall input[type="checkbox"]');
+      if (selall && !selall.id) {
+        selall.id = 'hvut_selall';
+      }
       //search
     },
     get_token: async function () {
@@ -9504,6 +9590,11 @@ if (_query.s === 'Bazaar' && _query.ss === 'am' && $id('equiplist')) {
         selectable_count = $armory.equiplist.filter((eq) => eq.node.check.name === 'eqids[]' && !eq.node.wrapper.dataset.eqprotect).length;
         _window.update_selected_count();
         dummy?.remove();
+        $armory.equiplist.forEach((eq) => {
+          if (!eq.node.check.name && !eq.node.check.id) {
+            eq.node.check.id = 'hvut_eq_' + eq.info.eid;
+          }
+        });
       },
     },
 
@@ -9919,7 +10010,7 @@ if (_query.s === 'Bazaar' && _query.ss === 'am' && $id('equiplist')) {
         if (code_featured) {
           code_list = $armory.equipcode.category('Featured') + '\n' + code_featured + code_list;
         }
-        popup_text(code_list.trim() || 'No equipment selected.', 900, 500);
+        popup_text(code_list.trim() || '未选择装备。', 900, 500);
       },
     },
   };
