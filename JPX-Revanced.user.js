@@ -7032,7 +7032,7 @@ function refreshSpellDamageBonusFromHvutEquipset() {
     const mainHand = equipset.find(info => /main\s*hand|主手/i.test(info?.slot || '')) || equipset[0];
     if (mainHand) {
         const text = getEquipText(mainHand);
-        const type = isStaff(mainHand, text) ? normalizeSpellDamageType(text, SPELL_DAMAGE_EQUIP_ALIASES) : '';
+        const type = normalizeSpellDamageType(text, SPELL_DAMAGE_EQUIP_ALIASES);
         if (type) {
             const value = Math.max(Number(spellDamageBonus.maxValue) || 0, 101);
             return saveSpellDamageBonus(type, value);
