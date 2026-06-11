@@ -9302,7 +9302,6 @@ function jpxPanelManager(panelType) {
     const ns = jpxPanelManager;
     if (ns._init) return ns;
 
-	ns.ready = true;
     ns.currentType = panelType;
     const panelSuffix = document.URL.includes('isekai') ? '_isekai' : '';
     ns.widgetPositionKey = `jpx_ctrlWidgetPosition${panelSuffix}`;
@@ -9632,12 +9631,11 @@ function jpxPanelManager(panelType) {
                 });
 
                 if (cfgBattle.ctrlWidgetMouseEnter) {
-					ns.toggleButton.addEventListener('mousemove', () => { ns.ready = true; });
-					ns.toggleButton.addEventListener('mouseenter', () => {
-						if (!ns.ready) return;
-						throttledToggleBattle();
-					});
-				}
+                    ns.ctrlWidget.addEventListener('pointerenter', () => {
+                        ns.updateContent('battle');
+                        ns.updateToggleButton();
+                    });
+                }
 
                 actionsDiv.appendChild(ns.toggleButton);
                 ns.updateToggleButton();
