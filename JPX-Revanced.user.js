@@ -2093,6 +2093,23 @@ const spellsDamageObj = {
     holy: ['Smite', 'Banishment', 'Paradise Lost'],
     dark: ['Corruption', 'Disintegrate', 'Ragnarok'],
 };
+const SPELL_DAMAGE_TYPES = Object.keys(spellsDamageObj);
+const SPELL_DAMAGE_STAT_ALIASES = {
+    fire: ['fire', '火', '火焰'],
+    cold: ['cold', '冰', '冰冷', '冰霜', '寒冰'],
+    elec: ['elec', 'electrical', 'electric', '闪电', '电'],
+    wind: ['wind', '风', '疾风'],
+    holy: ['holy', '圣', '神圣'],
+    dark: ['dark', '暗', '黑暗'],
+};
+const SPELL_DAMAGE_EQUIP_ALIASES = {
+    fire: ['Fiery', 'Surtr', '火法伤', '火焰魔法伤害', '灼热', '苏尔特'],
+    cold: ['Arctic', 'Niflheim', '冰法伤', '冰冷魔法伤害', '冰霜魔法伤害', '极寒', '尼芙菲姆'],
+    elec: ['Shocking', 'Mjolnir', '电法伤', '闪电魔法伤害', '闪电', '姆乔尔尼尔'],
+    wind: ['Tempestuous', 'Freyr', '风法伤', '疾风魔法伤害', '风暴', '弗瑞尔'],
+    holy: ['Hallowed', 'Heimdall', '圣法伤', '神圣魔法伤害', '神圣', '海姆达'],
+    dark: ['Demonic', 'Fenrir', '暗法伤', '黑暗魔法伤害', '恶魔', '芬里尔'],
+};
 const bossTypes = {
     Rare: new Set(['Manbearpig', 'White Bunneh', 'Mithra', 'Dalek']),
     Legendary: new Set(['Konata', 'Mikuru Asahina', 'Ryouko Asakura', 'Yuki Nagato']),
@@ -3495,69 +3512,7 @@ function initDo() {
             localStorage.setItem(prefix + 'persona' + isekaiSuffix, personaSelected);
         }
 
-        let spcArray = Array.from(document.querySelectorAll('.spc'));
-        let spellDamageBonus = spcArray.find(spc =>
-            spc.innerText.includes('Spell Damage Bonus') || jpxUtils.parseHVClasses(spc.querySelector('div')).includes('Spell Damage Bonus')
-        );
-        if (spellDamageBonus) {
-            if (!isekaiSuffix) {
-                let spellDamageBonusArray = Array.from(spellDamageBonus.nextElementSibling.children);
-                let maxValue = -Infinity;
-                let maxType = '';
-
-                for (let i = 0; i < spellDamageBonusArray.length; i += 2) {
-                    let value = parseFloat(spellDamageBonusArray[i].innerText || jpxUtils.parseHVClasses(spellDamageBonusArray[i].querySelector('div')));
-                    let spellsDamageType = (spellDamageBonusArray[i + 1].innerText || jpxUtils.parseHVClasses(spellDamageBonusArray[i + 1].querySelector('div'))).match(/[A-Za-z]+/)?.[0];
-
-                    if (value > maxValue) {
-                        maxValue = value;
-                        maxType = jpxUtils.lowerFirst(spellsDamageType);
-                    }
-                }
-
-                if (
-                    (maxType && spellDamageBonus.maxType != maxType) ||
-                    (maxValue > 0 && spellDamageBonus.maxValue != maxValue)
-                ){
-                    localStorage.setItem(prefix + 'spellDamageBonus' + isekaiSuffix, JSON.stringify({
-                        maxType: maxType,
-                        maxValue: maxValue,
-                    }));
-                }
-            /*isekai911*/
-            } else {
-                let table = spellDamageBonus.nextElementSibling;
-                let rows = table.querySelectorAll('tr');
-                let maxValue = -Infinity;
-                let maxType = "";
-
-                rows.forEach((tr) => {
-                    let tds = tr.querySelectorAll('td');
-                    if (tds.length < 2) {
-                        return;
-                    }
-
-                    let value = parseFloat(tds[0].textContent.trim());
-                    let spellsDamageType = tds[1].textContent.trim();
-
-                    if (value > maxValue) {
-                        maxValue = value;
-                        maxType = jpxUtils.lowerFirst(spellsDamageType);
-                    }
-                });
-
-                if (
-                    (maxType && spellDamageBonus.maxType != maxType) ||
-                    (maxValue > 0 && spellDamageBonus.maxValue != maxValue)
-                ) {
-                    localStorage.setItem(prefix + 'spellDamageBonus' + isekaiSuffix, JSON.stringify({
-                        maxType: maxType,
-                        maxValue: maxValue,
-                    }));
-                }
-            }
-            /*isekai912*/
-        }
+        refreshSpellDamageBonusFromStatsPane();
 
         return;
     }
@@ -3599,6 +3554,7 @@ function initDoBattle() {
     if (jpxUtils.isEmpty(combatRecords)) combatRecords = jpxUtils.createCombatRecords();
     revenueRecords = JSON.parse(localStorage.getItem(prefix + 'revenueRecords' + isekaiSuffix) || '{}');
     if (jpxUtils.isEmpty(revenueRecords)) revenueRecords = jpxUtils.createRevenueRecords();
+    refreshSpellDamageBonusFromHvutEquipset();
 
     //Battle Style
     let {
@@ -4634,7 +4590,7 @@ function checkConditions(conditions, target, checkGlobal = true, checkTarget = t
 
             return actions.every(action => {
                 let tier = action.match(/^T(\d)$/)?.[1];
-                let action2 = tier ? spellsDamageObj[spellDamageBonus.maxType][tier - 1] : action;
+                let action2 = tier ? getCurrentSpellDamage(tier) : action;
                 let cooldown = spellCooldowns[action2] ?? itemCooldowns[action2];
                 if (cooldown === '-') cooldown = 9999;
                 return jpxUtils.inRange(cooldown, range);
@@ -4646,7 +4602,7 @@ function checkConditions(conditions, target, checkGlobal = true, checkTarget = t
 
             return actions.every(action => {
                 let tier = action.match(/^T(\d)$/)?.[1];
-                let action2 = tier ? spellsDamageObj[spellDamageBonus.maxType][tier - 1] : action;
+                let action2 = tier ? getCurrentSpellDamage(tier) : action;
                 return jpxUtils.inRange(actionCounts[action2] ?? 0, range);
             });
         },
@@ -4872,7 +4828,7 @@ const actionHandlers = {
     spellDamage(action, monster) {
         const { name, conditions } = action;
         let tier = name.match(/^T(\d)$/)?.[1];
-        let spell = tier ? spellsDamageObj[spellDamageBonus.maxType][tier - 1] : name;
+        let spell = tier ? getCurrentSpellDamage(tier) : name;
         return (
             monster &&
             checkConditions(conditions, monster) &&
@@ -6978,6 +6934,113 @@ function setupStatsTooltip(root) {
 function getBattleMode(defaultBattleStyle = 'Unarmed') {
     let modeKey = `${battleStyle || defaultBattleStyle}_${battleType}`;
     return !jpxUtils.isEmpty(cfgBattle[modeKey]) ? modeKey : `${battleStyle || defaultBattleStyle}_General`;
+}
+
+function normalizeSpellDamageType(text, aliases = SPELL_DAMAGE_STAT_ALIASES) {
+    const value = String(text || '').trim();
+    if (!value) return '';
+    const lowerValue = value.toLowerCase();
+    for (const type of SPELL_DAMAGE_TYPES) {
+        if ((aliases[type] || []).some(alias => lowerValue.includes(String(alias).toLowerCase()))) {
+            return type;
+        }
+    }
+    return '';
+}
+
+function saveSpellDamageBonus(maxType, maxValue) {
+    if (!SPELL_DAMAGE_TYPES.includes(maxType)) return false;
+    const value = Number.isFinite(maxValue) ? maxValue : Number(spellDamageBonus.maxValue) || 0;
+    if (spellDamageBonus.maxType === maxType && Number(spellDamageBonus.maxValue) === value) return false;
+
+    spellDamageBonus = {
+        maxType,
+        maxValue: value,
+    };
+    localStorage.setItem(prefix + 'spellDamageBonus' + isekaiSuffix, JSON.stringify(spellDamageBonus));
+    return true;
+}
+
+function refreshSpellDamageBonusFromStatsPane() {
+    let spcArray = Array.from(document.querySelectorAll('.spc'));
+    let spellDamageBonusLabel = spcArray.find(spc =>
+        spc.innerText.includes('Spell Damage Bonus') ||
+        spc.innerText.includes('法术伤害加成') ||
+        spc.innerText.includes('魔法伤害加成') ||
+        jpxUtils.parseHVClasses(spc.querySelector('div')).includes('Spell Damage Bonus')
+    );
+    if (!spellDamageBonusLabel) return false;
+
+    let maxValue = -Infinity;
+    let maxType = '';
+
+    if (!isekaiSuffix) {
+        let spellDamageBonusArray = Array.from(spellDamageBonusLabel.nextElementSibling.children);
+        for (let i = 0; i < spellDamageBonusArray.length; i += 2) {
+            let valueText = spellDamageBonusArray[i].innerText || jpxUtils.parseHVClasses(spellDamageBonusArray[i].querySelector('div'));
+            let typeText = spellDamageBonusArray[i + 1].innerText || jpxUtils.parseHVClasses(spellDamageBonusArray[i + 1].querySelector('div'));
+            let value = parseFloat(valueText);
+            let type = normalizeSpellDamageType(typeText);
+
+            if (type && value > maxValue) {
+                maxValue = value;
+                maxType = type;
+            }
+        }
+    } else {
+        let rows = spellDamageBonusLabel.nextElementSibling.querySelectorAll('tr');
+        rows.forEach((tr) => {
+            let tds = tr.querySelectorAll('td');
+            if (tds.length < 2) return;
+
+            let value = parseFloat(tds[0].textContent.trim());
+            let type = normalizeSpellDamageType(tds[1].textContent.trim());
+
+            if (type && value > maxValue) {
+                maxValue = value;
+                maxType = type;
+            }
+        });
+    }
+
+    if (!maxType || !Number.isFinite(maxValue)) return false;
+    return saveSpellDamageBonus(maxType, maxValue);
+}
+
+function refreshSpellDamageBonusFromHvutEquipset() {
+    const hvutPrefix = isekaiSuffix ? 'hvuti_' : 'hvut_';
+    let equipset;
+    try {
+        equipset = JSON.parse(localStorage.getItem(hvutPrefix + 'equipset') || 'null');
+    } catch (err) {
+        equipset = null;
+    }
+    if (!Array.isArray(equipset)) return false;
+
+    const scores = Object.fromEntries(SPELL_DAMAGE_TYPES.map(type => [type, 0]));
+    equipset.forEach(info => {
+        const text = [info?.name, info?.customname, info?.prefix, info?.suffix].filter(Boolean).join(' ');
+        const type = normalizeSpellDamageType(text, SPELL_DAMAGE_EQUIP_ALIASES);
+        if (!type) return;
+        const isStaff = info?.category === 'Staff' || /staff|法杖/i.test(text);
+        scores[type] += isStaff ? 3 : 1;
+    });
+
+    const best = Object.entries(scores).sort((a, b) => b[1] - a[1])[0];
+    if (!best || best[1] <= 0) return false;
+
+    const value = Math.max(Number(spellDamageBonus.maxValue) || 0, 101);
+    return saveSpellDamageBonus(best[0], value);
+}
+
+function getCurrentSpellDamageType() {
+    refreshSpellDamageBonusFromHvutEquipset();
+    return SPELL_DAMAGE_TYPES.includes(spellDamageBonus.maxType) ? spellDamageBonus.maxType : 'fire';
+}
+
+function getCurrentSpellDamage(tier) {
+    const type = getCurrentSpellDamageType();
+    return spellsDamageObj[type]?.[Number(tier) - 1] || spellsDamageObj.fire[Number(tier) - 1];
 }
 
 function getBattleModeSelectionKey() {

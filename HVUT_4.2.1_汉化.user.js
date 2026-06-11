@@ -2924,12 +2924,14 @@ const $battle = {
 
     $battle.create();
   },
-  create: function () {
+  create: async function () {
     const items_rows = Math.max(Math.ceil(Object.keys($config.settings.equipPanelItemInventory).length / 3), 3);
     $battle.node.items.style.height = (items_rows * 21 - 1) + 'px';
     $battle.load_items();
     $battle.equips.length = 0;
     $battle.node.equip.innerHTML = '';
+    await $battle.refresh_equipset();
+
     const equipset = $config.get('equipset');
     if (!equipset) {
       $persona.change_p();
@@ -2952,6 +2954,20 @@ const $battle = {
     });
 
     $battle.load_repair();
+  },
+  refresh_equipset: async function () {
+    try {
+      const html = await $ajax.fetch(`?s=Character&ss=eq&t=${Date.now()}`);
+      const doc = $doc(html);
+      const script = $qs('script[src*="/dynjs/"]', doc);
+      if (script) {
+        const dynjs = await $ajax.fetch(`${script.src}?t=${Date.now()}`);
+        Object.assign($equip.dynjs_equip, JSON.parse(/dynjs_equip\s?=\s?(\{.*?\});/.exec(dynjs)?.[1] || '{}'));
+      }
+      $persona.save_equipset(doc);
+    } catch (err) {
+      console.warn('[HVUT] Failed to refresh current equipment set.', err);
+    }
   },
   click: function (e) {
     const target = e.target.closest('[data-action]');
