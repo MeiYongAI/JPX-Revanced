@@ -6940,12 +6940,22 @@ function normalizeSpellDamageType(text, aliases = SPELL_DAMAGE_STAT_ALIASES) {
     const value = String(text || '').trim();
     if (!value) return '';
     const lowerValue = value.toLowerCase();
+    let bestType = '';
+    let bestIndex = Infinity;
+    let bestLength = 0;
     for (const type of SPELL_DAMAGE_TYPES) {
-        if ((aliases[type] || []).some(alias => lowerValue.includes(String(alias).toLowerCase()))) {
-            return type;
+        for (const alias of aliases[type] || []) {
+            const needle = String(alias).toLowerCase();
+            const index = lowerValue.indexOf(needle);
+            if (index === -1) continue;
+            if (index < bestIndex || (index === bestIndex && needle.length > bestLength)) {
+                bestType = type;
+                bestIndex = index;
+                bestLength = needle.length;
+            }
         }
     }
-    return '';
+    return bestType;
 }
 
 function saveSpellDamageBonus(maxType, maxValue) {
@@ -7017,13 +7027,24 @@ function refreshSpellDamageBonusFromHvutEquipset() {
     }
     if (!Array.isArray(equipset)) return false;
 
+    const getEquipText = info => [info?.name, info?.customname, info?.prefix, info?.suffix].filter(Boolean).join(' ');
+    const isStaff = (info, text) => info?.category === 'Staff' || /staff|法杖/i.test(`${info?.category || ''} ${text}`);
+    const mainHand = equipset.find(info => /main\s*hand|主手/i.test(info?.slot || '')) || equipset[0];
+    if (mainHand) {
+        const text = getEquipText(mainHand);
+        const type = isStaff(mainHand, text) ? normalizeSpellDamageType(text, SPELL_DAMAGE_EQUIP_ALIASES) : '';
+        if (type) {
+            const value = Math.max(Number(spellDamageBonus.maxValue) || 0, 101);
+            return saveSpellDamageBonus(type, value);
+        }
+    }
+
     const scores = Object.fromEntries(SPELL_DAMAGE_TYPES.map(type => [type, 0]));
     equipset.forEach(info => {
-        const text = [info?.name, info?.customname, info?.prefix, info?.suffix].filter(Boolean).join(' ');
+        const text = getEquipText(info);
         const type = normalizeSpellDamageType(text, SPELL_DAMAGE_EQUIP_ALIASES);
         if (!type) return;
-        const isStaff = info?.category === 'Staff' || /staff|法杖/i.test(text);
-        scores[type] += isStaff ? 3 : 1;
+        scores[type] += isStaff(info, text) ? 3 : 1;
     });
 
     const best = Object.entries(scores).sort((a, b) => b[1] - a[1])[0];
