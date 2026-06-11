@@ -6980,6 +6980,21 @@ function getBattleMode(defaultBattleStyle = 'Unarmed') {
     return !jpxUtils.isEmpty(cfgBattle[modeKey]) ? modeKey : `${battleStyle || defaultBattleStyle}_General`;
 }
 
+function getBattleModeSelectionKey() {
+    return prefix + 'cfgBattleSelectedMode' + isekaiSuffix;
+}
+
+function getSavedBattleModeSelection() {
+    const modeKey = localStorage.getItem(getBattleModeSelectionKey()) || '';
+    return BATTLE_MODES.includes(modeKey) ? modeKey : '';
+}
+
+function saveBattleModeSelection(modeKey) {
+    if (BATTLE_MODES.includes(modeKey)) {
+        localStorage.setItem(getBattleModeSelectionKey(), modeKey);
+    }
+}
+
 function renderSchema(container, schema, data) {
     container.innerHTML = '';
 
@@ -7507,6 +7522,7 @@ const fieldRenderers = {
                 selectContent.innerHTML = '';
                 let currentValue = selectComponent.getValue();
                 container.dataset.currentValue = currentValue;
+                saveBattleModeSelection(currentValue);
                 if (!dataObj[currentValue] || jpxUtils.isEmpty(dataObj[currentValue])) dataObj[currentValue] = {};
                 renderSchema(selectContent, field.itemSchema, dataObj[currentValue]);
             };
@@ -7517,7 +7533,7 @@ const fieldRenderers = {
             let modeKey = getBattleMode('OneHanded');
             let importBtn = document.getElementById('import-button');
             let resetBtn = document.getElementById('reset-current-button');
-            let finalKey = (importBtn?.dataset.battleMode) || (resetBtn?.dataset.battleMode) || modeKey;
+            let finalKey = (importBtn?.dataset.battleMode) || (resetBtn?.dataset.battleMode) || getSavedBattleModeSelection() || modeKey;
 
             if (importBtn) delete importBtn.dataset.battleMode;
             if (resetBtn) delete resetBtn.dataset.battleMode;
