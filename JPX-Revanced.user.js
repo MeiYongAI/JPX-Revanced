@@ -7438,7 +7438,13 @@ const fieldRenderers = {
                         if (field.flatten === '_') values = value.split(/_(?!Mage(?:_|$))/);
                         else values = value.split(field.flatten);
                     }
-                    Object.keys(field.options).forEach((key, i) => { if (values?.[i] !== undefined) selects[key].value = values[i]; });
+                    Object.keys(field.options).forEach((key, i) => {
+                        if (values?.[i] === undefined) return;
+                        let nextValue = String(values[i]);
+                        if (Array.from(selects[key].options).some(opt => opt.value === nextValue)) {
+                            selects[key].value = nextValue;
+                        }
+                    });
                 };
 
                 for (const [subLabel, subOptions] of Object.entries(field.options)) {
@@ -7516,6 +7522,7 @@ const fieldRenderers = {
             if (importBtn) delete importBtn.dataset.battleMode;
             if (resetBtn) delete resetBtn.dataset.battleMode;
 
+            if (!BATTLE_MODES.includes(finalKey)) finalKey = BATTLE_MODES.includes(modeKey) ? modeKey : 'OneHanded_General';
             if (finalKey) selectComponent.setValue(finalKey);
             selectComponent.onchange();
         } else {
@@ -8495,6 +8502,38 @@ function getImportErrorMessage(err) {
     return detail ? `${t('cGen.importFailed!')}: ${detail}` : t('cGen.importFailed!');
 }
 
+function isBattleModeConfig(data, key) {
+    const mode = data?.[key];
+    return !!mode && typeof mode === 'object' && (
+        Array.isArray(mode.supports) ||
+        Array.isArray(mode.attacks) ||
+        Object.keys(mode).some(modeKey => modeKey.startsWith('kb_'))
+    );
+}
+
+function getBattleModeKeyFromFileName(fileName) {
+    const name = String(fileName || '');
+    const escapedModes = [...BATTLE_MODES]
+        .sort((a, b) => b.length - a.length)
+        .map(key => ({
+            key,
+            regex: new RegExp(`(^|_)${key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?=(_|\\.|$))`)
+        }));
+    return escapedModes.find(item => item.regex.test(name))?.key || '';
+}
+
+function getImportedBattleModeKey(data, fileName, fallbackKey) {
+    const importedModes = BATTLE_MODES.filter(key => isBattleModeConfig(data, key));
+    if (importedModes.length === 1) return importedModes[0];
+
+    const fileMode = getBattleModeKeyFromFileName(fileName);
+    if (fileMode && (!importedModes.length || importedModes.includes(fileMode) || data?.[fileMode])) return fileMode;
+
+    if (BATTLE_MODES.includes(fallbackKey)) return fallbackKey;
+    const runtimeMode = getBattleMode('OneHanded');
+    return BATTLE_MODES.includes(runtimeMode) ? runtimeMode : 'OneHanded_General';
+}
+
 function shouldUseJpxDarkMode() {
     if (cfgStats && cfgStats.darkMode !== undefined) return !!cfgStats.darkMode;
     try {
@@ -8746,17 +8785,19 @@ function renderSettings() {
             onExport() {
                 return { data: cfgBattle, fileName: `cfgBattle${!isekaiSuffix ? '_Persistent' : '_Isekai'}.txt`, depth: 3 };
             },
-            onImport(content) {
+            onImport(content, context = {}) {
                 let data = parseImportJSON(content);
                 if (!data.battleVersion && !BATTLE_MODES.some(key => data[key])) {
                     throw new Error(t('cGen.invalidImportData'));
                 }
+                const modeKey = getImportedBattleModeKey(data, context.fileName, context.currentModeKey);
                 mergeCfg(data, cfgBattle, cfgBattle, 'battle');
                 return createImportResult(t('cB.battleSettings'), {
                     uiId: 'cfgBattle-ui',
                     schema: getBattleSchemaForCurrentWorld(),
                     cfg: cfgBattle,
                     transModeKey: true,
+                    modeKey,
                 });
             },
         },
@@ -8897,11 +8938,15 @@ function renderSettings() {
 
                     try {
                         const content = await file.text();
-                        let info = activeTab.onImport(content);
+                        const currentModeKey = document.querySelector('[data-role="battleMode"]')?.dataset.currentValue;
+                        let info = activeTab.onImport(content, {
+                            fileName: file.name,
+                            currentModeKey,
+                        });
 
                         if (info.transModeKey) {
-                            let modeKey = document.querySelector('[data-role="battleMode"]')?.dataset.currentValue;
-                            if (modeKey) btn.dataset.battleMode = modeKey;
+                            let modeKey = info.modeKey || currentModeKey;
+                            if (BATTLE_MODES.includes(modeKey)) btn.dataset.battleMode = modeKey;
                         }
 
                         if (info.rerender) {
