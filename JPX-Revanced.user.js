@@ -7029,13 +7029,19 @@ function refreshSpellDamageBonusFromHvutEquipset() {
 
     const getEquipText = info => [info?.name, info?.customname, info?.prefix, info?.suffix].filter(Boolean).join(' ');
     const isStaff = (info, text) => info?.category === 'Staff' || /staff|法杖/i.test(`${info?.category || ''} ${text}`);
+    const isBattlecaster = text => /battlecaster|战法师/i.test(text);
     const mainHand = equipset.find(info => /main\s*hand|主手/i.test(info?.slot || '')) || equipset[0];
     if (mainHand) {
         const text = getEquipText(mainHand);
         const type = normalizeSpellDamageType(text, SPELL_DAMAGE_EQUIP_ALIASES);
+        const value = Number(spellDamageBonus.maxValue) || 0;
+        const isMageMainHand = isStaff(mainHand, text) || isBattlecaster(text);
         if (type) {
-            const value = Math.max(Number(spellDamageBonus.maxValue) || 0, 101);
-            return saveSpellDamageBonus(type, value);
+            return saveSpellDamageBonus(type, isMageMainHand ? Math.max(value, 101) : Math.min(value, 100));
+        }
+        if (!isMageMainHand) {
+            const maxType = SPELL_DAMAGE_TYPES.includes(spellDamageBonus.maxType) ? spellDamageBonus.maxType : 'fire';
+            return value > 100 ? saveSpellDamageBonus(maxType, 100) : false;
         }
     }
 
