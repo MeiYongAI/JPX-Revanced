@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         JPX-Revanced
 // @namespace    ijpx
-// @version      26.06.08
+// @version      26.06.17
 // @author       MeiYongAI
 // @icon         https://hentaiverse.org/y/favicon.png
 // @description  jpx
@@ -2536,6 +2536,7 @@ const conditionsGeneral = [
     mkF('bosses', 'rangeNumber'),
     mkF('activeBosses', 'rangeNumber'),
     mkF('defeatedBosses', 'rangeNumber'),
+    mkF('mLevel', 'rangeNumber'),
     mkF('mWithoutEffects', 'array', { multiSelectOptions: Object.keys(effectSrc), hasRange: 'cB.monsterCountRange', popup: true, itemSchema: { type: 'text' } }),
 ];
 const conditionsTarget = [
@@ -2784,6 +2785,10 @@ const I18N = (() => {
 			"resetFailed!": "重置失败",
 			"closeSettings": "关闭设定"
 		},
+		"sGen": {
+			"downloadBattleLog": "下载战斗日志",
+			"statsTab": "在新标签页打开统计"
+		},
 		"cB": {
 			"openBattleRecords": "打开战斗纪录",
 			"toggleActive": "切换启动",
@@ -2912,6 +2917,7 @@ const I18N = (() => {
 			"bosses": "魔王数量范围",
 			"activeBosses": "魔王存活数量范围",
 			"defeatedBosses": "魔王击败数量范围",
+			"mLevel": "怪物等级范围",
 			"mWithoutEffects": "怪物没有效果范围",
 			"monsterCountRange": "怪物数量范围",
 			"offset": "目标位移范围",
@@ -4320,6 +4326,7 @@ function getMonsters(render = false) {
             click: function() {
                 monster_btm1.click();
             },
+            level: 0,
             name: 'Unknown',
             type: 'Normal',
             hpPercentage: 0,
@@ -4330,8 +4337,12 @@ function getMonsters(render = false) {
             monster_btm1: monster_btm1,
         };
 
-        //index
+        //level
         let monster_btm2 = monster_btm1.querySelector('.btm2');
+        let levelContainer = monster_btm2.querySelector('div:last-child');
+        monster.level = parseInt(levelContainer?.textContent.trim() || jpxUtils.parseHVClasses(levelContainer)) || 0;
+
+        //index
         if (render && (cfgBattle.showMonsterIndex || cfgBattle.showMonsterInfo)) {
             monster_btm2.querySelector('img').style.display = 'none';
             let monIndex = document.createElement('div');
@@ -4646,6 +4657,7 @@ function checkConditions(conditions, target, checkGlobal = true, checkTarget = t
         bosses: range => jpxUtils.inRange(bosses.length, range),
         activeBosses: range => jpxUtils.inRange(activeBosses.length, range),
         defeatedBosses: range => jpxUtils.inRange(bosses.length - activeBosses.length, range),
+        mLevel: range => jpxUtils.inRange(monsters[0]?.level ?? 0, range),
         mWithoutEffects: arr => {
             let range = arr.slice(0, 2);
             let effects = arr.slice(2);
@@ -4661,10 +4673,7 @@ function checkConditions(conditions, target, checkGlobal = true, checkTarget = t
         tTypes: (arr, t) => arr.includes(t.type),
         tClasses: (arr, t) => arr.includes(allMonsterInfo?.[`mkey_${(t.index + 1) % 10}`]?.monsterClass),
         tPowerLevel: (range, t) => jpxUtils.inRange(allMonsterInfo?.[`mkey_${(t.index + 1) % 10}`]?.plvl, range),
-        tIndex: (range, t) => jpxUtils.inRange(t.index, range.map(n => (
-            n = n > 0 ? n - 1 : n === 0 ? 0 : monsters.length + n,
-            Math.min(monsters.length - 1, Math.max(0, n))
-        ))),
+        tIndex: (range, t) => jpxUtils.inRange(t.index, range.map(n => n = n > 0 ? n - 1 : n === 0 ? 0 : monsters.length + n)),
         tHP: (range, t) => jpxUtils.inRange(t.hpPercentage, range),
         tMP: (range, t) => jpxUtils.inRange(t.mpPercentage, range),
         tSP: (range, t) => jpxUtils.inRange(t.spPercentage, range),
@@ -5659,7 +5668,7 @@ function newWindowRecordPlayer(battleRecords) {
     try {
         const battleRecordsStr = JSON.stringify(battleRecords);
         const btn = document.createElement('button');
-        btn.textContent = 'New Tab Record';
+        btn.textContent = t('sGen.statsTab');
         btn.style.margin = '5px';
         btn.addEventListener('click', () => {
             const win = window.open();
@@ -5690,7 +5699,7 @@ function battleLogPlayer() {
     let url = URL.createObjectURL(blob);
     let a = document.createElement('a');
     log.parentNode.insertBefore(a, log.parentNode.firstChild);
-    a.innerText = 'Download Battle Log';
+    a.innerText = t('sGen.downloadBattleLog');
     a.style.cssText = 'float: left; font-size: 200%; margin: 10px 0px;';
     a.href = url;
     a.download = 'battleLog.txt';
