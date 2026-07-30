@@ -1,21 +1,33 @@
 # JPX-Revanced
 
-JPX userscripts and HentaiVerse localization resources.
+JPX-Revanced 是适用于 [HentaiVerse](https://hentaiverse.org/) 的战斗辅助用户脚本，在 JPX 的基础上持续维护和调整。
 
-## Scripts
+## 安装
 
-Tampermonkey/Violentmonkey install URLs:
+需要先安装 [Tampermonkey](https://www.tampermonkey.net/) 或 [Violentmonkey](https://violentmonkey.github.io/)。
 
-```text
-https://raw.githubusercontent.com/MeiYongAI/JPX-Revanced/main/JPX-Revanced.user.js
-https://raw.githubusercontent.com/MeiYongAI/JPX-Revanced/main/HVUT_4.2.1_%E6%B1%89%E5%8C%96.user.js
-https://raw.githubusercontent.com/MeiYongAI/JPX-Revanced/main/HV%E6%96%B0%E7%89%88%E6%B1%89%E5%8C%96.user.js
-```
+[点击安装 JPX-Revanced](https://raw.githubusercontent.com/MeiYongAI/JPX-Revanced/main/JPX-Revanced.user.js)
 
-- `JPX-Revanced.user.js`: JPX userscript for Hentaiverse.
-- `HVUT_4.2.1_汉化.user.js`: Chinese-localized HV Utils.
-- `HV新版汉化.user.js`: Chinese localization script for Hentaiverse/HVUT UI.
+脚本管理器会根据脚本头部的 `@version` 自动检查更新。
 
-## HV Dark Mode
+## 主要功能
 
-仓库同时包含 `hv-dark-mode.user.css`。推荐用 Stylus 导入，并把适用范围设为 `domain("hentaiverse.org")`。
+- 可配置的战斗规则与快捷键
+- 自动进入下一轮、AJAX 换轮和自动结束战斗
+- 技能与物品冷却、状态持续时间、怪物信息和生命值显示
+- 战斗记录、收益统计和历史数据筛选
+- 悬浮控制面板与深色界面
+
+## AJAX 换轮
+
+- `自动下一轮`：当前轮次结束后自动进入下一轮。
+- `AJAX 下一回合`：不刷新整个页面，仅更新战斗区域。
+- 如果其他用户脚本无法适配 AJAX 更新后的页面，请关闭 `AJAX 下一回合`，恢复 HentaiVerse 原生跳转。
+
+## 使用
+
+安装后进入 HentaiVerse，通过页面上的 JPX 悬浮面板打开设置。首次使用建议先检查战斗模式、规则和快捷键，再按需开启自动功能。
+
+## 问题反馈
+
+发现问题时，请在 [GitHub Issues](https://github.com/MeiYongAI/JPX-Revanced/issues) 提交复现步骤、脚本版本、浏览器与脚本管理器信息。

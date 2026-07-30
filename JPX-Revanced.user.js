@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         JPX-Revanced
 // @namespace    ijpx
-// @version      26.06.17
+// @version      26.07.30.1
 // @author       MeiYongAI
 // @icon         https://hentaiverse.org/y/favicon.png
 // @description  jpx
@@ -54,8 +54,8 @@ let defaultCfgBattle = {
             {"type":"stop","customMessage":"Can't use Health Elixir","conditions":[{"key":"pHP","value":[0,0.4]}]},
             {"type":"item","name":"Mana Gem","conditions":[{"key":"pMP","value":[0,0.8]}]},
             {"type":"item","name":"Mana Potion","conditions":[{"key":"pMP","value":[0,0.4]}]},
-            {"type":"item","name":"Mana Elixir","conditions":[{"key":"pMP","value":[0,0.1]}]},
-            {"type":"stop","customMessage":"Can't use Mana Elixir","conditions":[{"key":"pMP","value":[0,0.1]}]},
+            {"type":"item","name":"Mana Elixir","conditions":[{"key":"pMP","value":[0,0.2]}]},
+            {"type":"stop","customMessage":"Can't use Mana Elixir","conditions":[{"key":"pMP","value":[0,0.2]}]},
             {"type":"item","name":"Mystic Gem","conditions":[{"key":"pIgnoredEffects","value":[0,9999,"Channeling"]}]},
             {"type":"spellSupport","name":"Heartseeker","conditions":[{"key":"pEffects","value":[0,9999,"Channeling"]},{"key":"pEffects","value":[-1,100,"Heartseeker"]}]},
             {"type":"spellSupport","name":"Regen","conditions":[{"key":"pEffects","value":[0,9999,"Channeling"]},{"key":"pEffects","value":[-1,50,"Regen"]}]},
@@ -96,8 +96,8 @@ let defaultCfgBattle = {
             {"type":"stop","customMessage":"Can't use Health Elixir","conditions":[{"key":"pHP","value":[0,0.4]}]},
             {"type":"item","name":"Mana Gem","conditions":[{"key":"pMP","value":[0,0.8]}]},
             {"type":"item","name":"Mana Potion","conditions":[{"key":"pMP","value":[0,0.4]}]},
-            {"type":"item","name":"Mana Elixir","conditions":[{"key":"pMP","value":[0,0.1]}]},
-            {"type":"stop","customMessage":"Can't use Mana Elixir","conditions":[{"key":"pMP","value":[0,0.1]}]},
+            {"type":"item","name":"Mana Elixir","conditions":[{"key":"pMP","value":[0,0.2]}]},
+            {"type":"stop","customMessage":"Can't use Mana Elixir","conditions":[{"key":"pMP","value":[0,0.2]}]},
             {"type":"item","name":"Mystic Gem","conditions":[{"key":"pIgnoredEffects","value":[0,9999,"Channeling"]}]},
             {"type":"spellSupport","name":"Heartseeker","conditions":[{"key":"pEffects","value":[0,9999,"Channeling"]},{"key":"pEffects","value":[-1,100,"Heartseeker"]}]},
             {"type":"spellSupport","name":"Regen","conditions":[{"key":"pEffects","value":[0,9999,"Channeling"]},{"key":"pEffects","value":[-1,50,"Regen"]}]},
@@ -191,8 +191,8 @@ let defaultCfgBattle = {
             {"type":"stop","customMessage":"Can't use Health Elixir","conditions":[{"key":"pHP","value":[0,0.4]}]},
             {"type":"item","name":"Mana Gem","conditions":[{"key":"pMP","value":[0,0.8]}]},
             {"type":"item","name":"Mana Potion","conditions":[{"key":"pMP","value":[0,0.4]}]},
-            {"type":"item","name":"Mana Elixir","conditions":[{"key":"pMP","value":[0,0.1]}]},
-            {"type":"stop","customMessage":"Can't use Mana Elixir","conditions":[{"key":"pMP","value":[0,0.1]}]},
+            {"type":"item","name":"Mana Elixir","conditions":[{"key":"pMP","value":[0,0.2]}]},
+            {"type":"stop","customMessage":"Can't use Mana Elixir","conditions":[{"key":"pMP","value":[0,0.2]}]},
             {"type":"item","name":"Mystic Gem","conditions":[{"key":"pIgnoredEffects","value":[0,9999,"Channeling"]}]},
             {"type":"spellSupport","name":"Arcane Focus","conditions":[{"key":"pEffects","value":[0,9999,"Channeling"]},{"key":"pEffects","value":[-1,100,"Arcane Focus"]}]},
             {"type":"spellSupport","name":"Regen","conditions":[{"key":"pEffects","value":[0,9999,"Channeling"]},{"key":"pEffects","value":[-1,50,"Regen"]}]},
@@ -2003,6 +2003,7 @@ let regExp = {
 let log;
 let battleStyle = '';
 let battleType = '';
+let worldLevel = 0;
 let towerFloor = 0;
 let roundInfo = { current: 0, total: 0 }
 let monsterData = [];
@@ -2062,7 +2063,6 @@ const effectSrc = {
     'Confused': { scr: '/y/e/confuse.png' },
     'Blinded': { scr: '/y/e/blind.png' },
     'Silenced': { scr: '/y/e/silence.png' },
-    'Magically Snared': { scr: '/y/e/magnet.png' },
     'Immobilized': { scr: '/y/e/magnet.png' },
     'Stunned': { scr: '/y/e/wpn_stun.png' },
     'Penetrated Armor': { scr: '/y/e/wpn_ap.png' },
@@ -2137,18 +2137,19 @@ const SKILLS = ['Shield Bash', 'Vital Strike', 'Merciful Blow', 'Iris Strike', '
 const SPELLS_SUPPORT = ['Cure', 'Full-Cure', 'Regen', 'Haste', 'Protection', 'Absorb', 'Shadow Veil', 'Spark of Life', 'Spirit Shield', 'Heartseeker', 'Arcane Focus'];
 const ITEMS = ['Mystic Gem', 'Health Gem', 'Health Draught', 'Health Potion', 'Health Elixir', 'Mana Gem', 'Mana Draught', 'Mana Potion', 'Mana Elixir',
     'Spirit Gem', 'Spirit Draught', 'Spirit Potion', 'Spirit Elixir', 'Last Elixir', 'Infusion of Flames', 'Infusion of Frost', 'Infusion of Storms', 'Infusion of Lightning',
-    'Infusion of Divinity', 'Infusion of Darkness',    'Scroll of Swiftness', 'Scroll of Protection', 'Scroll of the Avatar', 'Scroll of Absorption', 'Scroll of Shadows',
-    'Scroll of Life', 'Scroll of the Gods',    'Caffeinated Candy', 'Energy Drink', 'Flower Vase', 'Bubble-Gum'];
+    'Infusion of Divinity', 'Infusion of Darkness', 'Scroll of Swiftness', 'Scroll of Protection', 'Scroll of the Avatar', 'Scroll of Absorption', 'Scroll of Shadows',
+    'Scroll of Life', 'Scroll of the Gods', 'Caffeinated Candy', 'Energy Drink', 'Flower Vase', 'Bubble-Gum'];
 const SPELLS_DAMAGE = ['T1', 'T2', 'T3', 'Fiery Blast', 'Inferno', 'Flames of Loki', 'Freeze', 'Blizzard', 'Fimbulvetr', 'Gale', 'Downburst', 'Storms of Njord',
     'Shockblast', 'Chained Lightning', 'Wrath of Thor', 'Smite', 'Banishment', 'Paradise Lost', 'Corruption', 'Disintegrate', 'Ragnarok'];
-const SPELLS_DEBUFF = ['Drain', 'Weaken', 'Imperil', 'Slow', 'Sleep', 'Confuse', 'Blind', 'Silence', 'MagNet', 'Immobilize'];
+const SPELLS_DEBUFF = ['Drain', 'Weaken', 'Imperil', 'Slow', 'Sleep', 'Confuse', 'Blind', 'Silence', 'Immobilize'];
 
 const CTRLWIDGET_FIELDS = [
     { id: 'isActiveBattle', get: () => isActiveBattle ? t('cW.auto') : t('cW.manual') },
     { id: 'readyNext', get: () => readyNext },
     { id: 'networkDelay', get: () => (lastLogTimestamp > lastActionTimestamp ? lastLogTimestamp - lastActionTimestamp : '-') },
     { id: 'battleStyle', get: () => t(`cW.${battleStyle}`) + (/Staff|Mage/.test(battleStyle) ? ` (${t(`cW.${spellDamageBonus.maxType}`)})` : '') },
-    { id: 'battleType', get: () => t(`cW.${battleType}`) + (towerFloor ? ` (${towerFloor}F)` : '') },
+    { id: 'battleType', get: () => t(`cW.${battleType}`) + (worldLevel ? ` (WL${worldLevel})` : '') + (towerFloor ? ` (${towerFloor}F)` : '') },
+    { id: 'battleMode', get: () => getBattleMode() },
     { id: 'round', get: () => roundInfo.total ? `${roundInfo.current} / ${roundInfo.total}` : '-' },
 ].map(f => ({ ...f, label: `cW.${f.id}` }));
 const COMBAT_FIELDS = [
@@ -2258,10 +2259,10 @@ const REVENUE_FIELDS = [
 ].map(f => ({ ...f, label: `rP.${f.id}` }));
 const sumRevenueCategory = (record, category) => {
     let data = record.revenueRecords?.[category];
-    if (!data) return '0';
+    if (!data) return 0;
     let total = 0;
     for (const [key, value] of Object.entries(data)) {
-        if (key !== 'total' && key !== 'profit') total += value;
+        if (key !== 'total' && key !== 'profit') total += toStatsNumber(value);
     }
     return Math.round(total * 100) / 100;
 };
@@ -2278,16 +2279,16 @@ const sumTrophies = (record, type) => {
         let isT2 = TROPHIES_T2.includes(key);
         switch (type) {
             case 'lesserCharm':
-                if (isLesser) total += value;
+                if (isLesser) total += toStatsNumber(value);
                 break;
             case 'greaterCharm':
-                if (isGreater) total += value;
+                if (isGreater) total += toStatsNumber(value);
                 break;
             case 'T2':
-                if (isT2) total += value;
+                if (isT2) total += toStatsNumber(value);
                 break;
             case 'T36':
-                if (!isT2 && !isLesser && !isGreater) total += value;
+                if (!isT2 && !isLesser && !isGreater) total += toStatsNumber(value);
                 break;
         }
     }
@@ -2296,15 +2297,34 @@ const sumTrophies = (record, type) => {
 const getConsumable = (record, field) => {
     let item = record.revenueRecords?.consumable?.[field];
     if (!item) return { drop: 0, use: 0, balance: 0 };
-    return { drop: item.drop || 0, use: item.use || 0, balance: item.balance || 0 };
+    return {
+        drop: toStatsNumber(item.drop),
+        use: toStatsNumber(item.use),
+        balance: toStatsNumber(item.balance),
+    };
+};
+const toStatsNumber = value => {
+    const number = Number(value);
+    return Number.isFinite(number) ? number : 0;
+};
+const getEquipmentData = value => {
+    if (Array.isArray(value)) return { count: value.length, names: value.filter(name => typeof name === 'string' && name.trim()) };
+    if (value && typeof value === 'object') {
+        const names = Array.isArray(value.names) ? value.names.filter(name => typeof name === 'string' && name.trim()) : [];
+        return { count: Math.max(toStatsNumber(value.count), names.length), names };
+    }
+    return { count: Math.max(0, toStatsNumber(value)), names: [] };
 };
 const getEquipmentCount = (record, quality) => {
-    let value = record.revenueRecords?.equipment?.[quality];
-    if (Array.isArray(value)) return value.length;
-    return typeof value === 'number' ? value : 0;
+    return getEquipmentData(record?.revenueRecords?.equipment?.[quality]).count;
 };
+const getEquipmentNames = (record, quality) => getEquipmentData(record?.revenueRecords?.equipment?.[quality]).names;
 const STATS_FIELDS = [
-    { id: 'date', get: d => d.date || '' },
+    { id: 'date', get: d => d?.date || '' },
+    { id: 'battleType', get: d => {
+        const battleTypeText = d?.battleType ? t(`sP.${d.battleType}`) : '';
+        return battleTypeText + (d?.worldLevel ? ` (WL${d.worldLevel})` : '') + (d?.towerFloor ? ` (${d.towerFloor}F)` : '');
+    } },
     { id: 'round', get: d => d.roundInfo?.current || '' },
     { id: 'deltaTime', get: d => d.deltaTime || '' },
     { id: 'turns', style: 'min-width: 60px;', get: d => d.turns || '' },
@@ -2510,6 +2530,7 @@ const mkItem = (type, nameList = null, extra = [], useGeneral = true, useTarget 
 const conditionsGeneral = [
     mkF('world', 'array', { multiSelectOptions: ['Persistent', 'Isekai'], itemSchema: { type: 'text' } }),
     mkF('pLevel', 'rangeNumber'),
+    mkF('pMaxSpellType', 'array', { multiSelectOptions: Object.keys(spellsDamageObj), popup: true, itemSchema: { type: 'text' } }),
     mkF('battleTypes', 'array', { multiSelectOptions: BATTLE_TYPES, popup: true, itemSchema: { type: 'text' } }),
     mkF('difficulty', 'array', { multiSelectOptions: Object.keys(difficultyMap), popup: true, itemSchema: { type: 'text' } }),
     mkF('roundCurrent', 'rangeNumber'),
@@ -2757,6 +2778,7 @@ const I18N = (() => {
 			"holy": "圣",
 			"dark": "暗",
 			"battleType": "战斗类型",
+            "battleMode": "战斗模式",
 			"Arena": "竞技场",
 			"Encounter": "随机遭遇",
 			"Colosseum": "浴血擂台",
@@ -2767,7 +2789,8 @@ const I18N = (() => {
             "toggleAutoOn": "启动自动",
             "toggleAutoOff": "暂停自动",
             "dragToMove": "可拖动区域",
-			"openSettings": "打开设定"
+			"openSettings": "打开设定",
+            "openStats": "统计"
 		},
 		"cGen": {
 			"saved!": "已储存",
@@ -2878,6 +2901,7 @@ const I18N = (() => {
 			"Persistent": "主世界",
 			"Isekai": "异世界",
 			"pLevel": "玩家等级范围",
+            "pMaxSpellType": "玩家最高法术类型",
 			"battleTypes": "战斗类型",
 			"Arena": "竞技场",
 			"Encounter": "随机遭遇",
@@ -3001,7 +3025,6 @@ const I18N = (() => {
 			"Confused": "混乱",
 			"Blinded": "致盲",
 			"Silenced": "沉默",
-			"Magically Snared": "魔磁网",
 			"Immobilized": "定身",
 			"Stunned": "晕眩",
 			"Penetrated Armor": "破甲",
@@ -3111,7 +3134,6 @@ const I18N = (() => {
 			"Confuse": "混乱",
 			"Blind": "致盲",
 			"Silence": "沉默",
-			"MagNet": "魔磁网",
 			"Immobilize": "定身",
 			"exportCurrentBattleMode": "导出当前战斗模式",
 			"resetCurrentBattleMode": "重置当前战斗模式",
@@ -3490,29 +3512,51 @@ function initDo() {
 
     //Lobby
     if (!log) {
-        let difficulty = localStorage.getItem(prefix + 'difficulty' + isekaiSuffix) || 'undefined';
-        let playerLevel = parseInt(localStorage.getItem(prefix + 'playerLevel' + isekaiSuffix)) || 0;
-        let persona = localStorage.getItem(prefix + 'persona' + isekaiSuffix) || 'undefined';
-        let stamina = parseFloat(localStorage.getItem(prefix + 'stamina' + isekaiSuffix)) || 80;
+        if (
+            (queriesObj.s === 'Bazaar' && queriesObj.ss === 'am' && queriesObj.screen === 'modify') ||
+            (queriesObj.s === 'Battle' && queriesObj.ss === 'iw')
+        ) {
+            let updateItemWorldInfo = () => {
+                let iwinfo = document.getElementById('iwinfo');
+                if (!iwinfo) return;
+
+                let info = {};
+                iwinfo.querySelectorAll('tr').forEach(tr => {
+                    let [keyTd, valueTd] = tr.querySelectorAll('td');
+                    if (keyTd && valueTd) info[keyTd.textContent.slice(0, -1)] = valueTd.textContent;
+                });
+
+                if (info['World Level']) localStorage.setItem(prefix + 'worldLevel' + isekaiSuffix, info['World Level']);
+                let difficulty = info['Difficulty']?.split(' ')[0];
+                if (difficulty) localStorage.setItem(prefix + 'difficulty' + isekaiSuffix, difficulty);
+            };
+            updateItemWorldInfo();
+
+            let equipForm = document.querySelector('#equipform');
+            if (equipForm) {
+                let observer = new MutationObserver(updateItemWorldInfo);
+                observer.observe(equipForm, { childList: true, subtree: true });
+            }
+        }
 
         if (queriesObj.s === 'Battle') {
             let levelReadout = document.querySelector('#level_readout > div > div')?.innerText;
             let playerInfo = levelReadout.match(regExp.playerInfo);
             if (playerInfo) {
-                if (difficulty != playerInfo[1]) {
-                    localStorage.setItem(prefix + 'difficulty' + isekaiSuffix, playerInfo[1]);
-                }
-                if (playerLevel != playerInfo[1]) {
-                    localStorage.setItem(prefix + 'playerLevel' + isekaiSuffix, playerInfo[2]);
-                }
+                let difficulty = localStorage.getItem(prefix + 'difficulty' + isekaiSuffix) || 'undefined';
+                let playerLevel = parseInt(localStorage.getItem(prefix + 'playerLevel' + isekaiSuffix)) || 0;
+                if (difficulty != playerInfo[1]) localStorage.setItem(prefix + 'difficulty' + isekaiSuffix, playerInfo[1]);
+                if (playerLevel != playerInfo[1]) localStorage.setItem(prefix + 'playerLevel' + isekaiSuffix, playerInfo[2]);
             }
             let staminaReadout = document.querySelector('#stamina_readout > div > div')?.innerText;
             let staminaInfo = staminaReadout.match(regExp.staminaInfo)?.[1];
-            if (staminaInfo && stamina != staminaInfo) {
-                localStorage.setItem(prefix + 'stamina' + isekaiSuffix, staminaInfo);
+            if (staminaInfo) {
+                let stamina = parseFloat(localStorage.getItem(prefix + 'stamina' + isekaiSuffix)) || 80;
+                if (stamina != staminaInfo) localStorage.setItem(prefix + 'stamina' + isekaiSuffix, staminaInfo);
             }
         }
 
+        let persona = localStorage.getItem(prefix + 'persona' + isekaiSuffix) || 'undefined';
         let personaSelected = document.querySelector('#persona_form > select > option[selected]')?.innerText;
         if (personaSelected && persona != personaSelected) {
             localStorage.setItem(prefix + 'persona' + isekaiSuffix, personaSelected);
@@ -3568,7 +3612,7 @@ function initDoBattle() {
     } = getActionCooldowns();
     let spells = Object.keys(spellCooldowns);
     if (spells.includes('Shield Bash')) {
-        battleStyle = spellDamageBonus.maxValue <= 100 ? 'OneHanded' : '1H_Mage';
+        battleStyle = spellDamageBonus.maxValue <= 70 ? 'OneHanded' : '1H_Mage';
     } else if (spells.includes('Great Cleave')) {
         battleStyle = spellDamageBonus.maxValue <= 100 ? 'TwoHanded' : '2H_Mage';
     } else if (spells.includes('Iris Strike')) {
@@ -3608,16 +3652,28 @@ function initDoBattle() {
         battleType = localStorage.getItem(prefix + 'battleType' + isekaiSuffix) || '';
     }
 
-    //Tower Floor
-    if (battleType === 'Tower') {
-        if (towerFloor) {
-            localStorage.setItem(prefix + 'towerFloor' + isekaiSuffix, towerFloor);
-        } else {
-            towerFloor = parseInt(localStorage.getItem(prefix + 'towerFloor' + isekaiSuffix)) || 0;
-        }
+    //World Level / Tower Floor
+    if (battleType === 'Item') {
+        worldLevel = parseInt(localStorage.getItem(prefix + 'worldLevel' + isekaiSuffix)) || 0;
+    } else if (battleType === 'Tower') {
+        if (towerFloor) localStorage.setItem(prefix + 'towerFloor' + isekaiSuffix, towerFloor);
+        else towerFloor = parseInt(localStorage.getItem(prefix + 'towerFloor' + isekaiSuffix)) || 0;
+
+        let difficulty = 'PFUDOR';
+        if (jpxUtils.inRange(towerFloor, [1, 6])) difficulty = 'Normal';
+        else if (jpxUtils.inRange(towerFloor, [7, 13])) difficulty = 'Hard';
+        else if (jpxUtils.inRange(towerFloor, [14, 19])) difficulty = 'Nightmare';
+        else if (jpxUtils.inRange(towerFloor, [20, 26])) difficulty = 'Hell';
+        else if (jpxUtils.inRange(towerFloor, [27, 33])) difficulty = 'Nintendo';
+        else if (jpxUtils.inRange(towerFloor, [34, 39])) difficulty = 'IWBTH';
+        localStorage.setItem(prefix + 'difficulty' + isekaiSuffix, difficulty);
     }
 
     preDoBattle();
+
+    if (battleType === 'Arena' && roundInfo.total >= 90) {
+        localStorage.setItem(prefix + 'difficulty' + isekaiSuffix, 'PFUDOR');
+    }
 }
 
 function preDoBattle() {
@@ -3768,6 +3824,164 @@ function preRender() {
     goNext();
 }
 
+const ajaxRoundNativeHandlers = new WeakMap();
+
+function bindAjaxRiddleForm(riddleForm) {
+    if (!riddleForm || riddleForm.dataset.jpxAjaxBound === '1') return;
+    riddleForm.dataset.jpxAjaxBound = '1';
+
+    let submitting = false;
+    let resetTimer;
+
+    riddleForm.addEventListener('submit', event => {
+        event.preventDefault();
+        if (submitting) return;
+
+        submitting = true;
+        resetTimer = setTimeout(() => { submitting = false; }, 10000);
+
+        let formData = new FormData(riddleForm);
+        let submitBtn = event.submitter || riddleForm.querySelector('#riddlesubmit') || document.querySelector('#riddlesubmit');
+        if (submitBtn?.name && !formData.has(submitBtn.name)) {
+            formData.append(submitBtn.name, submitBtn.value);
+        }
+
+        fetch(riddleForm.action || location.href, {
+            method: 'POST',
+            body: new URLSearchParams(formData),
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Cache-Control': 'max-age=0',
+            },
+        })
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                if (response.redirected) {
+                    location.href = response.url;
+                    return null;
+                }
+                return response.text();
+            })
+            .then(html => {
+                if (html === null) return;
+                replaceBattleMain(new DOMParser().parseFromString(html, 'text/html'));
+            })
+            .catch(err => {
+                console.error('Riddle submission failed:', err);
+                jpxUtils.createToast('Riddle submission failed: ' + err.message);
+            })
+            .finally(() => {
+                submitting = false;
+                clearTimeout(resetTimer);
+            });
+    });
+}
+
+function replaceBattleMain(doc) {
+    let main = document.querySelector('#battle_main');
+    let mainNew = doc.querySelector('#battle_main');
+    if (mainNew && typeof window.Battle !== 'function') {
+        throw new Error('Battle constructor is unavailable');
+    }
+
+    document.querySelector('#riddle-panel')?.remove();
+    clearInterval(window.timer);
+
+    if (main && mainNew) {
+        main.replaceWith(mainNew);
+    } else if (doc.body) {
+        document.body.innerHTML = doc.body.innerHTML;
+    } else {
+        throw new Error('AJAX response does not contain a page body');
+    }
+
+    if (mainNew) {
+        let latestTimer = setTimeout(() => {}, 0);
+        for (let timerId = latestTimer; timerId > 0 && timerId > latestTimer - 100; timerId--) {
+            clearInterval(timerId);
+        }
+        window.battle = new window.Battle();
+    }
+
+    document.dispatchEvent(new Event('DOMContentLoaded'));
+}
+
+function showAjaxRiddle(doc) {
+    document.querySelector('#riddle-panel')?.remove();
+
+    let riddlePanel = document.createElement('div');
+    riddlePanel.id = 'riddle-panel';
+    riddlePanel.style.cssText = 'position:fixed; top:0; left:0; z-index:9999; border:2px solid black; overflow:auto;';
+    riddlePanel.appendChild(document.importNode(doc.body, true));
+    document.body.appendChild(riddlePanel);
+
+    bindAjaxRiddleForm(riddlePanel.querySelector('#riddleform'));
+
+    let sourceScript = Array.from(doc.scripts || []).find(script => script.textContent.includes('riddleform'));
+    let mainPane = riddlePanel.querySelector('#mainpane');
+    if (sourceScript && mainPane) {
+        let script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.textContent = sourceScript.textContent.replace(
+            'e("riddleform").submit();',
+            'e("riddleform")?.requestSubmit();'
+        );
+        mainPane.appendChild(script);
+    }
+
+    document.dispatchEvent(new Event('DOMContentLoaded'));
+}
+
+async function advanceRoundWithAjax(btcp) {
+    if (btcp.dataset.jpxAjaxPending === '1') return;
+
+    let previousVisibility = btcp.style.visibility;
+    btcp.dataset.jpxAjaxPending = '1';
+    btcp.style.visibility = 'hidden';
+
+    try {
+        let response = await fetch(location.href, {
+            method: 'GET',
+            credentials: 'same-origin',
+            cache: 'no-store',
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        let html = await response.text();
+        let doc = new DOMParser().parseFromString(html, 'text/html');
+        if (doc.querySelector('#riddlemaster')) showAjaxRiddle(doc);
+        else replaceBattleMain(doc);
+    } catch (err) {
+        console.error('AJAX round transition failed:', err);
+        if (document.contains(btcp)) {
+            delete btcp.dataset.jpxAjaxPending;
+            btcp.style.visibility = previousVisibility;
+        }
+        jpxUtils.createToast('AJAX round transition failed: ' + err.message);
+    }
+}
+
+function configureAjaxRound(btcp) {
+    if (!cfgBattle.ajaxRound) {
+        if (ajaxRoundNativeHandlers.has(btcp)) {
+            btcp.onclick = ajaxRoundNativeHandlers.get(btcp);
+            ajaxRoundNativeHandlers.delete(btcp);
+            delete btcp.dataset.jpxAjaxRound;
+        }
+        return;
+    }
+    if (ajaxRoundNativeHandlers.has(btcp)) return;
+
+    ajaxRoundNativeHandlers.set(btcp, btcp.onclick);
+    btcp.dataset.jpxAjaxRound = '1';
+    btcp.onclick = event => {
+        event?.preventDefault();
+        void advanceRoundWithAjax(btcp);
+        return false;
+    };
+}
+
 function goNext() {
     if (isActiveBattle) {
         jpxPanelManager.setBackground('active');
@@ -3776,9 +3990,12 @@ function goNext() {
         let btcp = document.querySelector('#btcp');
         let finishBattle = document.querySelector('img[src$="finishbattle.png"]');
         if (!monstersObj.activeMonsters[0]) {
-            if (cfgBattle.advanceToNextRound && btcp && !finishBattle) {
-                btcp.click();
-                btcp.style.visibility = 'hidden';
+            if (btcp && !finishBattle) {
+                configureAjaxRound(btcp);
+                if (cfgBattle.advanceToNextRound) {
+                    btcp.click();
+                    btcp.style.visibility = 'hidden';
+                }
             }
             return;
         }
@@ -4574,23 +4791,9 @@ function checkConditions(conditions, target, checkGlobal = true, checkTarget = t
     const generalHandlers = {
         world: arr => arr.includes(!isekaiSuffix ? 'Persistent' : 'Isekai'),
         pLevel: range => jpxUtils.inRange(parseInt(localStorage.getItem(prefix + 'playerLevel' + isekaiSuffix) || 1), range),
+        pMaxSpellType: arr => arr.includes(spellDamageBonus.maxType),
         battleTypes: arr => arr.includes(battleType),
-        difficulty: arr => {
-            let difficulty;
-            if (battleType === 'Tower') {
-                if (jpxUtils.inRange(towerFloor, [1, 6])) difficulty = 'Normal';
-                else if (jpxUtils.inRange(towerFloor, [7, 13])) difficulty = 'Hard';
-                else if (jpxUtils.inRange(towerFloor, [14, 19])) difficulty = 'Nightmare';
-                else if (jpxUtils.inRange(towerFloor, [20, 26])) difficulty = 'Hell';
-                else if (jpxUtils.inRange(towerFloor, [27, 33])) difficulty = 'Nintendo';
-                else if (jpxUtils.inRange(towerFloor, [34, 39])) difficulty = 'IWBTH';
-                else difficulty = 'PFUDOR';
-            } else {
-                difficulty = localStorage.getItem(prefix + 'difficulty' + isekaiSuffix) || 'PFUDOR';
-            }
-
-            return arr.includes(difficulty);
-        },
+        difficulty: arr => arr.includes(localStorage.getItem(prefix + 'difficulty' + isekaiSuffix) || 'PFUDOR'),
         roundCurrent: range => jpxUtils.inRange(roundInfo.current, range),
         roundLeft: range => jpxUtils.inRange(roundInfo.total - roundInfo.current, range),
         roundTotal: range => jpxUtils.inRange(roundInfo.total, range),
@@ -5516,7 +5719,7 @@ function revenueRecorder(turnLog, action, use) {
     }
 }
 
-async function battleRecordPlayer() {
+async function battleRecordPlayer(doFinal = true) {
     if (Object.keys(cfgStats).length < 1) {
         let storedCfgStats = {};
         try {
@@ -5531,8 +5734,8 @@ async function battleRecordPlayer() {
     let startTime = timeRecords['startTime'] || 0;
     let timestamp = new Date(timeRecords['startTime']).toISOString().slice(0, 19).replace('T', ' ');
     let date = timestamp.slice(0, 10);
-    let result = 'undefined';
-    if (log.innerHTML.includes('You are Victorious!')) {
+    let result = 'inProgress';
+    if (log.innerHTML.includes('You are Victorious!') && roundInfo.current === roundInfo.total) {
         result = 'Victory';
     } else if (log.innerHTML.includes('You have been defeated.')) {
         result = 'Defeat';
@@ -5545,8 +5748,9 @@ async function battleRecordPlayer() {
     let tps = Math.round(action / deltaSeconds * 100) / 100;
 
     //revenueRecords
-    let priceData = await jpxMarket.getMarketPrice();
-    for (const [categoryKey, categoryValue] of Object.entries(revenueRecords)) {
+    let priceData = await jpxMarket.getMarketPrice(doFinal);
+    let revenueSnapshot = JSON.parse(JSON.stringify(revenueRecords));
+    for (const [categoryKey, categoryValue] of Object.entries(revenueSnapshot)) {
         switch (categoryKey) {
             case ('proficiency'):
                 for (const [key, value] of Object.entries(categoryValue)) {
@@ -5579,12 +5783,12 @@ async function battleRecordPlayer() {
         }
         if (categoryValue?.['profit']) {
             categoryValue['profit'] = Math.round(categoryValue['profit'] * 10) / 10;
-            revenueRecords['totalProfit'] += categoryValue['profit'];
+            revenueSnapshot['totalProfit'] += categoryValue['profit'];
         }
     }
 
-    revenueRecords['totalProfit'] += revenueRecords['credit'] || 0;
-    revenueRecords['totalProfit'] = Math.round(revenueRecords['totalProfit']);
+    revenueSnapshot['totalProfit'] += revenueSnapshot['credit'] || 0;
+    revenueSnapshot['totalProfit'] = Math.round(revenueSnapshot['totalProfit']);
 
     //Stamina
     let stamina = parseFloat(localStorage.getItem(prefix + 'stamina' + isekaiSuffix)) || 80;
@@ -5613,19 +5817,21 @@ async function battleRecordPlayer() {
     let staminaQuota = 24 + (!isekaiSuffix ? cfgBattle.dailyStaminaQuotaPlus : 0) - staminaRecords.staminaCost;
     if (staminaCost > staminaQuota) {
         if (staminaQuota > 0) {
-            revenueRecords['staminaCost'] = Math.round((staminaCost - staminaQuota) * 10) / 10;
+            revenueSnapshot['staminaCost'] = Math.round((staminaCost - staminaQuota) * 10) / 10;
         } else {
-            revenueRecords['staminaCost'] = Math.round(staminaCost * 10) / 10;
+            revenueSnapshot['staminaCost'] = Math.round(staminaCost * 10) / 10;
         }
     } else {
-        revenueRecords['staminaCost'] = 0;
+        revenueSnapshot['staminaCost'] = 0;
     }
-    staminaRecords.staminaCost = Math.round((staminaRecords.staminaCost + staminaCost) * 10) / 10;
-    localStorage.setItem(prefix + 'staminaRecords' + isekaiSuffix, JSON.stringify(staminaRecords));
+    if (doFinal) {
+        staminaRecords.staminaCost = Math.round((staminaRecords.staminaCost + staminaCost) * 10) / 10;
+        localStorage.setItem(prefix + 'staminaRecords' + isekaiSuffix, JSON.stringify(staminaRecords));
+    }
     //Final Profit
     let staminaUnitPrice = priceData['Energy Drink'] / 10;
-    let staminaProfit = Math.round(-revenueRecords['staminaCost'] * staminaUnitPrice * 10) / 10;
-    revenueRecords['finalProfit'] = Math.round((revenueRecords['totalProfit'] + staminaProfit) * 10) / 10;
+    let staminaProfit = Math.round(-revenueSnapshot['staminaCost'] * staminaUnitPrice * 10) / 10;
+    revenueSnapshot['finalProfit'] = Math.round((revenueSnapshot['totalProfit'] + staminaProfit) * 10) / 10;
 
     let battleRecords = {
         world: !isekaiSuffix ? 'Persistent' : 'Isekai',
@@ -5635,6 +5841,7 @@ async function battleRecordPlayer() {
         difficulty: difficultyMap[localStorage.getItem(prefix + 'difficulty' + isekaiSuffix)] || 0,
         persona: localStorage.getItem(prefix + 'persona' + isekaiSuffix),
         battleType: battleType,
+        worldLevel: worldLevel,
         towerFloor: towerFloor,
         roundInfo: roundInfo,
         result: result,
@@ -5644,36 +5851,38 @@ async function battleRecordPlayer() {
         tps: tps,
         riddle: timeRecords.riddle.total,
         combatRecords: combatRecords,
-        revenueRecords: revenueRecords,
+        revenueRecords: revenueSnapshot,
     }
 
-    timeRecordPlayer(battleRecords);
-    combatRecordPlayer(combatRecords);
-    revenueRecordPlayer(revenueRecords, priceData);
-    newWindowRecordPlayer(battleRecords);
-    if (cfgBattle.recordBattleLog) battleLogPlayer();
+    if (doFinal) {
+        timeRecordPlayer(battleRecords);
+        combatRecordPlayer(combatRecords);
+        revenueRecordPlayer(revenueSnapshot, priceData);
+        newWindowRecordPlayer(battleRecords);
+        if (cfgBattle.recordBattleLog) battleLogPlayer();
 
-    storeBattleRecords(battleRecords)
-        .then(result => console.log(result))
-        .catch(err => console.error('Save failed: ', err));
+        storeBattleRecords(battleRecords)
+            .then(result => console.log(result))
+            .catch(err => console.error('Save failed: ', err));
+    } else {
+        newWindowRecordPlayer(battleRecords, true);
+    }
 
     cfgBattle.recordBattleLog && console.log(battleLogRecord);
     console.log(timeRecords);
     console.log(combatRecords);
-    console.log(revenueRecords);
+    console.log(revenueSnapshot);
     console.log(battleRecords);
 }
 
-function newWindowRecordPlayer(battleRecords) {
+function newWindowRecordPlayer(battleRecords, openImmediately = false) {
     try {
         const battleRecordsStr = JSON.stringify(battleRecords);
-        const btn = document.createElement('button');
-        btn.textContent = t('sGen.statsTab');
-        btn.style.margin = '5px';
-        btn.addEventListener('click', () => {
+        const openRecordWindow = () => {
             const win = window.open();
             if (!win) return;
-            win.onload = () => {
+
+            const inject = () => {
                 let data = win.document.createElement('script');
                 data.type = 'text/javascript';
                 data.text = `var battleRecords = ${battleRecordsStr};`;
@@ -5683,8 +5892,21 @@ function newWindowRecordPlayer(battleRecords) {
                 win.document.head.append(data);
                 win.document.head.append(script);
             };
-        });
-        
+
+            if (win.document.readyState === 'loading') win.addEventListener('load', inject, { once: true });
+            else inject();
+        };
+
+        if (openImmediately) {
+            openRecordWindow();
+            return;
+        }
+
+        const btn = document.createElement('button');
+        btn.textContent = t('sGen.statsTab');
+        btn.style.margin = '5px';
+        btn.addEventListener('click', openRecordWindow);
+
         const container = document.getElementById('battleRecordsButtons');
         if (container) {
             container.appendChild(btn);
@@ -6075,9 +6297,11 @@ async function storeBattleRecords(battleRecords) {
 
     return new Promise((resolve, reject) => {
         transaction.oncomplete = () => {
+            db.close();
             resolve('Saved successfully');
         };
         transaction.onerror = () => {
+            db.close();
             reject(transaction.error);
         };
     });
@@ -6093,6 +6317,19 @@ function openBattleRecords() {
             storedCfgStats = {};
         }
         mergeCfg(storedCfgStats, defaultCfgStats, cfgStats, 'stats');
+    }
+
+    if (newWindow && !newWindow.closed) {
+        try {
+            if (newWindow.document.body?.dataset.jpxStats === 'true') {
+                newWindow.document.body.classList.toggle('dark-mode', !!cfgStats.darkMode);
+                newWindow.focus();
+                requestStatsRender(true);
+                return;
+            }
+        } catch (error) {
+            console.warn('Unable to reuse the existing stats window:', error);
+        }
     }
 
     newWindow = window.open();
@@ -6111,9 +6348,6 @@ function openBattleRecords() {
             --stats-row-hover: #fffaf0;
             --stats-tooltip-bg: #fffaf0;
             --stats-font: Arial, Helvetica, "Microsoft YaHei", sans-serif;
-            --stats-scroll-track: #ded5bd;
-            --stats-scroll-thumb: #9a8866;
-            --stats-scroll-thumb-hover: #7f6a45;
         }
 
         body.dark-mode {
@@ -6126,97 +6360,118 @@ function openBattleRecords() {
             --stats-accent-soft: #332a1c;
             --stats-row-hover: #2a2a2a;
             --stats-tooltip-bg: #2a2a2a;
-            --stats-scroll-track: #252525;
-            --stats-scroll-thumb: #666;
-            --stats-scroll-thumb-hover: #888;
+        }
+
+        html {
+            height: 100%;
         }
 
         body {
             margin: 0;
-            padding: 10px;
-            text-align: center;
+            height: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            text-align: left;
             background: var(--stats-bg);
             color: var(--stats-text);
             font-family: var(--stats-font);
             font-size: 12px;
         }
 
-        * {
-            scrollbar-width: thin;
-            scrollbar-color: var(--stats-scroll-thumb) var(--stats-scroll-track);
-        }
-
-        *::-webkit-scrollbar {
-            width: 10px;
-            height: 10px;
-        }
-
-        *::-webkit-scrollbar-track {
-            background: var(--stats-scroll-track);
-            border-radius: 0;
-        }
-
-        *::-webkit-scrollbar-thumb {
-            background: var(--stats-scroll-thumb);
-            border-radius: 0;
-        }
-
-        *::-webkit-scrollbar-thumb:hover {
-            background: var(--stats-scroll-thumb-hover);
+        button,
+        input,
+        summary {
+            font: inherit;
         }
 
         #filtersDiv {
-            margin: 0 auto 12px;
-            width: fit-content;
-            max-width: 100%;
+            position: relative;
+            z-index: 10;
+            flex: 0 0 auto;
+            width: 100%;
+            box-sizing: border-box;
             display: flex;
             flex-wrap: wrap;
-            justify-content: center;
-            align-items: flex-start;
-            gap: 10px;
-            padding: 6px;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 6px;
             border: 1px solid var(--stats-border);
-            border-radius: 0;
             background: var(--stats-panel);
         }
 
         #filtersDiv .filter-group {
-            min-width: 128px;
-            border-radius: 0;
-            border: 1px solid var(--stats-border);
-            background: var(--stats-accent-soft);
-            overflow: hidden;
+            position: relative;
+            min-width: 0;
         }
 
         #filtersDiv .filter-group > summary {
+            height: 26px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
             list-style: none;
             cursor: pointer;
             user-select: none;
-            padding: 4px 8px;
+            padding: 0 7px;
+            border: 1px solid var(--stats-border);
+            background: var(--stats-accent-soft);
             color: var(--stats-text);
             font-weight: 700;
-            text-align: left;
-            border-bottom: 1px solid var(--stats-border);
         }
 
         #filtersDiv .filter-group > summary::-webkit-details-marker {
             display: none;
         }
 
-        #filtersDiv .filter-group[open] > summary {
-            border-bottom-color: var(--stats-border);
+        #filtersDiv .filter-group > summary::after {
+            content: '▾';
+            color: var(--stats-muted);
+            font-size: 10px;
         }
 
         #filtersDiv .filter-group > summary:hover {
             background: var(--stats-row-hover);
         }
 
-        #filtersDiv .filter-options {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 6px;
-            padding: 6px;
+        #filtersDiv .filter-value {
+            max-width: 96px;
+            overflow: hidden;
+            color: var(--stats-muted);
+            font-weight: 400;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        #filtersDiv .filter-menu {
+            position: absolute;
+            top: calc(100% + 2px);
+            left: 0;
+            z-index: 20;
+            min-width: 150px;
+            max-width: calc(100vw - 24px);
+            max-height: min(320px, calc(100vh - 72px));
+            display: grid;
+            gap: 1px;
+            overflow: auto;
+            padding: 3px;
+            border: 1px solid var(--stats-border);
+            background: var(--stats-panel);
+        }
+
+        #filtersDiv .filter-group:not([open]) > .filter-menu {
+            display: none;
+        }
+
+        #filtersDiv .filter-option {
+            min-height: 25px;
+            padding: 2px 5px;
+        }
+
+        #filtersDiv .filter-option:hover {
+            background: var(--stats-row-hover);
         }
 
         #filtersDiv label {
@@ -6228,15 +6483,23 @@ function openBattleRecords() {
             white-space: nowrap;
         }
 
+        #filtersDiv .filter-toggle,
+        #filtersDiv .filter-inline {
+            min-height: 26px;
+            padding: 0 6px;
+            border: 1px solid var(--stats-border);
+            background: var(--stats-accent-soft);
+        }
+
         #filtersDiv input[type="checkbox"] {
+            margin: 0;
             accent-color: var(--stats-accent);
         }
 
         #filtersDiv input[type="number"] {
-            width: 72px;
-            height: 24px;
+            width: 58px;
+            height: 22px;
             border: 1px solid var(--stats-border);
-            border-radius: 0;
             background: var(--stats-panel);
             color: var(--stats-text);
             text-align: right;
@@ -6251,26 +6514,40 @@ function openBattleRecords() {
             border-color: var(--stats-accent);
         }
 
+        #statsStatus {
+            margin-left: auto;
+            padding: 0 3px;
+            color: var(--stats-muted);
+            white-space: nowrap;
+        }
+
+        #statsStatus[data-state="error"] {
+            color: var(--stats-accent);
+        }
+
         #battleStatsWrap {
-            margin: 10px auto 0;
-            width: min(100%, calc(100vw - 32px));
-            max-height: 72vh;
+            flex: 1 1 auto;
+            min-height: 0;
+            width: 100%;
+            box-sizing: border-box;
+            margin-top: 6px;
             overflow: auto;
-            border-radius: 0;
+            border: 1px solid var(--stats-border);
+            background: var(--stats-panel);
         }
 
         #battleStatsTable {
             border-collapse: collapse;
             border-spacing: 0;
-            table-layout: fixed;
+            table-layout: auto;
+            width: max-content;
+            min-width: 100%;
             margin: 0;
-            border: 1px solid var(--stats-border);
             background: var(--stats-panel);
-            min-width: max-content;
         }
 
         #battleStatsTable tr {
-            font-size: 80%;
+            font-size: 11px;
         }
 
         #battleStatsTable tbody tr:hover {
@@ -6283,6 +6560,7 @@ function openBattleRecords() {
             padding: 3px 5px;
             white-space: nowrap;
             border: 1px solid var(--stats-border);
+            text-align: right;
         }
 
         #battleStatsTable th {
@@ -6295,8 +6573,35 @@ function openBattleRecords() {
             font-weight: 700;
         }
 
+        #battleStatsTable [data-field="date"],
+        #battleStatsTable [data-field="battleType"] {
+            text-align: left;
+        }
+
+        #battleStatsTable .stats-summary {
+            background: var(--stats-accent-soft);
+            font-weight: 700;
+        }
+
+        #battleStatsTable .stats-average td {
+            border-bottom-width: 2px;
+        }
+
+        #battleStatsTable .stats-day {
+            font-weight: 600;
+        }
+
         #battleStatsTable tr:last-child td {
             border-bottom: 0;
+        }
+
+        .stats-empty {
+            min-height: 120px;
+            display: grid;
+            place-items: center;
+            padding: 20px;
+            color: var(--stats-muted);
+            text-align: center;
         }
 
         .tooltip {
@@ -6315,36 +6620,25 @@ function openBattleRecords() {
             text-align: left;
             max-width: calc(100vw - 16px);
             max-height: calc(100vh - 16px);
-            overflow: auto;
+            overflow: hidden;
             pointer-events: none;
             box-sizing: border-box;
+            line-height: 18px;
         }
 
         @media (max-width: 900px) {
             body {
-                padding: 10px;
+                padding: 4px;
                 font-size: 12px;
             }
 
             #filtersDiv {
-                justify-content: stretch;
-                gap: 8px;
-                padding: 8px;
-            }
-
-            #filtersDiv .filter-group {
-                width: 100%;
-            }
-
-            #filtersDiv .filter-options {
                 gap: 4px;
-                padding: 7px;
+                padding: 4px;
             }
 
             #battleStatsWrap {
-                width: 100%;
-                max-height: 70vh;
-                border-radius: 0;
+                margin-top: 4px;
             }
 
             #battleStatsTable td,
@@ -6352,66 +6646,108 @@ function openBattleRecords() {
                 padding: 5px 6px;
                 font-size: 11px;
             }
+
+            #statsStatus {
+                width: 100%;
+                text-align: right;
+            }
         }
     `;
 
+    newWindow.document.body.dataset.jpxStats = 'true';
     cfgStats.darkMode && newWindow.document.body.classList.add('dark-mode');
     newWindow.document.body.appendChild(createFilter());
-    getBattleRecordsRender().then(battleRecords => {
-        renderDynamicTable(battleRecords, cfgStats.statsColumns, newWindow.document.body);
-    });
+    requestStatsRender(true);
 }
 
-async function getBattleRecordsRender() {
+let statsRenderTimer = 0;
+let statsRenderRequestId = 0;
+
+function requestStatsRender(immediate = false) {
+    clearTimeout(statsRenderTimer);
+    const requestId = ++statsRenderRequestId;
+    const status = newWindow?.document?.getElementById('statsStatus');
+    if (status) {
+        status.textContent = '读取中...';
+        status.dataset.state = 'loading';
+    }
+
+    const run = async () => {
+        try {
+            const filters = getFilters();
+            const battleRecords = await getBattleRecordsRender(filters);
+            if (requestId !== statsRenderRequestId || newWindow?.closed) return;
+            renderDynamicTable(battleRecords, cfgStats.statsColumns, newWindow.document.body);
+
+            const dataRows = battleRecords.filter(record => record?.aggregateScope !== 'overall');
+            const battles = dataRows.reduce((sum, record) => sum + (filters.aggregate ? Math.max(1, toStatsNumber(record.sourceCount)) : 1), 0);
+            if (status) {
+                status.textContent = filters.aggregate ? `${dataRows.length} 天 / ${battles} 场` : `${dataRows.length} 场`;
+                status.dataset.state = 'ready';
+            }
+        } catch (error) {
+            if (requestId !== statsRenderRequestId || newWindow?.closed) return;
+            console.error('Failed to load battle stats:', error);
+            renderDynamicTable([], cfgStats.statsColumns, newWindow.document.body, '统计读取失败，请稍后重试');
+            if (status) {
+                status.textContent = '读取失败';
+                status.dataset.state = 'error';
+            }
+        }
+    };
+
+    if (immediate) run();
+    else statsRenderTimer = setTimeout(run, 120);
+}
+
+async function getBattleRecordsRender(filters = getFilters()) {
     const db = await openDB();
-    const transaction = db.transaction('battleRecords', 'readonly');
-    const objectStore = transaction.objectStore('battleRecords');
+    try {
+        const transaction = db.transaction('battleRecords', 'readonly');
+        const objectStore = transaction.objectStore('battleRecords');
+        const source = filters.aggregate ? objectStore.index('date') : objectStore;
+        const battleRecords = [];
+        let count = 0;
 
-    let battleRecords = [];
-    let filters = getFilters();
-    let indexName = filters.aggregate ? 'date' : 'default';
+        await new Promise((resolve, reject) => {
+            const req = source.openCursor(null, 'prevunique');
+            req.onerror = () => reject(req.error || new Error('Failed to read battle records'));
+            req.onsuccess = event => {
+                const cursor = event.target.result;
+                if (!cursor || count >= filters.limit) {
+                    resolve();
+                    return;
+                }
 
-    let keyRange = IDBKeyRange.bound(0, 'z');
-    let source = (indexName === 'default' ? objectStore : objectStore.index(indexName));
-    let i = 0;
+                if (filters.aggregate) {
+                    const dailyReq = objectStore.index('date').getAll(cursor.key);
+                    dailyReq.onerror = () => reject(dailyReq.error || new Error('Failed to read daily battle records'));
+                    dailyReq.onsuccess = () => {
+                        const results = (dailyReq.result || []).filter(record => filterData(record, filters));
+                        if (results.length) {
+                            battleRecords.push(generateAggregate(results, 'Total', results[0].date || String(cursor.key)));
+                            count += 1;
+                        }
+                        cursor.continue();
+                    };
+                    return;
+                }
 
-    return new Promise(resolve => {
-        const req = source.openCursor(keyRange, 'prevunique');
-        req.onsuccess = function(e) {
-            let cursor = e.target.result;
+                if (filterData(cursor.value, filters)) {
+                    battleRecords.push(cursor.value);
+                    count += 1;
+                }
+                cursor.continue();
+            };
+        });
 
-            if (!cursor || i >= filters.limit) {
-                battleRecords.unshift(generateAggregate(battleRecords, 'Total'), generateAggregate(battleRecords, 'Average'));
-
-                resolve(battleRecords);
-                return;
-            }
-
-            if (indexName === 'date') {
-                let dailyReq = objectStore.index('date').getAll(cursor.key);
-                dailyReq.onsuccess = function(ev) {
-                    let results = ev.target.result || [];
-                    results = results.filter(x => filterData(x, filters));
-                    if (results.length > 0) {
-                        battleRecords.push(generateAggregate(results, 'Total', results[0].date));
-                        i += 1;
-                    }
-
-                    cursor.continue();
-                };
-
-                return;
-            }
-
-            let bs = filterData(cursor.value, filters);
-            if (bs) {
-                battleRecords.push(bs);
-                i += 1;
-            }
-
-            cursor.continue();
-        };
-    });
+        const total = generateAggregate(battleRecords, 'Total');
+        const average = generateAggregate(battleRecords, 'Average');
+        if (total && average) battleRecords.unshift(total, average);
+        return battleRecords;
+    } finally {
+        db.close();
+    }
 }
 
 async function exportIndexedDB() {
@@ -6476,316 +6812,322 @@ async function importIndexedDB(jsonData, merge = true) {
 }
 
 function filterData(data, filters) {
-    if (filters.world && !filters.world.includes(data.world)) {return false }
-    if (filters.battleType && !filters.battleType.includes(data.battleType)) {return false}
-    if (filters.difficulties && !filters.difficulties.includes(data.difficulty.toString())) {return false}
-    if (filters.result && !filters.result.includes(data.result)) {return false}
-    if (filters.roundTotal && !jpxUtils.inRange(data.roundInfo.total, filters.roundTotal)) {return false}
-
-    return data;
+    if (!data || typeof data !== 'object') return false;
+    if (Array.isArray(filters.world) && !filters.world.includes(data.world)) return false;
+    if (Array.isArray(filters.battleType) && !filters.battleType.includes(data.battleType)) return false;
+    const difficulty = difficultyMap[data.difficulty] ?? data.difficulty ?? 0;
+    if (Array.isArray(filters.difficulties) && !filters.difficulties.includes(String(difficulty))) return false;
+    if (Array.isArray(filters.result) && !filters.result.includes(data.result)) return false;
+    if (filters.roundTotal && !jpxUtils.inRange(toStatsNumber(data.roundInfo?.total), filters.roundTotal)) return false;
+    return true;
 }
 
 function generateAggregate(data_array, type, timestamp_name = null) { //type: Average, Total
-    if (data_array.length === 0) {
-        return false
-    } else {
-        let length = type === 'Average' ? data_array.length : 1;
-        let total_turns = data_array.map(x => x.turns).reduce((a,b) => a + b, 0);
-        let total_deltaSeconds = data_array.map(x => x.deltaSeconds).reduce((a,b) => a + b, 0);
+    const records = Array.isArray(data_array) ? data_array.filter(record => record && typeof record === 'object') : [];
+    if (!records.length) return null;
 
-        let new_data = {
-            date: timestamp_name || t(`sP.${type}`),
-            roundInfo: {
-                current: Math.round(data_array.map(x => x.roundInfo.current).reduce((a,b) => a + b, 0) / length * 100) / 100,
-                total: Math.round(data_array.map(x => x.roundInfo.total).reduce((a,b) => a + b, 0) / length * 100) / 100,
-            },
-            deltaSeconds: type === 'Average' ? (Math.round(total_deltaSeconds / length * 1000) / 1000) : Math.round(total_deltaSeconds * 1000) / 1000,
-            deltaTime: '',
-            turns: type === 'Average' ? (Math.round(total_turns / length * 100) / 100) : total_turns,
-            tps: 0,
-            riddle: 0,
-            aggregateType: type,
-            combatRecords: jpxUtils.createCombatRecords(),
-            revenueRecords: jpxUtils.createRevenueRecords(),
-        };
-        new_data.deltaTime = jpxUtils.secondsToTime(new_data.deltaSeconds, true);
-        new_data.tps = Math.round(new_data.turns / new_data.deltaSeconds * 100) / 100;
+    const isAverage = type === 'Average';
+    const divisor = isAverage ? records.length : 1;
+    const roundValue = (value, digits = 1) => {
+        const factor = 10 ** digits;
+        return Math.round(toStatsNumber(value) * factor) / factor;
+    };
+    const totalTurns = records.reduce((sum, record) => sum + toStatsNumber(record.turns), 0);
+    const totalSeconds = records.reduce((sum, record) => sum + toStatsNumber(record.deltaSeconds), 0);
+    const new_data = {
+        date: timestamp_name || t(`sP.${type}`),
+        roundInfo: {
+            current: records.reduce((sum, record) => sum + toStatsNumber(record.roundInfo?.current), 0),
+            total: records.reduce((sum, record) => sum + toStatsNumber(record.roundInfo?.total), 0),
+        },
+        deltaSeconds: isAverage ? roundValue(totalSeconds / divisor, 3) : roundValue(totalSeconds, 3),
+        deltaTime: '',
+        turns: isAverage ? roundValue(totalTurns / divisor, 2) : totalTurns,
+        tps: totalSeconds > 0 ? roundValue(totalTurns / totalSeconds, 2) : 0,
+        riddle: records.reduce((sum, record) => sum + toStatsNumber(record.riddle), 0),
+        aggregateType: type,
+        aggregateScope: timestamp_name ? 'day' : 'overall',
+        sourceCount: records.reduce((sum, record) => sum + Math.max(1, toStatsNumber(record.sourceCount)), 0),
+        combatRecords: jpxUtils.createCombatRecords(),
+        revenueRecords: jpxUtils.createRevenueRecords(),
+    };
 
-        for (let i = 0; i < data_array.length; i++) {
-            new_data.riddle += data_array[i].riddle || 0;
-
-            for (const [categoryKey, categoryValue] of Object.entries(data_array[i].combatRecords)) {
-                for (const [fieldKey, fieldValue] of Object.entries(categoryValue)) {
-                    jpxUtils.inc(new_data.combatRecords[categoryKey], fieldKey, fieldValue);
-                }
-            }
-            for (const [categoryKey, categoryValue] of Object.entries(data_array[i].revenueRecords)) {
-                switch (categoryKey) {
-                    case ('credit'):
-                    case ('staminaCost'):
-                    case ('totalProfit'):
-                    case ('finalProfit'):
-                        new_data.revenueRecords[categoryKey] += categoryValue;
-                        break;
-                    case ('equipment'):
-                        for (const [key, value] of Object.entries(categoryValue)) {
-                            new_data.revenueRecords[categoryKey][key] ??= [];
-                            new_data.revenueRecords[categoryKey][key] = new_data.revenueRecords[categoryKey][key].concat(value);
-                        }
-                        break;
-                    case ('consumable'):
-                        for (const [key, value] of Object.entries(categoryValue)) {
-                            if (key != 'total' && key != 'profit') {
-                                new_data.revenueRecords[categoryKey][key] ??= {};
-                                jpxUtils.inc(new_data.revenueRecords[categoryKey][key], 'balance', value.balance);
-                            }
-                        }
-                        break;
-                    case ('token'):
-                    case ('food'):
-                    case ('figurine'):
-                    case ('artifact'):
-                    case ('trophy'):
-                    case ('crystal'):
-                        for (const [key, value] of Object.entries(categoryValue)) {
-                            if (key != 'total' && key != 'profit') {
-                                jpxUtils.inc(new_data.revenueRecords[categoryKey], key, value);
-                            }
-                        }
-                        break;
-                }
+    for (const record of records) {
+        for (const [categoryKey, categoryValue] of Object.entries(record.combatRecords || {})) {
+            if (!categoryValue || typeof categoryValue !== 'object') continue;
+            new_data.combatRecords[categoryKey] ??= {};
+            for (const [fieldKey, fieldValue] of Object.entries(categoryValue)) {
+                jpxUtils.inc(new_data.combatRecords[categoryKey], fieldKey, toStatsNumber(fieldValue));
             }
         }
 
-        if (type === 'Average') {
-            new_data.riddle = Math.round(new_data.riddle / length * 10) / 10;
-
-            for (const [categoryKey, categoryValue] of Object.entries(new_data.combatRecords)) {
-                for (const [fieldKey, fieldValue] of Object.entries(categoryValue)) {
-                    new_data.combatRecords[categoryKey][fieldKey] = Math.round(fieldValue / length * 10) / 10;
-                }
+        for (const [categoryKey, categoryValue] of Object.entries(record.revenueRecords || {})) {
+            if (['exp', 'credit', 'staminaCost', 'totalProfit', 'finalProfit'].includes(categoryKey)) {
+                new_data.revenueRecords[categoryKey] = toStatsNumber(new_data.revenueRecords[categoryKey]) + toStatsNumber(categoryValue);
+                continue;
             }
-            for (const [categoryKey, categoryValue] of Object.entries(new_data.revenueRecords)) {
-                switch (categoryKey) {
-                    case ('credit'):
-                    case ('staminaCost'):
-                    case ('totalProfit'):
-                    case ('finalProfit'):
-                        new_data.revenueRecords[categoryKey] = Math.round(categoryValue / length * 10) / 10;
-                        break;
-                    case ('consumable'):
-                        for (const [key, value] of Object.entries(categoryValue)) {
-                            if (key != 'total' && key != 'profit') {
-                                new_data.revenueRecords[categoryKey][key].balance = Math.round(value.balance / length * 10) / 10;
-                            }
-                        }
-                        break;
-                    case ('equipment'):
-                        for (const [key, value] of Object.entries(categoryValue)) {
-                            new_data.revenueRecords[categoryKey][key] = Math.round((Array.isArray(value) ? value.length : value) / length * 10) / 10;
-                        }
-                        break;
-                    case ('material'):
-                    case ('token'):
-                    case ('food'):
-                    case ('figurine'):
-                    case ('artifact'):
-                    case ('trophy'):
-                    case ('crystal'):
-                        for (const [key, value] of Object.entries(categoryValue)) {
-                            if (key != 'total' && key != 'profit') {
-                                new_data.revenueRecords[categoryKey][key] = Math.round(value / length * 10) / 10;
-                            }
-                        }
-                        break;
+            if (!categoryValue || typeof categoryValue !== 'object') continue;
+            new_data.revenueRecords[categoryKey] ??= {};
+
+            if (categoryKey === 'equipment') {
+                for (const [quality, value] of Object.entries(categoryValue)) {
+                    const equipment = getEquipmentData(value);
+                    const target = new_data.revenueRecords.equipment[quality] ??= { count: 0, names: [] };
+                    target.count += equipment.count;
+                    if (timestamp_name) target.names.push(...equipment.names);
                 }
+                continue;
+            }
+
+            if (categoryKey === 'consumable') {
+                for (const [itemName, value] of Object.entries(categoryValue)) {
+                    if (!value || typeof value !== 'object') {
+                        jpxUtils.inc(new_data.revenueRecords.consumable, itemName, toStatsNumber(value));
+                        continue;
+                    }
+                    const target = new_data.revenueRecords.consumable[itemName] ??= { drop: 0, use: 0, balance: 0 };
+                    target.drop += toStatsNumber(value.drop);
+                    target.use += toStatsNumber(value.use);
+                    target.balance += Number.isFinite(Number(value.balance)) ? Number(value.balance) : toStatsNumber(value.drop) - toStatsNumber(value.use);
+                }
+                continue;
+            }
+
+            for (const [fieldKey, fieldValue] of Object.entries(categoryValue)) {
+                jpxUtils.inc(new_data.revenueRecords[categoryKey], fieldKey, toStatsNumber(fieldValue));
             }
         }
-
-        return new_data;
     }
+
+    if (isAverage) {
+        new_data.roundInfo.current = roundValue(new_data.roundInfo.current / divisor, 2);
+        new_data.roundInfo.total = roundValue(new_data.roundInfo.total / divisor, 2);
+        new_data.riddle = roundValue(new_data.riddle / divisor, 1);
+
+        for (const categoryValue of Object.values(new_data.combatRecords)) {
+            for (const fieldKey of Object.keys(categoryValue)) categoryValue[fieldKey] = roundValue(categoryValue[fieldKey] / divisor, 1);
+        }
+        for (const [categoryKey, categoryValue] of Object.entries(new_data.revenueRecords)) {
+            if (typeof categoryValue === 'number') {
+                new_data.revenueRecords[categoryKey] = roundValue(categoryValue / divisor, 1);
+            } else if (categoryKey === 'equipment') {
+                for (const value of Object.values(categoryValue)) {
+                    value.count = roundValue(value.count / divisor, 1);
+                    value.names = [];
+                }
+            } else if (categoryKey === 'consumable') {
+                for (const [fieldKey, value] of Object.entries(categoryValue)) {
+                    if (typeof value === 'number') {
+                        categoryValue[fieldKey] = roundValue(value / divisor, 1);
+                        continue;
+                    }
+                    if (!value || typeof value !== 'object') continue;
+                    for (const fieldKey of ['drop', 'use', 'balance']) value[fieldKey] = roundValue(value[fieldKey] / divisor, 1);
+                }
+            } else {
+                for (const fieldKey of Object.keys(categoryValue)) categoryValue[fieldKey] = roundValue(categoryValue[fieldKey] / divisor, 1);
+            }
+        }
+    }
+
+    new_data.deltaTime = jpxUtils.secondsToTime(new_data.deltaSeconds, true);
+    return new_data;
+}
+
+const STATS_FILTER_GROUPS = [
+    { key: 'world', id: 'filter-world', title: '世界', options: ['Persistent', 'Isekai'] },
+    { key: 'battleType', id: 'filter-battleType', title: '战斗', options: BATTLE_TYPES },
+    { key: 'difficulties', id: 'filter-difficulties', title: '难度', options: ['20', '15', '10', '7', '4', '2', '1', '0'] },
+    { key: 'result', id: 'filter-result', title: '结果', options: ['Victory', 'Defeat', 'Flee'] },
+];
+
+function getStatsFilterOptionLabel(group, value) {
+    if (group.key !== 'difficulties') return t(`sP.${value}`);
+    if (value === '0') return '未知';
+    const difficulty = Object.keys(difficultyMap).find(key => String(difficultyMap[key]) === value);
+    return difficulty ? t(`cGen.${difficulty}`) : value;
 }
 
 function createFilter() {
-    let filtersDiv = newWindow.document.createElement('div');
+    const doc = newWindow.document;
+    const filtersDiv = doc.createElement('div');
     filtersDiv.id = 'filtersDiv';
 
-    let checkboxSortArray = [
-        {
-            id: 'filter-aggregate',
-            title: '汇总',
-            sortArray: ['Aggregate by Day'],
-        },
-        {
-            id: 'filter-world',
-            title: '世界',
-            sortArray: ['Persistent', 'Isekai'],
-        },
-        {
-            id: 'filter-battleType',
-            title: '战斗类型',
-            sortArray: ['Arena', 'Encounter', 'Colosseum', 'Battle1000', 'Item', 'Tower'],
-        },
-        {
-            id: 'filter-difficulties',
-            title: '难度',
-            sortArray: ['20', '15', '10', '7', '4', '2', '1'],
-        },
-        {
-            id: 'filter-result',
-            title: '结果',
-            sortArray: ['Victory', 'Defeat', 'Flee'],
-        },
-    ];
+    const aggregateLabel = doc.createElement('label');
+    aggregateLabel.id = 'filter-aggregate';
+    aggregateLabel.className = 'filter-toggle';
+    const aggregateInput = doc.createElement('input');
+    aggregateInput.type = 'checkbox';
+    aggregateInput.checked = true;
+    aggregateLabel.append(aggregateInput, t('sP.Aggregate by Day'));
+    filtersDiv.appendChild(aggregateLabel);
 
-    //checkBox Filter
-    for (let checkboxSort of checkboxSortArray) {
-        let group = newWindow.document.createElement('details');
+    const updateGroupSummary = group => {
+        const spec = STATS_FILTER_GROUPS.find(item => item.id === group.id.replace(/-group$/, ''));
+        if (!spec) return;
+        const selected = Array.from(group.querySelectorAll('input:checked')).map(input => input.value);
+        const value = group.querySelector('.filter-value');
+        if (selected.length === spec.options.length) value.textContent = '全部';
+        else if (!selected.length) value.textContent = '无';
+        else if (selected.length === 1) value.textContent = getStatsFilterOptionLabel(spec, selected[0]);
+        else value.textContent = `${selected.length} 项`;
+    };
+
+    for (const spec of STATS_FILTER_GROUPS) {
+        const group = doc.createElement('details');
         group.className = 'filter-group';
-        group.id = `${checkboxSort.id}-group`;
-        group.open = true;
+        group.id = `${spec.id}-group`;
 
-        let summary = newWindow.document.createElement('summary');
-        summary.textContent = checkboxSort.title;
+        const summary = doc.createElement('summary');
+        const title = doc.createElement('span');
+        title.textContent = spec.title;
+        const value = doc.createElement('span');
+        value.className = 'filter-value';
+        summary.append(title, value);
 
-        let filterDiv = newWindow.document.createElement('div');
-        filterDiv.id = checkboxSort.id;
-        filterDiv.className = 'filter-options';
-        for (let checkboxValue of checkboxSort.sortArray) {
-            let label = newWindow.document.createElement('label');
-            let input = newWindow.document.createElement('input');
+        const menu = doc.createElement('div');
+        menu.id = spec.id;
+        menu.className = 'filter-menu';
+        for (const option of spec.options) {
+            const label = doc.createElement('label');
+            label.className = 'filter-option';
+            const input = doc.createElement('input');
             input.type = 'checkbox';
-            input.addEventListener('change', function() {
-                getBattleRecordsRender().then(battleRecords => {
-                    renderDynamicTable(battleRecords, cfgStats.statsColumns, newWindow.document.body);
-                });
-            });
-            input.defaultChecked = true;
-            input.value = checkboxValue;
-            label.append(input);
-            label.append(t(`sP.${checkboxValue}`));
-            filterDiv.appendChild(label);
+            input.value = option;
+            input.checked = spec.key === 'world' ? option === (isekaiSuffix ? 'Isekai' : 'Persistent') : true;
+            label.append(input, getStatsFilterOptionLabel(spec, option));
+            menu.appendChild(label);
         }
-
-        group.append(summary, filterDiv);
+        group.append(summary, menu);
         filtersDiv.appendChild(group);
+        updateGroupSummary(group);
     }
 
-    //range Filter
-    let roundTotalGroup = newWindow.document.createElement('details');
-    roundTotalGroup.className = 'filter-group';
-    roundTotalGroup.id = 'filter-roundTotal-group';
-    roundTotalGroup.open = true;
+    const makeNumberInput = (value, max = 9999) => {
+        const input = doc.createElement('input');
+        input.type = 'number';
+        input.className = 'filter-number';
+        input.value = value;
+        input.min = '0';
+        input.max = String(max);
+        input.step = '1';
+        return input;
+    };
+    const roundControl = doc.createElement('label');
+    roundControl.id = 'filter-roundTotal';
+    roundControl.className = 'filter-inline';
+    roundControl.append('轮次', makeNumberInput(0), '–', makeNumberInput(9999));
+    filtersDiv.appendChild(roundControl);
 
-    let roundTotalSummary = newWindow.document.createElement('summary');
-    roundTotalSummary.textContent = t('sP.roundTotal');
+    const rowsControl = doc.createElement('label');
+    rowsControl.id = 'filter-rows';
+    rowsControl.className = 'filter-inline';
+    rowsControl.append('条数', makeNumberInput(50, 5000));
+    filtersDiv.appendChild(rowsControl);
 
-    let roundTotalDiv = newWindow.document.createElement('div');
-    roundTotalDiv.id = 'filter-roundTotal';
-    roundTotalDiv.className = 'filter-options';
+    const status = doc.createElement('span');
+    status.id = 'statsStatus';
+    status.textContent = '读取中...';
+    filtersDiv.appendChild(status);
 
-    let roundMinInput = newWindow.document.createElement('input');
-    roundMinInput.type = 'number';
-    roundMinInput.addEventListener('change', function() {
-        getBattleRecordsRender().then(battleRecords => {
-            renderDynamicTable(battleRecords, cfgStats.statsColumns, newWindow.document.body);
-        });
+    filtersDiv.addEventListener('change', event => {
+        const group = event.target.closest('.filter-group');
+        if (group) updateGroupSummary(group);
+        requestStatsRender();
     });
-    roundMinInput.value = 0;
-    roundMinInput.min = '0';
-    roundMinInput.step = '1';
-
-    let roundMaxInput = newWindow.document.createElement('input');
-    roundMaxInput.type = 'number';
-    roundMaxInput.addEventListener('change', function() {
-        getBattleRecordsRender().then(battleRecords => {
-            renderDynamicTable(battleRecords, cfgStats.statsColumns, newWindow.document.body);
+    filtersDiv.addEventListener('toggle', event => {
+        if (!event.target.open) return;
+        filtersDiv.querySelectorAll('.filter-group[open]').forEach(group => {
+            if (group !== event.target) group.open = false;
         });
-    });
-    roundMaxInput.value = 9999;
-    roundMaxInput.min = '0';
-    roundMaxInput.step = '1';
-
-    let rangeSpan = newWindow.document.createElement('span');
-    rangeSpan.textContent = ' to ';
-
-    roundTotalDiv.append(roundMinInput, rangeSpan, roundMaxInput);
-    roundTotalGroup.append(roundTotalSummary, roundTotalDiv);
-    filtersDiv.appendChild(roundTotalGroup);
-
-    //number Filter
-    let rowsGroup = newWindow.document.createElement('details');
-    rowsGroup.className = 'filter-group';
-    rowsGroup.id = 'filter-rows-group';
-    rowsGroup.open = true;
-
-    let rowsSummary = newWindow.document.createElement('summary');
-    rowsSummary.textContent = '记录条数';
-
-    let filterDiv = newWindow.document.createElement('div');
-    filterDiv.id = 'filter-rows';
-    filterDiv.className = 'filter-options';
-    let input = newWindow.document.createElement('input');
-    input.type = 'number';
-    input.addEventListener('change', function() {
-        getBattleRecordsRender().then(battleRecords => {
-            renderDynamicTable(battleRecords, cfgStats.statsColumns, newWindow.document.body);
+        newWindow.requestAnimationFrame(() => {
+            const menu = event.target.querySelector('.filter-menu');
+            if (!menu) return;
+            menu.style.transform = '';
+            const rect = menu.getBoundingClientRect();
+            let offset = Math.min(0, newWindow.innerWidth - rect.right - 8);
+            if (rect.left + offset < 8) offset += 8 - rect.left - offset;
+            if (offset) menu.style.transform = `translateX(${Math.round(offset)}px)`;
         });
-    });
-    input.value = 50;
-    input.min = '0';
-    input.step = '1';
-    filterDiv.append(input);
-    rowsGroup.append(rowsSummary, filterDiv);
-    filtersDiv.appendChild(rowsGroup);
+    }, true);
+
+    const closeMenus = event => {
+        const current = event?.target?.closest?.('.filter-group');
+        filtersDiv.querySelectorAll('.filter-group[open]').forEach(group => {
+            if (group !== current) group.open = false;
+        });
+    };
+    doc.addEventListener('pointerdown', closeMenus);
+    newWindow.addEventListener('scroll', closeMenus, true);
 
     return filtersDiv;
 }
 
 function getFilters() {
-    let filters = {};
-    let aggregateInput = newWindow.document.querySelector('#filter-aggregate input[type="checkbox"]');
-    filters.aggregate = aggregateInput?.checked === true;
-    filters.world =  Array.from(newWindow.document.getElementById('filter-world').querySelectorAll('input:checked')).map(x => x.value);
-    filters.battleType =  Array.from(newWindow.document.getElementById('filter-battleType').querySelectorAll('input:checked')).map(x => x.value);
-    filters.difficulties =  Array.from(newWindow.document.getElementById('filter-difficulties').querySelectorAll('input:checked')).map(x => x.value);
-    filters.result = Array.from(newWindow.document.getElementById('filter-result').querySelectorAll('input:checked')).map(x => x.value);
-    let roundTotalInputs = newWindow.document.querySelectorAll('#filter-roundTotal input[type="number"]');
-    if (roundTotalInputs.length >= 2) {
-        let min = parseInt(roundTotalInputs[0].value);
-        let max = parseInt(roundTotalInputs[1].value);
-        min = isNaN(min) ? 0 : min;
-        max = isNaN(max) ? Number.MAX_SAFE_INTEGER : max;
-        filters.roundTotal = [min, max];
+    const doc = newWindow.document;
+    const getChecked = id => Array.from(doc.querySelectorAll(`#${id} input:checked`), input => input.value);
+    const roundInputs = doc.querySelectorAll('#filter-roundTotal input[type="number"]');
+    const parsedMin = parseInt(roundInputs[0]?.value);
+    const parsedMax = parseInt(roundInputs[1]?.value);
+    let roundMin = Math.max(0, Number.isFinite(parsedMin) ? parsedMin : 0);
+    let roundMax = Math.max(0, Number.isFinite(parsedMax) ? parsedMax : 9999);
+    if (roundMin > roundMax) [roundMin, roundMax] = [roundMax, roundMin];
+    if (roundInputs.length >= 2) {
+        roundInputs[0].value = String(roundMin);
+        roundInputs[1].value = String(roundMax);
     }
-    let limitInput = newWindow.document.querySelector('#filter-rows input[type="number"]');
-    filters.limit = parseInt(limitInput?.value) || 1;
+    const limitInput = doc.querySelector('#filter-rows input');
+    const parsedLimit = parseInt(limitInput?.value);
+    const limit = Math.min(5000, Math.max(1, Number.isFinite(parsedLimit) ? parsedLimit : 50));
+    if (limitInput) limitInput.value = String(limit);
 
-    return filters;
+    return {
+        aggregate: doc.querySelector('#filter-aggregate input')?.checked === true,
+        world: getChecked('filter-world'),
+        battleType: getChecked('filter-battleType'),
+        difficulties: getChecked('filter-difficulties'),
+        result: getChecked('filter-result'),
+        roundTotal: [roundMin, roundMax],
+        limit,
+    };
 }
 
-function renderDynamicTable(battleRecords, displayedColumns, parent) {
+function renderDynamicTable(battleRecords, displayedColumns, parent, emptyMessage = '没有符合当前筛选条件的战斗记录') {
     newWindow.document.querySelector('#battleStatsWrap')?.remove();
 
-    let activeFields = displayedColumns.map(column => {
+    const activeFields = (displayedColumns || []).map(column => {
         let baseField = STATS_FIELDS.find(f => f.id === column.id);
         return baseField ? { ...baseField, ...column } : null;
     }).filter(f => f);
 
-    let table = newWindow.document.createElement('table');
+    const tableWrap = newWindow.document.createElement('div');
+    tableWrap.id = 'battleStatsWrap';
+    if (!Array.isArray(battleRecords) || !battleRecords.length || !activeFields.length) {
+        if (newWindow.document._jpxStatsTooltipCleanup) newWindow.document._jpxStatsTooltipCleanup();
+        const empty = newWindow.document.createElement('div');
+        empty.className = 'stats-empty';
+        empty.textContent = activeFields.length ? emptyMessage : '请先在统计设定中选择显示栏位';
+        tableWrap.appendChild(empty);
+        parent.appendChild(tableWrap);
+        return;
+    }
+
+    const table = newWindow.document.createElement('table');
     table.id = 'battleStatsTable';
 
-    let thead = newWindow.document.createElement('thead');
-    let theadHTML = '<tr>';
+    const thead = newWindow.document.createElement('thead');
+    const headerRow = newWindow.document.createElement('tr');
     for (const field of activeFields) {
-        let style = field.style ? ` style="${field.style}"` : '';
-        theadHTML += `<th${style}>${field.customName || t(field.label)}</th>`;
+        const th = newWindow.document.createElement('th');
+        th.textContent = field.customName || t(field.label);
+        th.dataset.field = field.id;
+        if (field.style) th.style.cssText = field.style;
+        headerRow.appendChild(th);
     }
-    theadHTML += '</tr>';
-    thead.innerHTML = theadHTML;
+    thead.appendChild(headerRow);
     table.appendChild(thead);
 
-    let tbody = newWindow.document.createElement('tbody');
+    const tbody = newWindow.document.createElement('tbody');
 
     const parseColorThresholds = (str) => {
         if (!str) return [];
@@ -6794,54 +7136,51 @@ function renderDynamicTable(battleRecords, displayedColumns, parent) {
             return { min: parseFloat(value.trim()), color: color?.trim() };
         }).filter(thr => !isNaN(thr.min)).sort((a, b) => b.min - a.min);
     };
-    const isOverallSummaryRow = (record) => record.aggregateType && (record.date === t('sP.Total') || record.date === t('sP.Average'));
-    const getHvTextTranslator = () => {
-        const candidates = [
-            window.hvTranslateText,
-            typeof unsafeWindow !== 'undefined' ? unsafeWindow.hvTranslateText : null,
-            globalThis.hvTranslateText
-        ];
-        return candidates.find(fn => typeof fn === 'function') || null;
-    };
+    const hvTextTranslator = [
+        window.hvTranslateText,
+        typeof unsafeWindow !== 'undefined' ? unsafeWindow.hvTranslateText : null,
+        globalThis.hvTranslateText
+    ].find(fn => typeof fn === 'function') || null;
     const translateStatsTooltipText = (text) => {
-        const translator = getHvTextTranslator();
-        if (!translator) return text;
+        if (!hvTextTranslator) return text;
         try {
-            return translator(text) || text;
+            return hvTextTranslator(text) || text;
         } catch (e) {
             return text;
         }
     };
+    const tooltipItemLimit = Math.max(5, Math.min(25, Math.floor((newWindow.innerHeight - 64) / 18)));
 
     for (const record of battleRecords) {
-        let tr = newWindow.document.createElement('tr');
+        const tr = newWindow.document.createElement('tr');
+        if (record.aggregateScope === 'overall') tr.className = `stats-summary stats-${record.aggregateType.toLowerCase()}`;
+        else if (record.aggregateScope === 'day') tr.className = 'stats-day';
 
         for (const field of activeFields) {
-            let td = newWindow.document.createElement('td');
+            const td = newWindow.document.createElement('td');
+            td.dataset.field = field.id;
             let value = field.get(record);
 
             if (field.styleText) td.style.cssText = field.styleText;
             if (field.doI18n) value = t(`sP.${value}`);
-            
-            if (!isOverallSummaryRow(record) && (field.id === 'eqP' || field.id === 'eqL' || field.id === 'eqM') && value > 0) {
+
+            if (record.aggregateScope !== 'overall' && (field.id === 'eqP' || field.id === 'eqL' || field.id === 'eqM') && value > 0) {
                 let eqType = field.id === 'eqP' ? 'Peerless' : (field.id === 'eqL' ? 'Legendary' : 'Magnificent');
-                let eqList = record.revenueRecords?.equipment?.[eqType] || [];
-                if (Array.isArray(eqList) && eqList.length > 0) {
+                const eqList = getEquipmentNames(record, eqType);
+                if (eqList.length) {
                     td.classList.add('tooltip');
                     let displayList = eqList.map(name => translateStatsTooltipText(name));
-                    if (displayList.length > 25) {
-                        displayList = displayList.slice(0, 25);
-                        displayList.push(`...及其他 ${eqList.length - 25} 件`);
+                    if (displayList.length > tooltipItemLimit) {
+                        displayList = displayList.slice(0, tooltipItemLimit);
+                        displayList.push(`...及其他 ${eqList.length - tooltipItemLimit} 件`);
                     }
-                    let tooltipText = displayList.join('\n');
-                    td.dataset.tooltip = tooltipText;
+                    td.dataset.tooltip = displayList.join('\n');
                 }
             }
 
             if (value && typeof value === 'object' && 'drop' in value) {
                 td.classList.add('tooltip');
-                let tooltipText = `${t('sP.drop')}: ${value.drop.toLocaleString()}\n${t('sP.use')}: ${value.use.toLocaleString()}`;
-                td.dataset.tooltip = tooltipText;
+                td.dataset.tooltip = `${t('sP.drop')}: ${value.drop.toLocaleString()}\n${t('sP.use')}: ${value.use.toLocaleString()}`;
                 td.textContent = value.balance.toLocaleString();
             } else if (typeof value === 'number') {
                 td.textContent = value.toLocaleString();
@@ -6861,9 +7200,6 @@ function renderDynamicTable(battleRecords, displayedColumns, parent) {
     }
 
     table.appendChild(tbody);
-
-    let tableWrap = newWindow.document.createElement('div');
-    tableWrap.id = 'battleStatsWrap';
     tableWrap.appendChild(table);
     parent.appendChild(tableWrap);
     setupStatsTooltip(tableWrap);
@@ -6887,6 +7223,7 @@ function setupStatsTooltip(root) {
     const hide = () => {
         tooltip.style.display = 'none';
         tooltip.textContent = '';
+        activeTarget = null;
     };
     const place = (event) => {
         const margin = 8;
@@ -6906,9 +7243,12 @@ function setupStatsTooltip(root) {
             top = event.clientY - rect.height - offset;
         }
 
-        tooltip.style.left = `${Math.max(margin, left)}px`;
-        tooltip.style.top = `${Math.max(margin, top)}px`;
+        left = Math.min(Math.max(margin, left), Math.max(margin, viewportWidth - rect.width - margin));
+        top = Math.min(Math.max(margin, top), Math.max(margin, viewportHeight - rect.height - margin));
+        tooltip.style.left = `${left}px`;
+        tooltip.style.top = `${top}px`;
     };
+    let activeTarget = null;
     const show = (event) => {
         const target = getTarget(event);
         const text = target?.dataset?.tooltip;
@@ -6916,7 +7256,11 @@ function setupStatsTooltip(root) {
             hide();
             return;
         }
-        tooltip.textContent = text;
+        if (target !== activeTarget) {
+            activeTarget = target;
+            tooltip.textContent = text;
+            tooltip.style.display = 'block';
+        }
         place(event);
     };
     const onMouseOut = (event) => {
@@ -6925,15 +7269,15 @@ function setupStatsTooltip(root) {
         if (!event.relatedTarget || !target.contains(event.relatedTarget)) hide();
     };
 
-    root.addEventListener('mouseover', show);
-    root.addEventListener('mousemove', show);
-    root.addEventListener('mouseout', onMouseOut);
+    root.addEventListener('pointerover', show);
+    root.addEventListener('pointermove', show);
+    root.addEventListener('pointerout', onMouseOut);
     newWindow.addEventListener('scroll', hide, true);
 
     doc._jpxStatsTooltipCleanup = () => {
-        root.removeEventListener('mouseover', show);
-        root.removeEventListener('mousemove', show);
-        root.removeEventListener('mouseout', onMouseOut);
+        root.removeEventListener('pointerover', show);
+        root.removeEventListener('pointermove', show);
+        root.removeEventListener('pointerout', onMouseOut);
         newWindow.removeEventListener('scroll', hide, true);
         tooltip.remove();
     };
@@ -8883,7 +9227,7 @@ function renderSettings() {
                 let modeKey = document.querySelector('[data-role="battleMode"]')?.dataset.currentValue;
                 for (const key of BATTLE_MODES) {
                     if (
-                        key !== modeKey && !key.includes('_General') && cfgBattle[key] &&
+                        key !== modeKey && !key.includes('_General') && cfgBattle[key] && jpxUtils.isEmpty(defaultCfgBattle[key]) &&
                         Array.isArray(cfgBattle[key].supports) && cfgBattle[key].supports.length === 0 &&
                         Array.isArray(cfgBattle[key].attacks) && cfgBattle[key].attacks.length === 0 &&
                         !Object.keys(cfgBattle[key]).some(key => key.startsWith('kb_'))
@@ -9739,6 +10083,20 @@ function jpxPanelManager(panelType) {
                 actionsDiv.appendChild(ns.toggleButton);
                 ns.updateToggleButton();
 
+                let statsDiv = document.createElement('button');
+                statsDiv.type = 'button';
+                statsDiv.className = 'jpx-widget-btn jpx-widget-stats';
+                statsDiv.textContent = t('cW.openStats');
+                statsDiv.title = '打开历史战斗统计';
+                statsDiv.addEventListener('pointerdown', (e) => {
+                    if (e.pointerType === 'mouse' && e.button !== 0) return;
+                    e.stopPropagation();
+                    e.preventDefault();
+                    if (e.currentTarget.hasPointerCapture?.(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId);
+                    openBattleRecords();
+                });
+                actionsDiv.appendChild(statsDiv);
+
                 let settingsDiv = document.createElement('button');
                 settingsDiv.type = 'button';
                 settingsDiv.className = 'jpx-widget-btn jpx-widget-settings';
@@ -9842,20 +10200,22 @@ function jpxMarket() {
     const ns = jpxMarket;
     if (ns._init) return ns;
 
-    ns.getMarketPrice = async function () {
+    ns.getMarketPrice = async function (update = true) {
         let priceData = JSON.parse(localStorage.getItem(prefix + 'priceData' + isekaiSuffix) || '{}');
+        if (!update) return this.updatePrice(priceData, false);
+
         let currentDate = new Date().toISOString().slice(0, 10);
         if (
             !priceData?.lastUpdate ||
             new Date(priceData.lastUpdate).toISOString().slice(0, 10) != currentDate
         ) {
-            priceData = await this.updatePrice(priceData);
+            priceData = await this.updatePrice(priceData, true);
         }
 
         return priceData;
     };
 
-    ns.updatePrice = async function (priceData) {
+    ns.updatePrice = async function (priceData, update = true) {
         let finishBattle = document.querySelector('img[src$="finishbattle.png"]');
         let isekaiSuffixUrl = document.URL.includes('isekai') ? 'isekai/' : '';
         let urlArray = [
@@ -9931,6 +10291,13 @@ function jpxMarket() {
             //Upgrade Material
             'Wispy Catalyst': 1, 'Diluted Catalyst': 5, 'Regular Catalyst': 10, 'Robust Catalyst': 25, 'Vibrant Catalyst': 50, 'Coruscating Catalyst': 100,
         };
+        if (!update) {
+            for (let defaultPriceDataKey in defaultPriceData) {
+                if (!priceData[defaultPriceDataKey]) priceData[defaultPriceDataKey] = defaultPriceData[defaultPriceDataKey];
+            }
+            if (isekaiSuffix) priceData['Energy Drink'] = 0;
+            return priceData;
+        }
         let latestPriceData = {};
 
         if (!log || finishBattle) {
@@ -9988,7 +10355,7 @@ function jpxMarket() {
             }
         }
         if (isekaiSuffix) {
-            priceData['Energy Drink'] = 130000;
+            priceData['Energy Drink'] = 0;
         }
 
         localStorage.setItem(prefix + 'priceData' + isekaiSuffix, JSON.stringify(priceData));
@@ -10255,7 +10622,7 @@ function jpxUtils() {
         return new RegExp(input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
     };
 
-    ns.keyCaptureController = null,
+    ns.keyCaptureController = null;
     ns.captureKeyCombo = function(onComplete, onAbort) {
         if (ns.keyCaptureController) ns.keyCaptureController.abort();
         let currentController = new AbortController();
@@ -10290,11 +10657,14 @@ function jpxUtils() {
     };
     
     ns.formatKeyCombo = function(input, separator = '+') {
+        if (input == null) return '未设定';
+
         let key, ctrl, alt, shift;
         if (typeof input === 'string') {
             let pureKey = input.startsWith('kb_') ? input.slice(3) : input;
+            let isPlusKey = pureKey === '+' || pureKey.endsWith('++');
             let parts = pureKey.split('+');
-            key = parts.pop();
+            key = isPlusKey ? '+' : parts.pop();
             ctrl = parts.includes('Ctrl');
             alt = parts.includes('Alt');
             shift = parts.includes('Shift');
