@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         JPX-Revanced
 // @namespace    ijpx
-// @version      26.07.30.1
+// @version      26.07.30.2
 // @author       MeiYongAI
 // @icon         https://hentaiverse.org/y/favicon.png
 // @description  jpx
@@ -3574,6 +3574,8 @@ function initDoBattle() {
     syncNativeDialogGuard();
 
     document.addEventListener('DOMContentLoaded', (event) => {
+        if (event?.isTrusted) return;
+
         if (document.querySelector('#riddlemaster')) {
             riddleRecorder();
             return;
@@ -3825,6 +3827,7 @@ function preRender() {
 }
 
 const ajaxRoundNativeHandlers = new WeakMap();
+let ajaxBattleIntervals = [];
 
 function bindAjaxRiddleForm(riddleForm) {
     if (!riddleForm || riddleForm.dataset.jpxAjaxBound === '1') return;
@@ -3878,6 +3881,34 @@ function bindAjaxRiddleForm(riddleForm) {
     });
 }
 
+function clearAjaxBattleIntervals() {
+    ajaxBattleIntervals.forEach(intervalId => clearInterval(intervalId));
+    ajaxBattleIntervals = [];
+}
+
+function createAjaxBattle() {
+    clearAjaxBattleIntervals();
+
+    const nativeSetInterval = window.setInterval;
+    const createdIntervals = [];
+    window.setInterval = (...args) => {
+        const intervalId = nativeSetInterval.apply(window, args);
+        createdIntervals.push(intervalId);
+        return intervalId;
+    };
+
+    try {
+        const battle = new window.Battle();
+        ajaxBattleIntervals = createdIntervals;
+        return battle;
+    } catch (err) {
+        createdIntervals.forEach(intervalId => clearInterval(intervalId));
+        throw err;
+    } finally {
+        window.setInterval = nativeSetInterval;
+    }
+}
+
 function replaceBattleMain(doc) {
     let main = document.querySelector('#battle_main');
     let mainNew = doc.querySelector('#battle_main');
@@ -3887,6 +3918,7 @@ function replaceBattleMain(doc) {
 
     document.querySelector('#riddle-panel')?.remove();
     clearInterval(window.timer);
+    clearAjaxBattleIntervals();
 
     if (main && mainNew) {
         main.replaceWith(mainNew);
@@ -3897,11 +3929,7 @@ function replaceBattleMain(doc) {
     }
 
     if (mainNew) {
-        let latestTimer = setTimeout(() => {}, 0);
-        for (let timerId = latestTimer; timerId > 0 && timerId > latestTimer - 100; timerId--) {
-            clearInterval(timerId);
-        }
-        window.battle = new window.Battle();
+        window.battle = createAjaxBattle();
     }
 
     document.dispatchEvent(new Event('DOMContentLoaded'));
@@ -5814,7 +5842,7 @@ async function battleRecordPlayer(doFinal = true) {
         staminaRecords = { lastUpdate: Date.now(), staminaCost: 0 };
     }
 
-    let staminaQuota = 24 + (!isekaiSuffix ? cfgBattle.dailyStaminaQuotaPlus : 0) - staminaRecords.staminaCost;
+    let staminaQuota = 24 + (!isekaiSuffix ? toStatsNumber(cfgBattle.dailyStaminaQuotaPlus) : 0) - staminaRecords.staminaCost;
     if (staminaCost > staminaQuota) {
         if (staminaQuota > 0) {
             revenueSnapshot['staminaCost'] = Math.round((staminaCost - staminaQuota) * 10) / 10;
@@ -5854,18 +5882,28 @@ async function battleRecordPlayer(doFinal = true) {
         revenueRecords: revenueSnapshot,
     }
 
+    let battleLogEl = cfgBattle.recordBattleLog ? battleLogPlayer() : null;
+    let timeRecordEl = document.querySelector('#time-records-div') || timeRecordPlayer(battleRecords);
+    let combatRecordEl = document.querySelector('#combat-records-table') || combatRecordPlayer(combatRecords);
+    let combatRecordUseEl = document.querySelector('#combat-records-use-table') || combatRecordPlayer_Use(combatRecords);
+    let revenueRecordEl = document.querySelector('#revenue-records-table') || revenueRecordPlayer(revenueSnapshot, priceData);
+
     if (doFinal) {
-        timeRecordPlayer(battleRecords);
-        combatRecordPlayer(combatRecords);
-        revenueRecordPlayer(revenueSnapshot, priceData);
-        newWindowRecordPlayer(battleRecords);
-        if (cfgBattle.recordBattleLog) battleLogPlayer();
+        document.querySelector('#btcp')?.append(timeRecordEl, revenueRecordEl);
+        log?.parentNode?.prepend(...[battleLogEl, combatRecordEl, combatRecordUseEl].filter(Boolean));
 
         storeBattleRecords(battleRecords)
             .then(result => console.log(result))
             .catch(err => console.error('Save failed: ', err));
     } else {
-        newWindowRecordPlayer(battleRecords, true);
+        newWindowRecordPlayer(
+            Boolean(document.querySelector('#time-records-div')),
+            battleRecords,
+            timeRecordEl,
+            combatRecordEl,
+            combatRecordUseEl,
+            revenueRecordEl
+        );
     }
 
     cfgBattle.recordBattleLog && console.log(battleLogRecord);
@@ -5875,70 +5913,121 @@ async function battleRecordPlayer(doFinal = true) {
     console.log(battleRecords);
 }
 
-function newWindowRecordPlayer(battleRecords, openImmediately = false) {
-    try {
-        const battleRecordsStr = JSON.stringify(battleRecords);
-        const openRecordWindow = () => {
-            const win = window.open();
-            if (!win) return;
+function mergeReplayRecordData(defaultValue, storedValue) {
+    const isPlainObject = value => value && typeof value === 'object' && !Array.isArray(value);
+    if (!isPlainObject(defaultValue)) return storedValue ?? defaultValue;
 
-            const inject = () => {
-                let data = win.document.createElement('script');
-                data.type = 'text/javascript';
-                data.text = `var battleRecords = ${battleRecordsStr};`;
-                let script = win.document.createElement('script');
-                script.type = 'text/javascript';
-                script.src = "/script/battleRecord.js";
-                win.document.head.append(data);
-                win.document.head.append(script);
-            };
-
-            if (win.document.readyState === 'loading') win.addEventListener('load', inject, { once: true });
-            else inject();
-        };
-
-        if (openImmediately) {
-            openRecordWindow();
-            return;
+    const merged = { ...defaultValue };
+    if (!isPlainObject(storedValue)) return merged;
+    for (const [key, value] of Object.entries(storedValue)) {
+        if (isPlainObject(defaultValue[key])) {
+            merged[key] = isPlainObject(value)
+                ? mergeReplayRecordData(defaultValue[key], value)
+                : mergeReplayRecordData(defaultValue[key], undefined);
+        } else {
+            merged[key] = value ?? defaultValue[key];
         }
-
-        const btn = document.createElement('button');
-        btn.textContent = t('sGen.statsTab');
-        btn.style.margin = '5px';
-        btn.addEventListener('click', openRecordWindow);
-
-        const container = document.getElementById('battleRecordsButtons');
-        if (container) {
-            container.appendChild(btn);
-        }
-    } catch (e) {
-        console.error('newWindowRecordPlayer error:', e);
     }
+    return merged;
+}
+
+function normalizeBattleRecordForReplay(battleRecord) {
+    const record = battleRecord && typeof battleRecord === 'object' ? battleRecord : {};
+    return {
+        ...record,
+        roundInfo: mergeReplayRecordData({ current: 0, total: 0 }, record.roundInfo),
+        combatRecords: mergeReplayRecordData(jpxUtils.createCombatRecords(), record.combatRecords),
+        revenueRecords: mergeReplayRecordData(jpxUtils.createRevenueRecords(), record.revenueRecords),
+    };
+}
+
+function newWindowRecordPlayer(doClone, battleRecords, timeRecordEl, combatRecordEl, combatRecordUseEl, revenueRecordEl, targetWindow = null) {
+    let newWin = targetWindow || window.open();
+    if (!newWin) return;
+
+    let doc = newWin.document;
+    doc.title = 'JPX Battle Record';
+    doc.head.appendChild(doc.createElement('style')).textContent = `
+        .container { display: flex; gap: 16px; }
+        .left, .right { display: flex; flex: 0 0 auto; flex-direction: column; gap: 10px; }
+        table { width: max-content; }
+        body.dark-mode { background-color: #121212; color: #eee; }
+    `;
+
+    let style = doc.createElement('style');
+    style.id = 'jpx';
+    style.textContent = cfg.styleText || '';
+    doc.head.appendChild(style);
+    if (cfgStats.darkMode) doc.body.classList.add('dark-mode');
+
+    let container = doc.createElement('div');
+    container.className = 'container';
+    let left = doc.createElement('div');
+    left.className = 'left';
+    let right = doc.createElement('div');
+    right.className = 'right';
+
+    let info = doc.createElement('div');
+    info.id = 'info-records-div';
+    if (cfgStats.darkMode) info.classList.add('dark-mode');
+
+    const record = battleRecords || {};
+    const round = record.roundInfo || {};
+    const difficultyKey = Object.keys(difficultyMap).find(key => difficultyMap[key] === record.difficulty);
+    const battleLabel = record.battleType ? t(`sP.${record.battleType}`) : '';
+    const battleDetails = battleLabel +
+        (record.worldLevel ? ` (WL${record.worldLevel})` : '') +
+        (record.towerFloor ? ` (${record.towerFloor}F)` : '');
+    const roundDetails = round.current != null && round.total != null
+        ? `${round.current}/${round.total}${record.result && record.result !== 'Victory' ? ` (${t(`sP.${record.result}`)})` : ''}`
+        : '';
+    info.textContent = [
+        record.timestamp || record.date || '',
+        record.world ? t(`sP.${record.world}`) : '',
+        battleDetails,
+        roundDetails,
+        difficultyKey ? t(`sP.${difficultyKey}`) : '',
+        record.playerLevel != null ? `LV: ${record.playerLevel}` : '',
+    ].filter(Boolean).join('   ');
+
+    left.appendChild(info);
+    container.append(left, right);
+    doc.body.appendChild(container);
+
+    [timeRecordEl, combatRecordEl, combatRecordUseEl].forEach(el => {
+        if (el) left.appendChild(doClone ? el.cloneNode(true) : el);
+    });
+    if (revenueRecordEl) right.appendChild(doClone ? revenueRecordEl.cloneNode(true) : revenueRecordEl);
 }
 
 function battleLogPlayer() {
     let blob = new Blob([JSON.stringify(battleLogRecord, null, '\t')], { type: 'text/plain;charset=utf-8' });
     let url = URL.createObjectURL(blob);
     let a = document.createElement('a');
-    log.parentNode.insertBefore(a, log.parentNode.firstChild);
     a.innerText = t('sGen.downloadBattleLog');
-    a.style.cssText = 'float: left; font-size: 200%; margin: 10px 0px;';
+    a.style.cssText = 'display: block; margin: 10px 0px; text-align: left; font-size: 200%;';
     a.href = url;
     a.download = 'battleLog.txt';
+    return a;
 }
 
 function timeRecordPlayer(battleRecords) {
-    let btcp = document.querySelector('#btcp');
-    if (!btcp) return;
     let div = document.createElement('div');
     div.id = 'time-records-div';
     cfgStats.darkMode && div.classList.add('dark-mode');
 
-    let riddleSolved = timeRecords.riddle.solved < timeRecords.riddle.total ? `${timeRecords.riddle.solved} / ` : '';
+    const recordRiddles = toStatsNumber(battleRecords?.riddle);
+    const solvedRiddles = toStatsNumber(timeRecords?.riddle?.solved);
+    const currentStartTime = new Date(timeRecords?.startTime || 0);
+    const currentTimestamp = Number.isNaN(currentStartTime.getTime())
+        ? ''
+        : currentStartTime.toISOString().slice(0, 19).replace('T', ' ');
+    const isCurrentRecord = Boolean(timeRecords?.startTime && battleRecords?.timestamp === currentTimestamp);
+    let riddleSolved = isCurrentRecord && solvedRiddles < recordRiddles ? `${solvedRiddles} / ` : '';
     div.innerText =
-        `${battleRecords.turns.toLocaleString()} ${t('tP.turns')}   ${battleRecords.deltaTime}  (${battleRecords.tps} ${t('tP.t/s')})   ` +
-        `${riddleSolved}${timeRecords.riddle.total} ${t('tP.riddle')}   ${combatRecords.use['Cloak of the Fallen'] || 0} ${t('tP.spark')}`;
-    btcp.appendChild(div);
+        `${toStatsNumber(battleRecords?.turns).toLocaleString()} ${t('tP.turns')}   ${battleRecords?.deltaTime || ''}  (${toStatsNumber(battleRecords?.tps)} ${t('tP.t/s')})   ` +
+        `${riddleSolved}${recordRiddles} ${t('tP.riddle')}   ${toStatsNumber(battleRecords?.combatRecords?.use?.['Cloak of the Fallen'])} ${t('tP.spark')}`;
+    return div;
 }
 
 function combatRecordPlayer(combatRecords) {
@@ -6089,9 +6178,7 @@ function combatRecordPlayer(combatRecords) {
 
     tbody.innerHTML = innerHTML;
     table.appendChild(tbody);
-    log.parentNode.insertBefore(table, log.parentNode.firstChild);
-
-    combatRecordPlayer_Use(combatRecords)
+    return table;
 }
 
 function combatRecordPlayer_Use(combatRecords) {
@@ -6131,14 +6218,10 @@ function combatRecordPlayer_Use(combatRecords) {
 
     tbody.innerHTML = innerHTML;
     table.appendChild(tbody);
-    let combatRecordsTable = document.querySelector('#combat-records-table');
-    combatRecordsTable.parentNode.insertBefore(table, combatRecordsTable.nextSibling);
+    return table;
 }
 
 function revenueRecordPlayer(revenueRecords, priceData) {
-    let btcp = document.querySelector('#btcp');
-    if (!btcp) return;
-
     let table = document.createElement('table');
     table.id = 'revenue-records-table';
     table.className = 'records-table';
@@ -6176,8 +6259,13 @@ function revenueRecordPlayer(revenueRecords, priceData) {
 
                 let items = [];
                 sortedKeys.forEach(sortedKey => {
-                    if (field.type === 'list_flat') items.push(...data[sortedKey]);
-                    else if (field.type === 'list_paired') items.push(`${t(`rP.${sortedKey}`)}: ${data[sortedKey]}`);
+                    if (field.type === 'list_flat') {
+                        const equipment = getEquipmentData(data[sortedKey]);
+                        if (equipment.names.length) items.push(...equipment.names);
+                        else if (equipment.count) items.push(`${t(`rP.${sortedKey}`)}: ${equipment.count.toLocaleString()}`);
+                    } else if (field.type === 'list_paired') {
+                        items.push(`${t(`rP.${sortedKey}`)}: ${data[sortedKey]}`);
+                    }
                 });
                 if (!items.length) break;
 
@@ -6204,7 +6292,7 @@ function revenueRecordPlayer(revenueRecords, priceData) {
 
                 const renderRow = (key, rowStyle) => {
                     let value = data[key];
-                    let balance = (field.type === 'grid_detailed') ? (value.drop - value.use) : value;
+                    let balance = field.type === 'grid_detailed' ? Math.round((value.drop - value.use) * 10) / 10 : value;
                     let unitPrice = priceData[key];
                     let tdClass = !isNaN(unitPrice) ? '' : ' class="noData"';
                     let tdUnitPrice = !isNaN(unitPrice) ? unitPrice.toLocaleString() : t('rP.noData');
@@ -6239,7 +6327,7 @@ function revenueRecordPlayer(revenueRecords, priceData) {
             case 'stamina': {
                 let staminaRecords = JSON.parse(localStorage.getItem(prefix + 'staminaRecords' + isekaiSuffix) || '{}');
                 let staminaCost = staminaRecords?.staminaCost ?? 0;
-                let staminaQuotaTotal = 24 + (!isekaiSuffix ? cfgBattle.dailyStaminaQuotaPlus : 0)
+                let staminaQuotaTotal = 24 + (!isekaiSuffix ? toStatsNumber(cfgBattle.dailyStaminaQuotaPlus) : 0);
                 let unitPrice = priceData['Energy Drink'] / 10;
                 let balance = -revenueRecords.staminaCost || 0;
                 let profit = Math.round(balance * unitPrice * 10) / 10;
@@ -6262,7 +6350,7 @@ function revenueRecordPlayer(revenueRecords, priceData) {
 
     tbody.innerHTML = innerHTML;
     table.appendChild(tbody);
-    btcp.appendChild(table);
+    return table;
 }
 
 //Indexed DB
@@ -6902,7 +6990,7 @@ function generateAggregate(data_array, type, timestamp_name = null) { //type: Av
     if (isAverage) {
         new_data.roundInfo.current = roundValue(new_data.roundInfo.current / divisor, 2);
         new_data.roundInfo.total = roundValue(new_data.roundInfo.total / divisor, 2);
-        new_data.riddle = roundValue(new_data.riddle / divisor, 1);
+        new_data.riddle = roundValue(new_data.riddle / divisor, 2);
 
         for (const categoryValue of Object.values(new_data.combatRecords)) {
             for (const fieldKey of Object.keys(categoryValue)) categoryValue[fieldKey] = roundValue(categoryValue[fieldKey] / divisor, 1);
@@ -6910,6 +6998,8 @@ function generateAggregate(data_array, type, timestamp_name = null) { //type: Av
         for (const [categoryKey, categoryValue] of Object.entries(new_data.revenueRecords)) {
             if (typeof categoryValue === 'number') {
                 new_data.revenueRecords[categoryKey] = roundValue(categoryValue / divisor, 1);
+            } else if (categoryKey === 'proficiency') {
+                for (const fieldKey of Object.keys(categoryValue)) categoryValue[fieldKey] = roundValue(categoryValue[fieldKey] / divisor, 3);
             } else if (categoryKey === 'equipment') {
                 for (const value of Object.values(categoryValue)) {
                     value.count = roundValue(value.count / divisor, 1);
@@ -6927,6 +7017,11 @@ function generateAggregate(data_array, type, timestamp_name = null) { //type: Av
             } else {
                 for (const fieldKey of Object.keys(categoryValue)) categoryValue[fieldKey] = roundValue(categoryValue[fieldKey] / divisor, 1);
             }
+        }
+    } else {
+        new_data.revenueRecords.staminaCost = roundValue(new_data.revenueRecords.staminaCost, 1);
+        for (const fieldKey of Object.keys(new_data.revenueRecords.proficiency || {})) {
+            new_data.revenueRecords.proficiency[fieldKey] = roundValue(new_data.revenueRecords.proficiency[fieldKey], 3);
         }
     }
 
@@ -7178,7 +7273,39 @@ function renderDynamicTable(battleRecords, displayedColumns, parent, emptyMessag
                 }
             }
 
-            if (value && typeof value === 'object' && 'drop' in value) {
+            if (field.id === 'date') {
+                td.textContent = value || '';
+                td.style.cursor = 'pointer';
+                td.title = '回放战斗记录';
+                td.addEventListener('pointerdown', event => {
+                    if (event.pointerType === 'mouse' && event.button !== 0) return;
+                    event.preventDefault();
+                    if (event.currentTarget.hasPointerCapture?.(event.pointerId)) {
+                        event.currentTarget.releasePointerCapture(event.pointerId);
+                    }
+
+                    const replayWindow = newWindow.open();
+                    if (!replayWindow) return;
+                    jpxMarket.getMarketPrice(false)
+                        .then(priceData => {
+                            const replayRecord = normalizeBattleRecordForReplay(record);
+                            newWindowRecordPlayer(
+                                false,
+                                replayRecord,
+                                timeRecordPlayer(replayRecord),
+                                combatRecordPlayer(replayRecord.combatRecords),
+                                combatRecordPlayer_Use(replayRecord.combatRecords),
+                                revenueRecordPlayer(replayRecord.revenueRecords, priceData),
+                                replayWindow
+                            );
+                        })
+                        .catch(err => {
+                            replayWindow.close();
+                            console.error('Failed to replay battle record:', err);
+                            jpxUtils.createToast('Failed to replay battle record: ' + err.message);
+                        });
+                });
+            } else if (value && typeof value === 'object' && 'drop' in value) {
                 td.classList.add('tooltip');
                 td.dataset.tooltip = `${t('sP.drop')}: ${value.drop.toLocaleString()}\n${t('sP.use')}: ${value.use.toLocaleString()}`;
                 td.textContent = value.balance.toLocaleString();
