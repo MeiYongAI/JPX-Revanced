@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         JPX-Revanced
 // @namespace    ijpx
-// @version      26.07.30.2
+// @version      26.08.01.1
 // @author       MeiYongAI
 // @icon         https://hentaiverse.org/y/favicon.png
 // @description  jpx
@@ -7452,45 +7452,49 @@ function saveSpellDamageBonus(maxType, maxValue) {
 }
 
 function refreshSpellDamageBonusFromStatsPane() {
+    const readText = (element) => {
+        if (!element) return '';
+        let text = element.innerText?.trim() || element.textContent?.trim();
+        if (text) return text;
+
+        let hvTextContainer = element.querySelector('div');
+        return hvTextContainer ? jpxUtils.parseHVClasses(hvTextContainer) : '';
+    };
+
     let spcArray = Array.from(document.querySelectorAll('.spc'));
-    let spellDamageBonusLabel = spcArray.find(spc =>
-        spc.innerText.includes('Spell Damage Bonus') ||
-        spc.innerText.includes('法术伤害加成') ||
-        spc.innerText.includes('魔法伤害加成') ||
-        jpxUtils.parseHVClasses(spc.querySelector('div')).includes('Spell Damage Bonus')
-    );
-    if (!spellDamageBonusLabel) return false;
+    let spellDamageBonusLabel = spcArray.find(spc => {
+        let text = readText(spc);
+        return text.includes('Spell Damage Bonus') ||
+            text.includes('法术伤害加成') ||
+            text.includes('魔法伤害加成');
+    });
+    let statsContainer = spellDamageBonusLabel?.nextElementSibling;
+    if (!statsContainer) return false;
 
     let maxValue = -Infinity;
     let maxType = '';
+    const updateMax = (valueText, typeText) => {
+        let value = parseFloat(valueText);
+        let type = normalizeSpellDamageType(typeText);
 
-    if (!isekaiSuffix) {
-        let spellDamageBonusArray = Array.from(spellDamageBonusLabel.nextElementSibling.children);
-        for (let i = 0; i < spellDamageBonusArray.length; i += 2) {
-            let valueText = spellDamageBonusArray[i].innerText || jpxUtils.parseHVClasses(spellDamageBonusArray[i].querySelector('div'));
-            let typeText = spellDamageBonusArray[i + 1].innerText || jpxUtils.parseHVClasses(spellDamageBonusArray[i + 1].querySelector('div'));
-            let value = parseFloat(valueText);
-            let type = normalizeSpellDamageType(typeText);
-
-            if (type && value > maxValue) {
-                maxValue = value;
-                maxType = type;
-            }
+        if (type && Number.isFinite(value) && value > maxValue) {
+            maxValue = value;
+            maxType = type;
         }
-    } else {
-        let rows = spellDamageBonusLabel.nextElementSibling.querySelectorAll('tr');
+    };
+
+    let rows = statsContainer.querySelectorAll('tr');
+    if (rows.length) {
         rows.forEach((tr) => {
             let tds = tr.querySelectorAll('td');
             if (tds.length < 2) return;
-
-            let value = parseFloat(tds[0].textContent.trim());
-            let type = normalizeSpellDamageType(tds[1].textContent.trim());
-
-            if (type && value > maxValue) {
-                maxValue = value;
-                maxType = type;
-            }
+            updateMax(readText(tds[0]), readText(tds[1]));
         });
+    } else {
+        let spellDamageBonusArray = Array.from(statsContainer.children);
+        for (let i = 0; i + 1 < spellDamageBonusArray.length; i += 2) {
+            updateMax(readText(spellDamageBonusArray[i]), readText(spellDamageBonusArray[i + 1]));
+        }
     }
 
     if (!maxType || !Number.isFinite(maxValue)) return false;
